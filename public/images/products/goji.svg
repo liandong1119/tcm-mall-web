@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="product-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff0f5"/>
+      <stop offset="100%" style="stop-color:#ffe4e1"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="2" dy="2"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="800" height="800" fill="url(#product-bg)"/>
+  
+  <!-- 枸杞图案 -->
+  <g transform="translate(400,400)" filter="url(#shadow)">
+    <!-- 枸杞果实群组 -->
+    <g>
+      <!-- 中心果实 -->
+      <ellipse cx="0" cy="0" rx="40" ry="30" fill="#dc143c"/>
+      
+      <!-- 周围果实 -->
+      <ellipse cx="-50" cy="-30" rx="35" ry="25" fill="#cd5c5c"/>
+      <ellipse cx="50" cy="-30" rx="35" ry="25" fill="#cd5c5c"/>
+      <ellipse cx="-30" cy="40" rx="35" ry="25" fill="#cd5c5c"/>
+      <ellipse cx="30" cy="40" rx="35" ry="25" fill="#cd5c5c"/>
+      
+      <!-- 小果实 -->
+      <ellipse cx="-70" cy="10" rx="25" ry="20" fill="#dc143c"/>
+      <ellipse cx="70" cy="10" rx="25" ry="20" fill="#dc143c"/>
+      <ellipse cx="0" cy="-60" rx="25" ry="20" fill="#dc143c"/>
+      <ellipse cx="0" cy="60" rx="25" ry="20" fill="#dc143c"/>
+    </g>
+    
+    <!-- 叶子 -->
+    <g stroke="#228b22" stroke-width="3" fill="none">
+      <path d="M-100,-100 C-80,-120 -40,-120 -20,-100" />
+      <path d="M100,-100 C80,-120 40,-120 20,-100" />
+      <path d="M-100,100 C-80,80 -40,80 -20,100" />
+      <path d="M100,100 C80,80 40,80 20,100" />
+    </g>
+  </g>
+  
+  <!-- 装饰元素 -->
+  <circle cx="200" cy="200" r="30" fill="#cd5c5c" opacity="0.1"/>
+  <circle cx="600" cy="600" r="30" fill="#cd5c5c" opacity="0.1"/>
+  
+  <!-- 产品名称 -->
+  <text x="400" y="700" font-family="Arial" font-size="48" fill="#8b4513" 
+        text-anchor="middle" font-weight="bold">
+    宁夏枸杞
+  </text>
+</svg> 

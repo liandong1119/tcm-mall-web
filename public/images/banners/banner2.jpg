@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1920" height="400" viewBox="0 0 1920 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景渐变 -->
+  <defs>
+    <linearGradient id="banner-bg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#A8E6CF"/>
+      <stop offset="100%" style="stop-color:#DCEDC1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="1920" height="400" fill="url(#banner-bg)"/>
+  
+  <!-- 中药材元素组 -->
+  <g transform="translate(300,200)">
+    <!-- 药材包 -->
+    <rect x="-50" y="-30" width="100" height="60" rx="10" 
+          fill="#8B4513" stroke="#654321" stroke-width="4"/>
+    <text x="0" y="10" font-family="Arial" font-size="16" fill="#fff" text-anchor="middle">
+      品质保证
+    </text>
+  </g>
+  
+  <!-- 装饰线条 -->
+  <path d="M500,100 Q960,50 1420,100" stroke="#4CAF50" stroke-width="2" fill="none"/>
+  <path d="M500,300 Q960,350 1420,300" stroke="#4CAF50" stroke-width="2" fill="none"/>
+  
+  <!-- 文字 -->
+  <text x="700" y="180" font-family="Arial" font-size="48" fill="#333" font-weight="bold">
+    品质中药 源自传统
+  </text>
+  <text x="700" y="250" font-family="Arial" font-size="24" fill="#666">
+    严选上等药材 传承古法炮制
+  </text>
+  
+  <!-- 装饰图案 -->
+  <g transform="translate(1600,200)">
+    <circle cx="0" cy="0" r="80" fill="#4CAF50" opacity="0.1"/>
+    <circle cx="40" cy="40" r="40" fill="#4CAF50" opacity="0.1"/>
+  </g>
+</svg> 

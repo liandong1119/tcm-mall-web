@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="960" height="1080" viewBox="0 0 960 1080" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="banner-gradient">
+      <stop stop-color="#2b9939" offset="0%"></stop>
+      <stop stop-color="#1d6926" offset="100%"></stop>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="960" height="1080" fill="url(#banner-gradient)"/>
+  
+  <!-- 装饰图案 -->
+  <g transform="translate(480, 540)" fill="#FFFFFF" fill-opacity="0.1">
+    <!-- 中药材图案 -->
+    <g filter="url(#glow)">
+      <!-- 人参 -->
+      <path d="M0,-200 C0,-150 -20,-100 -20,0 C-20,100 0,150 0,200" 
+            stroke="#FFFFFF" stroke-width="8" fill="none" stroke-opacity="0.3"/>
+      <path d="M-20,0 C-60,-20 -100,0 -120,40" 
+            stroke="#FFFFFF" stroke-width="6" fill="none" stroke-opacity="0.3"/>
+      <path d="M-20,0 C20,-20 60,0 80,40" 
+            stroke="#FFFFFF" stroke-width="6" fill="none" stroke-opacity="0.3"/>
+      
+      <!-- 灵芝 -->
+      <path d="M100,-100 C140,-120 180,-100 200,-60" 
+            stroke="#FFFFFF" stroke-width="8" fill="none" stroke-opacity="0.3"/>
+      <path d="M-100,100 C-140,80 -180,100 -200,140" 
+            stroke="#FFFFFF" stroke-width="8" fill="none" stroke-opacity="0.3"/>
+    </g>
+    
+    <!-- 圆形装饰 -->
+    <circle cx="-200" cy="-200" r="20" fill="#FFFFFF" fill-opacity="0.1"/>
+    <circle cx="200" cy="200" r="20" fill="#FFFFFF" fill-opacity="0.1"/>
+    <circle cx="0" cy="0" r="300" fill="none" stroke="#FFFFFF" 
+            stroke-width="2" stroke-opacity="0.1"/>
+  </g>
+  
+  <!-- 波浪装饰 -->
+  <path d="M0,1080 C240,1000 480,960 720,960 C960,960 960,1000 960,1080" 
+        fill="#FFFFFF" fill-opacity="0.1"/>
+  <path d="M0,1080 C240,1020 480,990 720,990 C960,990 960,1020 960,1080" 
+        fill="#FFFFFF" fill-opacity="0.15"/>
+  
+  <!-- 动态效果 -->
+  <g transform="translate(480, 540)">
+    <circle r="200" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-opacity="0.2">
+      <animate attributeName="r" values="190;210;190" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-opacity" values="0.2;0.1;0.2" dur="4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg> 
