@@ -89,11 +89,13 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import ProductCard from '@/components/ProductCard.vue'
-import { getProducts, getCategories } from '@/api/product'
+import { getProductList, getCategoryList } from '@/api/product'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 // 分类数据
 const categories = ref([])
@@ -108,10 +110,10 @@ const filters = ref({
 
 // 排序选项
 const sortOptions = [
-  { value: 'default', label: '默认排序' },
-  { value: 'price-asc', label: '价格从低到高' },
-  { value: 'price-desc', label: '价格从高到低' },
-  { value: 'sales', label: '销量优先' }
+  { value: 'default', label: t('product.sortBy.default') },
+  { value: 'price-asc', label: t('common.price') + ' ↑' },
+  { value: 'price-desc', label: t('common.price') + ' ↓' },
+  { value: 'sales', label: t('product.sortBy.sales') }
 ]
 
 // 分页数据
@@ -123,7 +125,7 @@ const products = ref([])
 // 获取分类数据
 const fetchCategories = async () => {
   try {
-    categories.value = await getCategories()
+    categories.value = await getCategoryList()
   } catch (error) {
     console.error('Failed to fetch categories:', error)
   }
@@ -132,7 +134,7 @@ const fetchCategories = async () => {
 // 获取商品数据
 const fetchProducts = async () => {
   try {
-    const { data, total: totalCount } = await getProducts({
+    const { data, total: totalCount } = await getProductList({
       page: currentPage.value,
       pageSize: pageSize.value,
       ...filters.value

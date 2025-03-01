@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { getUserInfo, login, logout } from '@/api/user'
+import { getUserInfo, login, logout, sendEmailCode } from '@/api/user'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -14,6 +14,17 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
+    // 发送邮箱验证码
+    async sendEmailCode(email) {
+      try {
+        await sendEmailCode(email)
+        return true
+      } catch (error) {
+        console.error('Send email code failed:', error)
+        return false
+      }
+    },
+
     setToken(token) {
       this.token = token
       localStorage.setItem('token', token)
