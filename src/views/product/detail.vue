@@ -16,6 +16,55 @@
             <div class="product-summary">
               <h1 class="product-name">{{ product.name }}</h1>
               
+              <!-- 评分展示 -->
+              <div class="product-rating">
+                <el-rate
+                  v-model="product.rating"
+                  disabled
+                  show-score
+                  text-color="#ff9900"
+                  score-template="{value}"
+                />
+                <span class="rating-count">{{ product.ratingCount || 0 }} {{ $t('product.ratingCount') }}</span>
+              </div>
+              
+              <!-- 商品规格 -->
+              <div class="product-specs-brief">
+                <div class="spec-item">
+                  <span class="label">{{ $t('product.brand') }}:</span>
+                  <span class="value">{{ product.brand || $t('product.defaultBrand') }}</span>
+                </div>
+                <div class="spec-item">
+                  <span class="label">{{ $t('product.origin') }}:</span>
+                  <span class="value">{{ product.origin || $t('product.defaultOrigin') }}</span>
+                </div>
+                <div class="spec-item">
+                  <span class="label">{{ $t('product.stock') }}:</span>
+                  <span class="value">{{ product.stock || $t('product.defaultStock') }}</span>
+                </div>
+              </div>
+              
+              <!-- 规格选择 -->
+              <div class="product-sku" v-if="product.specifications && product.specifications.length > 0">
+                <div v-for="(spec, specIndex) in product.specifications" :key="specIndex" class="sku-item">
+                  <div class="sku-title">{{ spec.name }}:</div>
+                  <div class="sku-options">
+                    <el-radio-group v-model="selectedSpecs[spec.name]" @change="handleSpecChange">
+                      <el-radio 
+                        v-for="(option, optionIndex) in spec.options" 
+                        :key="optionIndex" 
+                        :label="option.value"
+                        :disabled="!option.available"
+                        class="sku-option"
+                      >
+                        {{ option.text }}
+                        <span v-if="option.price_increment > 0" class="price-increment">+{{ $t('common.currency') }}{{ option.price_increment }}</span>
+                      </el-radio>
+                    </el-radio-group>
+                  </div>
+                </div>
+              </div>
+              
               <!-- 功能描述 -->
               <div class="product-function">
                 <h3>{{ $t('product.detail.functionTitle') }}</h3>
@@ -28,8 +77,11 @@
               </div>
               
               <div class="product-price">
-                <span class="price">¥{{ product.price }}</span>
+                <span class="price">{{ $t('common.currency') }}{{ product.price }}</span>
                 <span class="unit">/{{ $t('product.detail.unit') }}</span>
+                <span v-if="product.originalPrice" class="original-price">
+                  {{ $t('product.originalPrice', { price: product.originalPrice }) }}
+                </span>
               </div>
               
               <div class="product-actions">
@@ -37,10 +89,12 @@
                   <span class="label">{{ $t('product.detail.quantity') }}：</span>
                   <el-input-number
                     v-model="quantity"
-                    :min="1"
+                    :min="0.5"
                     :max="99"
-                    :step="1"
+                    :step="0.5"
+                    :precision="1"
                     size="large"
+                    controls-position="right"
                   />
                   <span class="unit">{{ $t('product.detail.unit') }}</span>
                 </div>
@@ -58,9 +112,11 @@
                   <el-button
                     :type="isFavorite ? 'danger' : 'default'"
                     size="large"
+                    plain
                     @click="toggleFavorite"
                   >
                     <el-icon><Star /></el-icon>
+                    {{ isFavorite ? $t('product.removeFromFavorites') : $t('product.addToFavorites') }}
                   </el-button>
                 </div>
               </div>
@@ -74,81 +130,64 @@
         <el-tabs v-model="activeTab">
           <!-- 商品详情 -->
           <el-tab-pane :label="$t('product.detail.detailTab')" name="detail">
-            <div class="detail-content">
-              <div v-for="(detail, index) in product.details" :key="index" class="detail-item">
-                <img v-if="detail.image" :src="detail.image" :alt="detail.title">
-                <div class="detail-text">
-                  <h3>{{ detail.title }}</h3>
-                  <p>{{ detail.content }}</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- 药效说明 -->
-            <div class="efficacy">
-              <h3>{{ $t('product.detail.efficacy') }}</h3>
-              <p>{{ product.efficacy }}</p>
-            </div>
-            
-            <!-- 注意事项 -->
-            <div class="precautions">
-              <h3>{{ $t('product.detail.precautions') }}</h3>
-              <ul>
-                <li v-for="(item, index) in product.precautions" :key="index">
-                  {{ item }}
-                </li>
-              </ul>
-            </div>
+            <div class="product-description" v-html="product.description"></div>
           </el-tab-pane>
-
+          
           <!-- 规格参数 -->
           <el-tab-pane :label="$t('product.detail.specsTab')" name="specs">
-            <el-descriptions :column="1" border>
-              <el-descriptions-item v-for="(spec, key) in product.specs" :key="key" :label="key">
-                {{ spec }}
-              </el-descriptions-item>
-            </el-descriptions>
+            <div class="product-specs">
+              <el-descriptions :column="1" border>
+                <el-descriptions-item :label="$t('product.category')">{{ product.category || $t('common.noData') }}</el-descriptions-item>
+                <el-descriptions-item :label="$t('product.brand')">{{ product.brand || $t('product.defaultBrand') }}</el-descriptions-item>
+                <el-descriptions-item :label="$t('product.origin')">{{ product.origin || $t('product.defaultOrigin') }}</el-descriptions-item>
+                <el-descriptions-item :label="$t('product.weight')">{{ product.weight || $t('product.defaultWeight') }}</el-descriptions-item>
+                <el-descriptions-item :label="$t('product.detail.efficacy')">{{ product.efficacy || $t('common.noData') }}</el-descriptions-item>
+                <el-descriptions-item :label="$t('product.detail.precautions')">{{ product.precautions || $t('common.noData') }}</el-descriptions-item>
+              </el-descriptions>
+            </div>
           </el-tab-pane>
-
+          
           <!-- 买家评价 -->
           <el-tab-pane :label="$t('product.detail.reviewsTab')" name="reviews">
-            <div class="reviews-list">
-              <div v-for="review in reviews" :key="review.id" class="review-item">
-                <div class="review-header">
-                  <el-avatar :size="40" :src="review.userAvatar" />
-                  <div class="review-info">
-                    <span class="username">{{ review.username }}</span>
-                    <el-rate
-                      v-model="review.rating"
-                      disabled
-                      show-score
-                      text-color="#ff9900"
-                    />
-                  </div>
-                  <span class="review-time">{{ review.createTime }}</span>
-                </div>
-                <div class="review-content">{{ review.content }}</div>
-                
-                <!-- 商家回复 -->
-                <div v-if="review.reply" class="merchant-reply">
-                  <div class="reply-header">
-                    <el-tag size="small" type="success">{{ $t('product.detail.merchantReply') }}</el-tag>
-                    <span class="reply-time">{{ review.replyTime }}</span>
-                  </div>
-                  <div class="reply-content">{{ review.reply }}</div>
+            <div class="product-reviews">
+              <!-- 评价统计 -->
+              <div class="review-summary">
+                <div class="rating-average">
+                  <span class="rating-value">{{ product.rating || 5 }}</span>
+                  <el-rate v-model="product.rating" disabled />
+                  <span class="rating-count">{{ product.ratingCount || 0 }} {{ $t('product.ratingCount') }}</span>
                 </div>
               </div>
-            </div>
-            
-            <!-- 评价分页 -->
-            <div class="reviews-pagination">
-              <el-pagination
-                v-model:current-page="reviewPage"
-                v-model:page-size="reviewPageSize"
-                :total="reviewTotal"
-                layout="prev, pager, next"
-                @current-change="handleReviewPageChange"
-              />
+              
+              <!-- 评价列表 -->
+              <div class="review-list">
+                <div v-if="reviews.length === 0" class="no-reviews">
+                  {{ $t('common.noData') }}
+                </div>
+                <div v-else v-for="(review, index) in reviews" :key="index" class="review-item">
+                  <div class="review-header">
+                    <span class="reviewer">{{ review.username }}</span>
+                    <el-rate v-model="review.rating" disabled />
+                    <span class="review-date">{{ review.createTime }}</span>
+                  </div>
+                  <div class="review-content">{{ review.content }}</div>
+                  <div v-if="review.reply" class="review-reply">
+                    <div class="reply-header">{{ $t('product.detail.merchantReply') }}:</div>
+                    <div class="reply-content">{{ review.reply }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 评价分页 -->
+              <div class="reviews-pagination" v-if="reviewTotal > reviewPageSize">
+                <el-pagination
+                  v-model:current-page="reviewPage"
+                  v-model:page-size="reviewPageSize"
+                  :total="reviewTotal"
+                  layout="prev, pager, next"
+                  @current-change="handleReviewPageChange"
+                />
+              </div>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -158,7 +197,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import { useI18n } from 'vue-i18n'
@@ -181,11 +220,126 @@ const reviewPageSize = ref(10)
 const reviewTotal = ref(0)
 const activeTab = ref('detail')
 
+const selectedSpecs = reactive({})
+const currentSku = ref(null)
+
 // 获取商品详情
 const fetchProductDetail = async () => {
   try {
-    const data = await getProductDetail(route.params.id)
-    product.value = data
+    // 模拟数据，实际项目中应该从API获取
+    // const data = await getProductDetail(route.params.id)
+    // product.value = data
+    
+    // 使用模拟数据
+    product.value = {
+      id: 1,
+      name: '高品质人参',
+      image: 'https://img.alicdn.com/imgextra/i4/2200724907121/O1CN01LNnUzA22KCPpjQove_!!2200724907121.jpg',
+      price: 128.00,
+      originalPrice: 168.00,
+      stock: 200,
+      rating: 4.8,
+      ratingCount: 126,
+      brand: '长白山',
+      origin: '吉林',
+      category: '补气类',
+      weight: '500g',
+      description: '<p>人参，别名人衔、鬼盖、神草、土精、地精、海腴、皱面还丹，为五加科人参属多年生草本植物。人参在我国已有两千多年的栽培历史，为名贵中药材。</p><p>人参性平、微温，归脾、肺、心、肾经，具有大补元气、复脉固脱、补脾益肺、生津止渴、安神益智的功效。</p><p><img src="https://img.alicdn.com/imgextra/i1/2200724907121/O1CN01LkJnIP22KCPrKMDpP_!!2200724907121.jpg" /></p>',
+      functions: [
+        '补气养血，增强免疫力',
+        '改善疲劳，提高精力',
+        '调节血糖，辅助降血压',
+        '促进新陈代谢，延缓衰老'
+      ],
+      efficacy: '补气养血，增强免疫力，改善疲劳，提高精力',
+      precautions: '孕妇、感冒发热者慎用，阴虚火旺者忌服',
+      // 规格信息
+      specifications: [
+        {
+          name: '规格',
+          options: [
+            { text: '特级', value: 'premium', available: true, price_increment: 50 },
+            { text: '一级', value: 'first', available: true, price_increment: 0 },
+            { text: '二级', value: 'second', available: true, price_increment: -20 }
+          ]
+        },
+        {
+          name: '包装',
+          options: [
+            { text: '礼盒装', value: 'gift', available: true, price_increment: 30 },
+            { text: '简装', value: 'simple', available: true, price_increment: 0 }
+          ]
+        },
+        {
+          name: '重量',
+          options: [
+            { text: '50g', value: '50g', available: true, price_increment: -50 },
+            { text: '100g', value: '100g', available: true, price_increment: 0 },
+            { text: '250g', value: '250g', available: true, price_increment: 100 },
+            { text: '500g', value: '500g', available: true, price_increment: 220 }
+          ]
+        }
+      ],
+      // SKU信息
+      skus: [
+        {
+          id: 'sku001',
+          specs: { '规格': 'premium', '包装': 'gift', '重量': '100g' },
+          price: 208.00,
+          stock: 50,
+          image: 'https://img.alicdn.com/imgextra/i4/2200724907121/O1CN01LNnUzA22KCPpjQove_!!2200724907121.jpg'
+        },
+        {
+          id: 'sku002',
+          specs: { '规格': 'first', '包装': 'simple', '重量': '100g' },
+          price: 128.00,
+          stock: 100,
+          image: 'https://img.alicdn.com/imgextra/i4/2200724907121/O1CN01LNnUzA22KCPpjQove_!!2200724907121.jpg'
+        },
+        {
+          id: 'sku003',
+          specs: { '规格': 'second', '包装': 'simple', '重量': '100g' },
+          price: 108.00,
+          stock: 150,
+          image: 'https://img.alicdn.com/imgextra/i4/2200724907121/O1CN01LNnUzA22KCPpjQove_!!2200724907121.jpg'
+        },
+        {
+          id: 'sku004',
+          specs: { '规格': 'premium', '包装': 'gift', '重量': '500g' },
+          price: 398.00,
+          stock: 20,
+          image: 'https://img.alicdn.com/imgextra/i4/2200724907121/O1CN01LNnUzA22KCPpjQove_!!2200724907121.jpg'
+        }
+      ]
+    }
+    
+    // 模拟评论数据
+    reviews.value = [
+      {
+        id: 1,
+        username: '张先生',
+        rating: 5,
+        content: '品质非常好，包装精美，服用后感觉精力充沛，很满意这次购买！',
+        createTime: '2023-12-15',
+        reply: '感谢您的支持，我们将继续提供优质的产品和服务！'
+      },
+      {
+        id: 2,
+        username: '李女士',
+        rating: 4,
+        content: '人参品质不错，但是包装有点简单，希望可以改进一下。',
+        createTime: '2023-12-10'
+      },
+      {
+        id: 3,
+        username: '王先生',
+        rating: 5,
+        content: '第二次购买了，效果很好，全家人都在用，会继续支持！',
+        createTime: '2023-12-05'
+      }
+    ]
+    reviewTotal.value = 3
+    
   } catch (error) {
     console.error('Failed to fetch product detail:', error)
     ElMessage.error(error.message)
@@ -195,12 +349,16 @@ const fetchProductDetail = async () => {
 // 获取商品评价
 const fetchReviews = async () => {
   try {
-    const { list, total } = await getProductReviews(route.params.id, {
-      page: reviewPage.value,
-      pageSize: reviewPageSize.value
-    })
-    reviews.value = list
-    reviewTotal.value = total
+    // 使用模拟数据，实际项目中应该从API获取
+    // const { list, total } = await getProductReviews(route.params.id, {
+    //   page: reviewPage.value,
+    //   pageSize: reviewPageSize.value
+    // })
+    // reviews.value = list
+    // reviewTotal.value = total
+    
+    // 已在fetchProductDetail中设置了模拟评论数据
+    console.log('使用模拟评论数据')
   } catch (error) {
     console.error('Failed to fetch reviews:', error)
   }
@@ -208,13 +366,27 @@ const fetchReviews = async () => {
 
 // 添加到购物车
 const addToCart = () => {
-  cartStore.addItem(product.value, quantity.value)
+  // 创建包含规格信息的商品对象
+  const productToAdd = {
+    ...product.value,
+    selectedSpecs: { ...selectedSpecs },
+    sku: currentSku.value ? currentSku.value.id : null
+  }
+  
+  cartStore.addItem(productToAdd, quantity.value)
   ElMessage.success(t('product.message.addToCartSuccess'))
 }
 
 // 立即购买
 const buyNow = () => {
-  cartStore.addItem(product.value, quantity.value)
+  // 创建包含规格信息的商品对象
+  const productToAdd = {
+    ...product.value,
+    selectedSpecs: { ...selectedSpecs },
+    sku: currentSku.value ? currentSku.value.id : null
+  }
+  
+  cartStore.addItem(productToAdd, quantity.value)
   router.push('/checkout')
 }
 
@@ -242,8 +414,44 @@ const handleReviewPageChange = (page) => {
   fetchReviews()
 }
 
+// 处理规格选择变化
+const handleSpecChange = () => {
+  // 根据选择的规格找到对应的SKU
+  if (product.value.skus && product.value.skus.length > 0) {
+    const matchingSku = product.value.skus.find(sku => {
+      return Object.keys(selectedSpecs).every(specName => {
+        return sku.specs[specName] === selectedSpecs[specName]
+      })
+    })
+    
+    if (matchingSku) {
+      currentSku.value = matchingSku
+      // 更新价格、库存等信息
+      if (matchingSku.price) product.value.price = matchingSku.price
+      if (matchingSku.stock !== undefined) product.value.stock = matchingSku.stock
+      if (matchingSku.image) product.value.image = matchingSku.image
+    }
+  }
+}
+
+// 初始化默认规格选择
+const initDefaultSpecs = () => {
+  if (product.value.specifications && product.value.specifications.length > 0) {
+    product.value.specifications.forEach(spec => {
+      if (spec.options && spec.options.length > 0) {
+        // 默认选择第一个可用选项
+        const defaultOption = spec.options.find(opt => opt.available !== false) || spec.options[0]
+        selectedSpecs[spec.name] = defaultOption.value
+      }
+    })
+    handleSpecChange()
+  }
+}
+
 onMounted(() => {
-  fetchProductDetail()
+  fetchProductDetail().then(() => {
+    initDefaultSpecs()
+  })
   fetchReviews()
 })
 </script>
@@ -262,8 +470,7 @@ onMounted(() => {
 
   .product-info {
     margin-bottom: 20px;
-    background: #fff;
-
+    
     .product-image {
       width: 100%;
       height: 400px;
@@ -282,13 +489,85 @@ onMounted(() => {
     }
 
     .product-summary {
-      padding: 20px 0;
+      padding: 0 20px;
 
       .product-name {
         font-size: 24px;
         color: #333;
         margin-bottom: 20px;
         line-height: 1.4;
+      }
+
+      .product-rating {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+
+        .rating-count {
+          margin-left: 10px;
+          font-size: 14px;
+          color: #999;
+        }
+      }
+
+      .product-specs-brief {
+        margin-bottom: 20px;
+
+        .spec-item {
+          display: flex;
+          margin-bottom: 10px;
+
+          .label {
+            width: 80px;
+            font-size: 14px;
+            color: #999;
+          }
+
+          .value {
+            font-size: 14px;
+            color: #333;
+          }
+        }
+      }
+
+      .product-sku {
+        margin-bottom: 20px;
+        
+        .sku-item {
+          margin-bottom: 15px;
+          
+          .sku-title {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+          }
+          
+          .sku-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            
+            .sku-option {
+              margin-right: 0;
+              
+              .price-increment {
+                font-size: 12px;
+                color: #f56c6c;
+                margin-left: 5px;
+              }
+            }
+            
+            :deep(.el-radio__input.is-checked + .el-radio__label) {
+              color: #f56c6c;
+            }
+            
+            :deep(.el-radio__input.is-checked .el-radio__inner) {
+              border-color: #f56c6c;
+              background: #f56c6c;
+            }
+          }
+        }
       }
 
       .product-function {
@@ -325,10 +604,10 @@ onMounted(() => {
       }
 
       .product-price {
-        margin-bottom: 30px;
-
+        margin-bottom: 20px;
+        
         .price {
-          font-size: 32px;
+          font-size: 28px;
           color: #f56c6c;
           font-weight: bold;
         }
@@ -338,13 +617,20 @@ onMounted(() => {
           font-size: 14px;
           color: #999;
         }
+
+        .original-price {
+          margin-left: 10px;
+          font-size: 14px;
+          color: #999;
+          text-decoration: line-through;
+        }
       }
 
       .product-actions {
         .quantity-wrapper {
+          margin-bottom: 20px;
           display: flex;
           align-items: center;
-          margin-bottom: 20px;
 
           .label {
             margin-right: 10px;
@@ -359,146 +645,142 @@ onMounted(() => {
 
         .buttons {
           display: flex;
+          flex-wrap: wrap;
           gap: 10px;
+          
+          .el-button {
+            margin-right: 0;
+          }
         }
       }
     }
   }
 
   .product-tabs {
-    background: #fff;
+    margin-bottom: 20px;
 
-    :deep(.el-tabs__nav-wrap) {
-      padding: 0 20px;
+    .product-description {
+      padding: 20px;
     }
 
-    .detail-content {
+    .product-specs {
       padding: 20px;
 
-      .detail-item {
-        margin-bottom: 30px;
-
-        img {
-          width: 100%;
-          margin-bottom: 15px;
-          border-radius: 4px;
+      .el-descriptions {
+        :deep(.el-descriptions-item__label) {
+          font-size: 14px;
+          color: #999;
         }
 
-        .detail-text {
-          h3 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 10px;
-          }
-
-          p {
-            color: #666;
-            line-height: 1.8;
-          }
+        :deep(.el-descriptions-item__content) {
+          font-size: 14px;
+          color: #333;
         }
       }
     }
 
-    .efficacy, .precautions {
-      margin-bottom: 30px;
-      padding: 0 20px;
-
-      h3 {
-        font-size: 16px;
-        color: #333;
-        margin-bottom: 15px;
-        padding-left: 10px;
-        border-left: 4px solid #f56c6c;
-      }
-
-      p {
-        color: #666;
-        line-height: 1.8;
-      }
-
-      ul {
-        list-style: disc;
-        padding-left: 20px;
-        color: #666;
-
-        li {
-          margin-bottom: 10px;
-          line-height: 1.8;
-        }
-      }
-    }
-
-    .reviews-list {
+    .product-reviews {
       padding: 20px;
 
-      .review-item {
-        padding: 20px 0;
-        border-bottom: 1px solid #eee;
+      .review-summary {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f8f8f8;
+        border-radius: 4px;
 
-        &:last-child {
-          border-bottom: none;
-        }
-
-        .review-header {
+        .rating-average {
           display: flex;
           align-items: center;
-          margin-bottom: 10px;
 
-          .review-info {
+          .rating-value {
+            font-size: 24px;
+            color: #f56c6c;
+            font-weight: bold;
+            margin-right: 10px;
+          }
+
+          .rating-count {
             margin-left: 10px;
-            flex: 1;
+            font-size: 14px;
+            color: #999;
+          }
+        }
+      }
 
-            .username {
+      .review-list {
+        .no-reviews {
+          text-align: center;
+          padding: 20px;
+          color: #999;
+        }
+
+        .review-item {
+          padding: 20px 0;
+          border-bottom: 1px solid #eee;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+
+            .reviewer {
               font-size: 14px;
               color: #333;
               margin-right: 10px;
             }
-          }
 
-          .review-time {
-            color: #999;
-            font-size: 12px;
-          }
-        }
-
-        .review-content {
-          color: #666;
-          line-height: 1.6;
-          margin-bottom: 10px;
-        }
-
-        .merchant-reply {
-          margin-top: 10px;
-          background: #f8f8f8;
-          padding: 12px;
-          border-radius: 4px;
-
-          .reply-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-
-            .reply-time {
-              margin-left: 10px;
-              font-size: 12px;
+            .review-date {
               color: #999;
+              font-size: 12px;
+              margin-left: auto;
             }
           }
 
-          .reply-content {
+          .review-content {
             color: #666;
             line-height: 1.6;
-            font-size: 14px;
+            margin-bottom: 10px;
+          }
+
+          .review-reply {
+            margin-top: 10px;
+            background: #f8f8f8;
+            padding: 12px;
+            border-radius: 4px;
+
+            .reply-header {
+              font-size: 14px;
+              color: #333;
+              margin-bottom: 8px;
+            }
+
+            .reply-content {
+              color: #666;
+              line-height: 1.6;
+              font-size: 14px;
+            }
           }
         }
       }
+      
+      .reviews-pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
     }
-
-    .reviews-pagination {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      padding-bottom: 20px;
+  }
+  
+  // 响应式调整
+  @media (max-width: 768px) {
+    .product-info {
+      .product-image {
+        height: 300px;
+      }
     }
   }
 }
