@@ -204,6 +204,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { ShoppingCart, Star, Check } from '@element-plus/icons-vue'
 import { getProductDetail, getProductReviews } from '@/api/product'
+import { getProductStats, getProductSpecs } from '@/api/mock'
 import { addToFavorite, removeFavorite } from '@/api/favorite'
 
 const route = useRoute()
@@ -219,6 +220,8 @@ const reviewPage = ref(1)
 const reviewPageSize = ref(10)
 const reviewTotal = ref(0)
 const activeTab = ref('detail')
+const productStats = ref({})
+const productSpecs = ref([])
 
 const selectedSpecs = reactive({})
 const currentSku = ref(null)
@@ -311,6 +314,15 @@ const fetchProductDetail = async () => {
           image: 'https://img.alicdn.com/imgextra/i4/2200724907121/O1CN01LNnUzA22KCPpjQove_!!2200724907121.jpg'
         }
       ]
+    }
+    
+    // 获取商品评价统计
+    productStats.value = await getProductStats(product.value.id)
+    
+    // 获取商品规格信息
+    const specsData = await getProductSpecs(product.value.id)
+    if (specsData) {
+      productSpecs.value = specsData
     }
     
     // 模拟评论数据

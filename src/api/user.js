@@ -3,6 +3,23 @@ import * as mockApi from './mock'
 
 const USE_MOCK = true // 控制是否使用Mock数据
 
+// 发送邮箱验证码
+export function sendEmailCode(email) {
+  if (USE_MOCK) {
+    // 模拟发送邮箱验证码
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(true)
+      }, 500)
+    })
+  }
+  return request({
+    url: '/user/email/code',
+    method: 'post',
+    data: { email }
+  })
+}
+
 // 用户登录
 export function login(data) {
   if (USE_MOCK) return mockApi.login(data)
