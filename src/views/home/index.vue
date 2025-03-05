@@ -127,7 +127,7 @@ const fetchCategories = async () => {
 const fetchProducts = async () => {
   try {
     const params = {
-      page: currentPage.value,
+      pageNum: currentPage.value,
       pageSize: pageSize.value,
       query: searchQuery.value,
       categoryId: activeCategory.value === 'all' ? undefined : activeCategory.value

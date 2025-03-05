@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import * as mockApi from './mock'
 
-const USE_MOCK = true
+const USE_MOCK = false
 
 // 获取消息通知列表
 export function getNotifications(params) {

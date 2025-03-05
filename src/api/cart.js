@@ -1,13 +1,14 @@
 import request from '@/utils/request'
 import * as mockApi from './mock'
 
-const USE_MOCK = true
+const USE_MOCK = false
 
 // 获取购物车列表
-export function getCartList() {
+export function getCartList(queryPage) {
   if (USE_MOCK) return mockApi.getCartList()
   return request({
     url: '/cart',
+    params:queryPage,
     method: 'get'
   })
 }

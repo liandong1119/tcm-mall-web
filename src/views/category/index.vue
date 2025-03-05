@@ -95,7 +95,7 @@ const fetchProducts = async () => {
   loading.value = true
   try {
     const params = {
-      page: currentPage.value,
+      pageNum: currentPage.value,
       pageSize: pageSize.value
     }
     const { list, total: totalCount } = await getCategoryProducts(currentCategory.value, params)

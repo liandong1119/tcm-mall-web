@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import * as mockApi from './mock'
 
-const USE_MOCK = true // 控制是否使用Mock数据
+const USE_MOCK = false // 控制是否使用Mock数据
 
 // 获取首页数据
 export function getHomeData() {

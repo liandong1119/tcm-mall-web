@@ -156,6 +156,7 @@ const handleSubmit = async () => {
       rememberMe: form.rememberMe
     })
 
+      console.log("当前的请求是否成功；",success)
     if (success) {
       ElMessage.success(t('message.loginSuccess'))
       const redirect = route.query.redirect || '/'

@@ -1,199 +1,233 @@
 <template>
-  <div class="cart-page">
-    <div class="container">
-      <el-card class="cart-container">
-        <template #header>
-          <div class="cart-header">
-            <h2>{{ $t('cart.title') }}</h2>
-            <el-button
-              v-if="cartStore.items.length"
-              type="danger"
-              link
-              @click="handleClearCart"
-            >
-              {{ $t('cart.clear') }}
-            </el-button>
-          </div>
-        </template>
+    <div class="cart-page">
+        <div class="container">
 
-        <!-- 空购物车 -->
-        <div v-if="!cartStore.items.length" class="empty-cart">
-          <el-empty :description="$t('cart.empty')">
-            <el-button type="primary" @click="$router.push('/')">
-              {{ $t('cart.goShopping') }}
-            </el-button>
-          </el-empty>
-        </div>
 
-        <!-- 购物车列表 -->
-        <template v-else>
-          <!-- 商品列表 -->
-          <div class="cart-list">
-            <div class="cart-item" v-for="item in cartStore.items" :key="item.id">
-              <el-checkbox v-model="item.selected" @change="handleItemSelect" />
-              
-              <div class="item-info">
-                <el-image :src="item.image" :alt="item.name" class="item-image" />
-                <div class="item-details">
-                  <h3 class="item-name">{{ item.name }}</h3>
-                  <p class="item-price">¥{{ item.price.toFixed(2) }}/{{ $t('cart.unit') }}</p>
+            <el-card class="cart-container">
+                <template #header>
+                    <div class="cart-header">
+                        <h2>{{ $t('cart.title') }}</h2>
+                        <el-button
+                                v-if="cartStore.items.length"
+                                type="danger"
+                                link
+                                @click="handleClearCart"
+                        >
+                            {{ $t('cart.clear') }}
+                        </el-button>
+                    </div>
+                </template>
+
+<!--                -->
+                <!-- 空购物车 -->
+                <div v-if="!cartStore.items.length" class="empty-cart">
+                    <el-empty :description="$t('cart.empty')">
+                        <el-button type="primary" @click="$router.push('/')">
+                            {{ $t('cart.goShopping') }}
+                        </el-button>
+                    </el-empty>
                 </div>
-              </div>
-              
-              <div class="item-quantity">
-                <span class="quantity-label">{{ $t('cart.quantity') }}：</span>
-                <el-input-number 
-                  v-model="item.quantity" 
-                  :min="0.1" 
-                  :max="99.9"
-                  :step="0.1"
-                  :precision="1"
-                  size="small"
-                  @change="(val) => handleQuantityChange(item.id, val)"
-                />
-                <span class="unit">{{ $t('cart.unit') }}</span>
-              </div>
-              
-              <div class="item-subtotal">
-                <span class="subtotal-label">{{ $t('cart.subtotal') }}：</span>
-                <span class="subtotal-amount">¥{{ (item.price * item.quantity).toFixed(2) }}</span>
-              </div>
-              
-              <div class="item-actions">
-                <el-button 
-                  type="danger" 
-                  size="small" 
-                  @click="handleRemoveItem(item.id)"
-                >
-                  {{ $t('common.delete') }}
-                </el-button>
-              </div>
-            </div>
-          </div>
 
-          <!-- 底部结算栏 -->
-          <div class="cart-footer">
-            <div class="select-all">
-              <el-checkbox 
-                v-model="isAllSelected"
-                @change="handleSelectAll"
-              >
-                {{ $t('cart.selectAll') }}
-              </el-checkbox>
-            </div>
-            
-            <div class="cart-total">
+                <!-- 购物车列表 -->
+                <template v-else>
+                    <!-- 商品列表 -->
+                    <div class="cart-list">
+                        <div class="cart-item" v-for="item in cartStore.items" :key="item.id">
+                            <el-checkbox v-model="item.selected" @change="handleItemSelect"/>
+
+                            <div class="item-info">
+                                <el-image :src="item.image" :alt="item.name" class="item-image"/>
+                                <div class="item-details">
+                                    <h3 class="item-name">{{ item.name }}</h3>
+                                    <p class="item-price">¥{{ item.price}}/{{ $t('cart.unit') }}</p>
+                                </div>
+                            </div>
+
+                            <div class="item-quantity">
+                                <span class="quantity-label">{{ $t('cart.quantity') }}：</span>
+                                <el-input-number
+                                        v-model="item.quantity"
+                                        :min="0.1"
+                                        :max="99.9"
+                                        :step="0.1"
+                                        :precision="1"
+                                        size="small"
+                                        @change="(val) => handleQuantityChange(item.id, val)"
+                                />
+                                <span class="unit">{{ $t('cart.unit') }}</span>
+                            </div>
+
+                            <div class="item-subtotal">
+                                <span class="subtotal-label">{{ $t('cart.subtotal') }}：</span>
+                                <span class="subtotal-amount">¥{{ (item.price * item.quantity) }}</span>
+                            </div>
+
+                            <div class="item-actions">
+                                <el-button
+                                        type="danger"
+                                        size="small"
+                                        @click="handleRemoveItem(item.id)"
+                                >
+                                    {{ $t('common.delete') }}
+                                </el-button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部结算栏 -->
+                    <div class="cart-footer">
+                        <div class="select-all">
+                            <el-checkbox
+                                    v-model="isAllSelected"
+                                    @change="handleSelectAll"
+                            >
+                                {{ $t('cart.selectAll') }}
+                            </el-checkbox>
+                        </div>
+
+                        <div class="cart-total">
               <span class="selected-count">
                 {{ $t('cart.selected') }}
                 <span class="count">{{ cartStore.selectedCount }}</span>
                 {{ $t('cart.items') }}
               </span>
-              <span class="total-label">{{ $t('cart.total') }}：</span>
-              <span class="total-amount">¥{{ cartStore.selectedAmount.toFixed(2) }}</span>
-              <el-button 
-                type="danger" 
-                size="large"
-                :disabled="!cartStore.selectedCount"
-                @click="handleCheckout"
-              >
-                {{ $t('cart.checkout') }}
-              </el-button>
+                            <span class="total-label">{{ $t('cart.total') }}：</span>
+                            <span class="total-amount">¥{{ cartStore.selectedAmount }}</span>
+                            <el-button
+                                    type="danger"
+                                    size="large"
+                                    :disabled="!cartStore.selectedCount"
+                                    @click="handleCheckout"
+                            >
+                                {{ $t('cart.checkout') }}
+                            </el-button>
+                        </div>
+                    </div>
+                </template>
+            </el-card>
+            <div class="cart-item" v-for="item in cartStore.items" :key="item.id">
+                {{item.medicinalName}}
             </div>
-          </div>
-        </template>
-      </el-card>
+        </div>
     </div>
-  </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCartStore } from '@/stores/cart'
-import { useI18n } from 'vue-i18n'
-import { ElMessageBox, ElMessage } from 'element-plus'
+import {computed, onMounted, ref, watch} from 'vue'
+import {useRouter} from 'vue-router'
+import {useCartStore} from '@/stores/cart'
+import {useI18n} from 'vue-i18n'
+import {ElMessageBox, ElMessage} from 'element-plus'
+import {getCartList} from "@/api/cart";
+import {generateCartItems} from "@/utils/mockData";
+
+// await getCartList().then(res => {
+//     const {code,msg,data} = res.data
+//     if (code === 200){
+//         localStorage.setItem("cartItems",data)
+//     }else{
+//         ElMessage.error(msg)
+//     }
+// })
+
+// const data = generateCartItems(3)
+// console.log("这是一个测试：",data)
+// const cartItems = ref({})
+
+// // Vue3在组件加载的时候就获取数据
+// onMounted(async () => {
+//     console.log("开始获取数据")
+//     getCartList({pageNum: 1, pageSize: 7}).then(res => {
+//         console.log("获取到的响应：", res)
+//     })
+//
+// })
+
+
 
 const router = useRouter()
 const cartStore = useCartStore()
-const { t } = useI18n()
-
+const {t} = useI18n()
+cartStore.loadCart()
 const cartItems = computed(() => cartStore.items)
 
+watch(cartStore.items,() => {
+    console.log("数据发生了变化：：：：", cartStore.items)})
 // 选中商品数量
 const selectedCount = computed(() => {
-  return cartItems.value.filter(item => item.selected).length
+    return cartItems.value.filter(item => item.selected).length
 })
 
 // 总金额
 const totalAmount = computed(() => {
-  return cartItems.value
-    .filter(item => item.selected)
-    .reduce((total, item) => total + item.price * item.quantity, 0)
+    return cartItems.value
+        .filter(item => item.selected)
+        .reduce((total, item) => total + item.price * item.quantity, 0)
 })
 
 // 是否全选
 const isAllSelected = computed({
-  get: () => {
-    return cartItems.value.length > 0 && cartItems.value.every(item => item.selected)
-  },
-  set: (value) => {
-    cartItems.value.forEach(item => item.selected = value)
-  }
+    get: () => {
+        return cartItems.value.length > 0 && cartItems.value.every(item => item.selected)
+    },
+    set: (value) => {
+        cartItems.value.forEach(item => item.selected = value)
+    }
 })
 
 // 全选/取消全选
 const handleSelectAll = (value) => {
-  cartItems.value.forEach(item => item.selected = value)
+    cartItems.value.forEach(item => item.selected = value)
 }
 
 // 选择单个商品
 const handleItemSelect = () => {
-  // 更新本地存储
-  cartStore.saveToStorage()
+    // 更新本地存储
+    cartStore.saveToStorage()
 }
 
 // 修改商品数量
 const handleQuantityChange = (id, quantity) => {
-  cartStore.updateQuantity(id, quantity)
+    cartStore.updateQuantity(id, quantity)
 }
 
 // 删除商品
 const handleRemoveItem = (id) => {
-  ElMessageBox.confirm(
-    t('cart.message.deleteConfirm'),
-    t('common.warning'),
-    {
-      confirmButtonText: t('common.confirm'),
-      cancelButtonText: t('common.cancel'),
-      type: 'warning'
-    }
-  ).then(() => {
-    cartStore.removeItem(id)
-    ElMessage.success(t('cart.message.deleteSuccess'))
-  })
+    ElMessageBox.confirm(
+        t('cart.message.deleteConfirm'),
+        t('common.warning'),
+        {
+            confirmButtonText: t('common.confirm'),
+            cancelButtonText: t('common.cancel'),
+            type: 'warning'
+        }
+    ).then(() => {
+        cartStore.removeItem(id)
+        ElMessage.success(t('cart.message.deleteSuccess'))
+    })
 }
 
 // 清空购物车
 const handleClearCart = () => {
-  ElMessageBox.confirm(
-    t('cart.message.clearConfirm'),
-    t('common.warning'),
-    {
-      confirmButtonText: t('common.confirm'),
-      cancelButtonText: t('common.cancel'),
-      type: 'warning'
-    }
-  ).then(() => {
-    cartStore.clear()
-    ElMessage.success(t('cart.message.clearSuccess'))
-  })
+    ElMessageBox.confirm(
+        t('cart.message.clearConfirm'),
+        t('common.warning'),
+        {
+            confirmButtonText: t('common.confirm'),
+            cancelButtonText: t('common.cancel'),
+            type: 'warning'
+        }
+    ).then(() => {
+        cartStore.clear()
+        ElMessage.success(t('cart.message.clearSuccess'))
+    })
 }
 
 // 结算
 const handleCheckout = () => {
-  if (selectedCount.value > 0) {
-    router.push('/checkout')
-  }
+    if (selectedCount.value > 0) {
+        router.push('/checkout')
+    }
 }
 </script>
 

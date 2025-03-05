@@ -17,7 +17,7 @@ service.interceptors.request.use(
     // 从 localStorage 获取 token
     const token = localStorage.getItem('token')
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
+      config.headers['token'] = `Bearer ${token}`
     }
     return config
   },
@@ -30,14 +30,23 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   response => {
-    const { code, message, data } = response.data
-
-    if (code === 0) {
+    const { code, msg, data } = response.data
+    if (code === 200) {
       return data
     }
+    if (code === 1002 || code === 1010 || code === 1013){
+        ElMessage.error('用户登录已失效，请重新登录！')
+        localStorage.removeItem('token')
+        router.push({
+            path: '/user/login',
+            query: { redirect: router.currentRoute.value.fullPath }
+        })
+        return Promise.reject(new Error(t('message.sessionExpired'))); // 直接返回 Promise.reject
 
-    ElMessage.error(message || 'Error')
-    return Promise.reject(new Error(message || 'Error'))
+    }
+
+    ElMessage.error(msg || 'Error')
+    return Promise.reject(new Error(msg || 'Error'))
   },
   error => {
     if (error.response) {

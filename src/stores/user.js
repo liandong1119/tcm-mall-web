@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { getUserInfo, login, logout, sendEmailCode } from '@/api/user'
+import { ElMessage } from 'element-plus'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -41,12 +42,14 @@ export const useUserStore = defineStore('user', {
 
     async login(credentials) {
       try {
-        const { token, userInfo } = await login(credentials)
+        const { token,userInfo } = await login(credentials)
+
+        // 判断是否是200
+        console.log('Login successful:', token, userInfo)
         this.setToken(token)
         this.setUserInfo(userInfo)
         return true
       } catch (error) {
-        console.error('Login failed:', error)
         return false
       }
     },

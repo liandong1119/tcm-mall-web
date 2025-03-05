@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import {getCartList} from "@/api/cart";
 
 export const useCartStore = defineStore('cart', () => {
   const items = ref(JSON.parse(localStorage.getItem('cartItems') || '[]'))
@@ -24,6 +25,26 @@ export const useCartStore = defineStore('cart', () => {
   const selectedAmount = computed(() => {
     return selectedItems.value.reduce((total, item) => total + item.price * item.quantity, 0)
   })
+
+  /**
+   * 从服务端加载数据
+   */
+  function loadCart() {
+    getCartList({pageNum: 1, pageSize: 7}).then(res => {
+      console.log("这是store中的数据：：：：：：",res)
+      localStorage.setItem('cartItems',JSON.stringify(res.list))
+      this.items = res.list
+    })
+
+    console.log("这是store中的数据：：：：：：",localStorage.getItem('cartItems'))
+    // const {pageNum, total, list} =
+    // console.log("这是数据；",list)
+    // localStorage.setItem("cartItems", JSON.stringify(list))
+    // cartItems.value = JSON.parse(localStorage.getItem("cartItems"))
+    // console.log("这是数据：",cartItems.value)
+    // const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]')
+    // items.value = cartItems
+  }
 
   // 方法
   function addItem(product, quantity = 1) {
@@ -96,6 +117,7 @@ export const useCartStore = defineStore('cart', () => {
     removeItem,
     toggleSelected,
     toggleAll,
-    clear
+    clear,
+    loadCart
   }
 }) 

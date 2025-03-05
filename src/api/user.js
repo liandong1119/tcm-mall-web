@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import * as mockApi from './mock'
 
-const USE_MOCK = true // 控制是否使用Mock数据
+const USE_MOCK = false // 控制是否使用Mock数据
 
 // 发送邮箱验证码
 export function sendEmailCode(email) {
@@ -77,10 +77,11 @@ export function logout() {
 }
 
 // 获取地址列表
-export function getAddressList() {
+export function getAddressList(data) {
   if (USE_MOCK) return mockApi.getAddressList()
   return request({
-    url: '/user/address',
+    url: '/address',
+    params:data,
     method: 'get'
   })
 }
@@ -89,7 +90,7 @@ export function getAddressList() {
 export function addAddress(data) {
   if (USE_MOCK) return mockApi.addAddress(data)
   return request({
-    url: '/user/address',
+    url: '/address',
     method: 'post',
     data
   })
@@ -99,7 +100,7 @@ export function addAddress(data) {
 export function updateAddress(id, data) {
   if (USE_MOCK) return mockApi.updateAddress(id, data)
   return request({
-    url: `/user/address/${id}`,
+    url: `/address/${id}`,
     method: 'put',
     data
   })
@@ -116,7 +117,7 @@ export function deleteAddress(id) {
 // 设置默认收货地址
 export function setDefaultAddress(id) {
   return request({
-    url: `/user/address/${id}/default`,
+    url: `/address/${id}/default`,
     method: 'put'
   })
 }

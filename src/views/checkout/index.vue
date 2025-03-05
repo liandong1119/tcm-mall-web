@@ -258,7 +258,7 @@ const submitting = ref(false)
 // 获取收货地址列表
 const fetchAddresses = async () => {
   try {
-    const data = await getAddressList()
+    const data = await getAddressList({pageNum: 1,pageSize:10}).list
     addresses.value = data
     // 如果有默认地址，选中默认地址
     const defaultAddress = data.find(addr => addr.isDefault)

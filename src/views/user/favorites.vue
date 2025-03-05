@@ -19,7 +19,7 @@
               <h4>{{ item.name }}</h4>
               <p class="price">¥{{ item.price }}</p>
               <div class="operations">
-                <el-button type="primary" link @click="viewProduct(item.id)">
+                <el-button type="primary" link @click="viewProduct(item.productId)">
                   {{ t('common.view') }}
                 </el-button>
                 <el-button type="danger" link @click="handleRemoveFavorite(item.id)">
@@ -65,7 +65,7 @@ const fetchFavorites = async () => {
   loading.value = true
   try {
     const params = {
-      page: currentPage.value,
+      pageNum: currentPage.value,
       pageSize: pageSize.value
     }
     const { list, total: totalCount } = await getFavoriteList(params)

@@ -1,11 +1,11 @@
 <template>
   <el-card class="product-card" shadow="hover">
     <div class="product-image">
-      <img :src="product.image" :alt="product.name">
+      <img :src="product.img" :alt="product.name">
     </div>
     <div class="product-info">
       <h3 class="product-name">{{ product.name }}</h3>
-      <p class="product-desc">{{ product.description }}</p>
+      <p class="product-desc">{{ product.desc }}</p>
       <div class="product-price">
         <span class="price">¥{{ product.price }}</span>
         <span class="unit">/斤</span>

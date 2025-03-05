@@ -102,7 +102,7 @@ const categories = ref([])
 
 // 筛选条件
 const filters = ref({
-  category: route.query.category || '',
+  categoryId: route.query.category || '',
   minPrice: '',
   maxPrice: '',
   sort: 'default'
@@ -135,7 +135,7 @@ const fetchCategories = async () => {
 const fetchProducts = async () => {
   try {
     const { data, total: totalCount } = await getProductList({
-      page: currentPage.value,
+      pageNum: currentPage.value,
       pageSize: pageSize.value,
       ...filters.value
     })
