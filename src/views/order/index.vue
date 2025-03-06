@@ -14,7 +14,7 @@
           <h4>{{ $t('order.info') }}</h4>
           <el-descriptions :column="2" border>
             <el-descriptions-item :label="$t('order.number')">
-              {{ order.orderNo }}
+              {{ order.orderCode }}
             </el-descriptions-item>
             <el-descriptions-item :label="$t('order.createTime')">
               {{ order.createTime }}
@@ -22,8 +22,8 @@
             <el-descriptions-item :label="$t('order.payTime')" v-if="order.payTime">
               {{ order.payTime }}
             </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.shipTime')" v-if="order.shipTime">
-              {{ order.shipTime }}
+            <el-descriptions-item :label="$t('order.shipTime')" v-if="order.shippingTime">
+              {{ order.shippingTime }}
             </el-descriptions-item>
           </el-descriptions>
         </div>
@@ -152,6 +152,7 @@ const fetchOrderDetail = async () => {
   loading.value = true
   try {
     const data = await getOrderDetail(route.params.id)
+      console.log('orderDetail', data)
     order.value = data
   } catch (error) {
     console.error('Failed to fetch order detail:', error)

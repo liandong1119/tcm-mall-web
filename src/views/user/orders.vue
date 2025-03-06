@@ -31,11 +31,11 @@
             <el-card v-for="order in orders" :key="order.id" class="order-item">
               <div class="order-header">
                 <div class="order-info">
-                  <span class="order-no">{{ $t('order.number') }}: {{ order.orderNo }}</span>
+                  <span class="order-no">{{ $t('order.number') }}: {{ order.orderCode }}</span>
                   <span class="order-time">{{ $t('order.createTime') }}: {{ order.createTime }}</span>
                 </div>
                 <el-tag :type="getStatusType(order.status)">
-                  {{ $t(`order.statuses.${order.status}`) }}
+                  {{ $t(`order.statuses`) }}{{order.status}}
                 </el-tag>
               </div>
 
