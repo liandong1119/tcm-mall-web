@@ -107,22 +107,27 @@
                         <div class="product-info">
                             <img :src="item.image" :alt="item.name">
                             <div class="product-name">{{ item.name }}</div>
+                            <div v-if="item.selectedSpecs" class="product-specs">
+                                <span v-for="(value, key) in item.selectedSpecs" 
+                                      :key="key" 
+                                      class="spec-item">
+                                    {{ key }}: {{ value }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="price" :data-label="$t('cart.price')">{{
-                            $t('common.currency')
-                            }}{{ item.price.toFixed(2) }}
+                        <div class="price" :data-label="$t('cart.price')">
+                            {{ $t('common.currency') }}{{ (Number(item.price) || 0).toFixed(2) }}
                         </div>
                         <div class="quantity" :data-label="$t('cart.quantity')">{{ item.quantity }}</div>
-                        <div class="subtotal" :data-label="$t('cart.subtotal')">{{
-                            $t('common.currency')
-                            }}{{ (item.price * item.quantity).toFixed(2) }}
+                        <div class="subtotal" :data-label="$t('cart.subtotal')">
+                            {{ $t('common.currency') }}{{ ((Number(item.price) || 0) * item.quantity).toFixed(2) }}
                         </div>
                     </div>
                 </div>
             </el-card>
 
             <!-- 订单备注 -->
-            <el-card class="remark-card">
+            <!-- <el-card class="remark-card">
                 <template #header>
                     <div class="card-header">
                         <h3><i class="el-icon-document"></i> {{ $t('checkout.orderRemark') }}</h3>
@@ -135,7 +140,7 @@
                         :rows="3"
                         :placeholder="$t('checkout.remarkPlaceholder')"
                 />
-            </el-card>
+            </el-card> -->
 
             <!-- 订单提交 -->
             <div class="checkout-footer">
@@ -212,7 +217,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, computed, watch} from 'vue'
 import {useRouter} from 'vue-router'
 import {useI18n} from 'vue-i18n'
 import {useCartStore} from '@/stores/cart'
@@ -230,52 +235,8 @@ const cartStore = useCartStore()
 const {t} = useI18n()
 
 // 收货地址相关
-const addresses = ref([
-    {
-        id: 1,
-        name: '张三',
-        phone: '13800138000',
-        address: '北京市朝阳区三里屯街道10号楼1单元801室',
-        isDefault: true
-    },
-    {
-        id: 2,
-        name: '李四',
-        phone: '13900139000',
-        address: '上海市浦东新区陆家嘴环路1000号1栋2201室',
-        isDefault: false
-    },
-    {
-        id: 3,
-        name: '王五1',
-        phone: '13700137000',
-        address: '广州市天河区珠江新城华夏路10号1504室',
-        isDefault: false
-    },
-    {
-        id: 4,
-        name: '王五1',
-        phone: '13700137000',
-        address: '广州市天河区珠江新城华夏路10号1504室',
-        isDefault: false
-    },
-    {
-        id: 5,
-        name: '王五',
-        phone: '13700137000',
-        address: '广州市天河区珠江新城华夏路10号1504室',
-        isDefault: false
-    },
-    {
-        id: 6,
-        name: '王五',
-        phone: '13700137000',
-        address: '广州市天河区珠江新城华夏路10号1504室',
-        isDefault: false
-    }
-])
-
-const selectedAddress = ref(addresses.value.find(addr => addr.isDefault)?.id || '')
+const addresses = ref([])
+const selectedAddress = ref('')
 const addressDialogVisible = ref(false)
 const addressFormRef = ref(null)
 const editingAddress = ref(null)
@@ -308,14 +269,13 @@ const submitting = ref(false)
 // 获取收货地址列表
 const fetchAddresses = async () => {
     try {
-        const {list: data} = await getAddressList({pageNum: 1, pageSize: 10})
-        addresses.value = data
-        // 如果有默认地址，选中默认地址
-        const defaultAddress = data.find(addr => addr.isMainAddr)
+        const {list} = await getAddressList({pageNum: 1, pageSize: 10})
+        addresses.value = list
+        const defaultAddress = list.find(addr => addr.isMainAddr)
         if (defaultAddress) {
             selectedAddress.value = defaultAddress.id
-        } else if (data.length > 0) {
-            selectedAddress.value = data[0].id
+        } else if (list.length > 0) {
+            selectedAddress.value = list[0].id
         }
     } catch (error) {
         console.error('Failed to fetch addresses:', error)
@@ -396,14 +356,20 @@ const handleSubmitOrder = async () => {
 
     submitting.value = true
     try {
+        // 将 Proxy 对象转换为普通对象
+        const items = cartStore.selectedItems.map(item => ({
+            // goodsId: item.id,
+            skuId: item.skuId || item.sku, // 兼容两种属性名
+            // buyNum: item.quantity,
+            // specs: JSON.parse(JSON.stringify(item.selectedSpecs || {})) // 深拷贝规格信息
+        }))
+
         const orderData = {
             addressId: selectedAddress.value,
-            orders: cartStore.selectedItems.map(item => ({
-                goodsId: item.id,
-                buyNum: item.quantity
-            })),
-            remark: remark.value
+            orders: items
         }
+
+        console.log("提交订单数据：", orderData)
         const {orderId} = await createOrder(orderData)
         ElMessage.success(t('checkout.createSuccess'))
         // 清除已购买的商品
@@ -420,8 +386,29 @@ const handleSubmitOrder = async () => {
 
 onMounted(() => {
     fetchAddresses()
-    console.log("初始化操作")
+    // 检查购物车是否有商品
+    if (!cartStore.selectedItems.length) {
+        ElMessage.warning(t('checkout.noItems'))
+        router.push('/cart')
+        return
+    }
+    console.log("当前选中的商品：", cartStore.selectedItems)
 })
+
+// 添加计算商品总数和总金额的方法
+const calculateTotal = computed(() => {
+    return cartStore.selectedItems.reduce((total, item) => {
+        return total + (Number(item.price) || 0) * item.quantity
+    }, 0)
+})
+
+// 监听购物车商品变化
+watch(() => cartStore.selectedItems, (newItems) => {
+    if (!newItems.length) {
+        ElMessage.warning(t('checkout.noItems'))
+        router.push('/cart')
+    }
+}, { deep: true })
 </script>
 
 <style lang="scss" scoped>
@@ -747,81 +734,81 @@ onMounted(() => {
       }
     }
   }
+}
 
-  .remark-card {
-    :deep(.el-textarea__inner) {
-      border-radius: 4px;
-      padding: 12px;
-      font-size: 14px;
+.remark-card {
+  :deep(.el-textarea__inner) {
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 14px;
 
-      &:focus {
-        border-color: var(--el-color-primary);
+    &:focus {
+      border-color: var(--el-color-primary);
+    }
+  }
+}
+
+.checkout-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 25px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+
+  .order-summary {
+    .summary-item {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+
+      .label {
+        font-size: 14px;
+        color: #606266;
+        margin-right: 15px;
+        min-width: 80px;
+        text-align: right;
+      }
+
+      .value {
+        font-size: 14px;
+        color: #303133;
+        font-weight: 500;
+        min-width: 80px;
+        text-align: right;
+      }
+
+      &.total {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #ebeef5;
+
+        .label {
+          font-size: 16px;
+          font-weight: bold;
+        }
+
+        .amount {
+          font-size: 24px;
+          color: var(--el-color-danger);
+          font-weight: bold;
+          min-width: 80px;
+          text-align: right;
+        }
       }
     }
   }
 
-  .checkout-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 25px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-    margin-bottom: 30px;
+  .el-button {
+    min-width: 180px;
+    height: 48px;
+    font-size: 16px;
+    border-radius: 24px;
 
-    .order-summary {
-      .summary-item {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 10px;
-
-        .label {
-          font-size: 14px;
-          color: #606266;
-          margin-right: 15px;
-          min-width: 80px;
-          text-align: right;
-        }
-
-        .value {
-          font-size: 14px;
-          color: #303133;
-          font-weight: 500;
-          min-width: 80px;
-          text-align: right;
-        }
-
-        &.total {
-          margin-top: 15px;
-          padding-top: 15px;
-          border-top: 1px solid #ebeef5;
-
-          .label {
-            font-size: 16px;
-            font-weight: bold;
-          }
-
-          .amount {
-            font-size: 24px;
-            color: var(--el-color-danger);
-            font-weight: bold;
-            min-width: 80px;
-            text-align: right;
-          }
-        }
-      }
-    }
-
-    .el-button {
-      min-width: 180px;
-      height: 48px;
-      font-size: 16px;
-      border-radius: 24px;
-
-      i {
-        margin-right: 6px;
-      }
+    i {
+      margin-right: 6px;
     }
   }
 }

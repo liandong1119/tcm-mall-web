@@ -7,7 +7,12 @@
                     <!-- 左侧主图 -->
                     <el-col :span="12">
                         <div class="product-image">
-                            <img :src="product.image" :alt="product.name">
+                            <el-image
+                                :src="getImageUrl(product.image)"
+                                :preview-src-list="product.images?.map(img => getImageUrl(img))"
+                                fit="cover"
+                                class="product-image"
+                            />
                         </div>
                     </el-col>
 
@@ -253,6 +258,14 @@ const productSpecs = ref([])
 const selectedSpecs = reactive({})
 const currentSku = ref(null)
 
+// 计算所有规格是否已选择
+const isAllSpecsSelected = computed(() => {
+    if (!product.value?.specifications || product.value.specifications.length === 0) {
+        return true
+    }
+    return product.value.specifications.every(spec => selectedSpecs[spec.name])
+})
+
 // 获取商品详情
 const fetchProductDetail = async () => {
     try {
@@ -407,6 +420,13 @@ const fetchReviews = async () => {
     }
 }
 
+// 处理图片URL
+const getImageUrl = (url) => {
+    if (!url) return ''
+    if (url.startsWith('http')) return url
+    return import.meta.env.VITE_API_BASE_URL + url
+}
+
 // 添加到购物车
 const addToCart = () => {
     // 检查是否选择了所有必要的规格
@@ -431,9 +451,9 @@ const addToCart = () => {
         sku: currentSku.value.id,
         price: currentSku.value.price,
         stock: currentSku.value.stock,
-        image: currentSku.value.image || product.value.image
+        image: getImageUrl(currentSku.value.image || product.value.image)
     }
-
+    console.log("添加到购物车",productToAdd)
     cartStore.addItem(productToAdd, quantity.value)
     ElMessage.success(t('product.message.addToCartSuccess'))
 }
@@ -441,12 +461,9 @@ const addToCart = () => {
 // 立即购买
 const buyNow = () => {
     // 检查是否选择了所有必要的规格
-    if (product.value.specifications && product.value.specifications.length > 0) {
-        const allSpecsSelected = product.value.specifications.every(spec => selectedSpecs[spec.name])
-        if (!allSpecsSelected) {
-            ElMessage.warning(t('product.message.selectAllSpecs'))
-            return
-        }
+    if (!isAllSpecsSelected.value) {
+        ElMessage.warning(t('product.message.selectAllSpecs'))
+        return
     }
 
     // 检查是否找到对应的 SKU
@@ -462,11 +479,10 @@ const buyNow = () => {
         sku: currentSku.value.id,
         price: currentSku.value.price,
         stock: currentSku.value.stock,
-        image: currentSku.value.image || product.value.image
+        image: getImageUrl(currentSku.value.image || product.value.image)
     }
 
-    cartStore.clear() // 清空购物车
-    cartStore.addItem(productToAdd, quantity.value)
+    cartStore.buyNow(productToAdd, quantity.value)
     router.push('/checkout')
 }
 

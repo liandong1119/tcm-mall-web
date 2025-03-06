@@ -29,21 +29,29 @@ export const useCartStore = defineStore('cart', () => {
   /**
    * 从服务端加载数据
    */
-  function loadCart() {
-    getCartList({pageNum: 1, pageSize: 7}).then(res => {
-      console.log("这是store中的数据：：：：：：",res)
-      localStorage.setItem('cartItems',JSON.stringify(res.list))
-      this.items = res.list
-    })
-
-    console.log("这是store中的数据：：：：：：",localStorage.getItem('cartItems'))
-    // const {pageNum, total, list} =
-    // console.log("这是数据；",list)
-    // localStorage.setItem("cartItems", JSON.stringify(list))
-    // cartItems.value = JSON.parse(localStorage.getItem("cartItems"))
-    // console.log("这是数据：",cartItems.value)
-    // const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]')
-    // items.value = cartItems
+  async function loadCart() {
+    try {
+      const res = await getCartList({pageNum: 1, pageSize: 7})
+      if (res && res.list) {
+        // 确保每个商品项都有必要的字段
+        const cartItems = res.list.map(item => ({
+          id: item.id,
+          name: item.medicinalName || item.name,
+          price: Number(item.price || 0),
+          image: item.image || '',
+          quantity: Number(item.quantity || 1),
+          selected: true,
+          // 保留其他可能的字段
+          ...item
+        }))
+        localStorage.setItem('cartItems', JSON.stringify(cartItems))
+        items.value = cartItems
+      }
+    } catch (error) {
+      console.error('Failed to load cart:', error)
+      // 如果加载失败，使用本地存储的数据
+      items.value = JSON.parse(localStorage.getItem('cartItems') || '[]')
+    }
   }
 
   // 方法
@@ -55,19 +63,27 @@ export const useCartStore = defineStore('cart', () => {
       items.value.push({
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: Number(product.price || 0),
         image: product.images?.[0] || product.image || '',
         quantity,
-        selected: true
+        selected: true,
+        skuId: product.sku,
+        selectedSpecs: product.selectedSpecs || {}
       })
     }
+    saveToStorage()
+  }
+
+  function buyNow(product, quantity = 1) {
+    clear()
+    addItem(product, quantity)
     saveToStorage()
   }
 
   function updateQuantity(id, quantity) {
     const item = items.value.find(item => item.id === id)
     if (item) {
-      item.quantity = quantity
+      item.quantity = Number(quantity)
       saveToStorage()
     }
   }
@@ -113,6 +129,7 @@ export const useCartStore = defineStore('cart', () => {
     selectedCount,
     selectedAmount,
     addItem,
+    buyNow,
     updateQuantity,
     removeItem,
     toggleSelected,
