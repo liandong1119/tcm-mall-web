@@ -531,6 +531,21 @@ export default {
     setDefault: 'Set as Default',
     setAsDefault: 'Set as Default Address'
   },
+  validation: {
+    required: 'This field is required',
+    email: 'Please enter a valid email address',
+    phone: 'Please enter a valid phone number',
+    password: 'Password must be between 6-20 characters',
+    passwordMatch: 'Passwords do not match',
+    number: 'Please enter a valid number',
+    integer: 'Please enter an integer',
+    positive: 'Please enter a positive number',
+    url: 'Please enter a valid URL',
+    max: 'Value cannot be greater than {max}',
+    min: 'Value cannot be less than {min}',
+    maxLength: 'Length cannot exceed {max} characters',
+    minLength: 'Length must be at least {min} characters'
+  },
   guide: {
     title: 'Shopping Guide for Beginners',
     registerLogin: {
@@ -553,10 +568,7 @@ export default {
     },
     cart: {
       title: 'Shopping Cart',
-      desc: 'In the shopping cart, you can:',
-      modify: 'Modify product quantities',
-      delete: 'Remove unwanted items',
-      select: 'Select items for checkout'
+      description: 'View items in your cart, manage quantities and proceed to checkout'
     },
     order: {
       title: 'Place Order',
@@ -574,6 +586,38 @@ export default {
       consult: 'Consult professional physicians for special conditions'
     },
     startShopping: 'Start Shopping',
-    browseAll: 'Browse Products'
+    browseAll: 'Browse Products',
+    startGuide: 'Start Guide',
+    done: 'Done',
+    close: 'Close',
+    next: 'Next',
+    prev: 'Previous',
+    search: {
+      title: 'Search Function',
+      description: 'Search for traditional Chinese medicines and related products here'
+    },
+    category: {
+      title: 'Category Navigation',
+      description: 'Browse different categories of medicines to quickly find what you need'
+    },
+    logo: {
+      title: 'Homepage',
+      description: 'Click here to return to homepage anytime'
+    },
+    userCenter: {
+      title: 'User Center',
+      description: 'Click avatar to open user menu'
+    },
+    userMenu: {
+      description: 'Here you can:\n• View/Edit Profile\n• Manage Orders\n• Manage Favorites\n• Manage Addresses\n• Account Settings'
+    },
+    service: {
+      title: 'Service Guarantee',
+      description: 'We provide authentic products, fast delivery, and professional services'
+    },
+    footerNav: {
+      title: 'Footer Navigation',
+      description: 'Learn more about us, get help and customer service'
+    }
   }
 } 

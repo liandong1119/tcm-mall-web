@@ -539,6 +539,21 @@ export default {
     setDefault: '设为默认',
     setAsDefault: '设为默认地址'
   },
+  validation: {
+    required: '此项为必填项',
+    email: '请输入有效的邮箱地址',
+    phone: '请输入有效的电话号码',
+    password: '密码长度必须在6-20个字符之间',
+    passwordMatch: '两次输入的密码不一致',
+    number: '请输入有效的数字',
+    integer: '请输入整数',
+    positive: '请输入正数',
+    url: '请输入有效的URL地址',
+    max: '输入值不能大于{max}',
+    min: '输入值不能小于{min}',
+    maxLength: '长度不能超过{max}个字符',
+    minLength: '长度不能少于{min}个字符'
+  },
   guide: {
     title: '新手购物指南',
     registerLogin: {
@@ -561,10 +576,7 @@ export default {
     },
     cart: {
       title: '购物车',
-      desc: '购物车中可以：',
-      modify: '修改商品数量',
-      delete: '删除不需要的商品',
-      select: '选择要结算的商品'
+      description: '查看购物车中的商品，管理商品数量并进行结算'
     },
     order: {
       title: '提交订单',
@@ -582,6 +594,42 @@ export default {
       consult: '如有特殊情况请咨询专业医师'
     },
     startShopping: '开始购物',
-    browseAll: '浏览商品'
+    browseAll: '浏览商品',
+    startGuide: '开始引导',
+    done: '完成',
+    close: '关闭',
+    next: '下一步',
+    prev: '上一步',
+    search: {
+      title: '搜索功能',
+      description: '在这里可以搜索您需要的中药材和相关产品'
+    },
+    category: {
+      title: '分类导航',
+      description: '浏览不同类别的中药材，快速找到您需要的商品'
+    },
+    logo: {
+      title: '网站首页',
+      description: '点击这里随时回到首页'
+    },
+    userCenter: {
+      title: '个人中心',
+      description: '点击头像打开个人中心菜单'
+    },
+    userMenu: {
+      description: '这里可以：\n• 查看/修改个人资料\n• 管理订单记录\n• 管理收藏商品\n• 管理收货地址\n• 修改账户设置'
+    },
+    profile: {
+      title: '个人资料',
+      description: '查看和修改您的个人信息、密码等'
+    },
+    service: {
+      title: '服务保障',
+      description: '我们提供正品保障、极速配送、专业服务等多重保障'
+    },
+    footerNav: {
+      title: '底部导航',
+      description: '了解更多关于我们的信息，获取帮助和客户服务'
+    }
   }
 } 
