@@ -161,9 +161,45 @@ export async function getOrderList(params = {}) {
   }
 }
 
-export async function getOrderDetail(id) {
-  await delay()
-  return generateOrders(1)[0]
+export async function getOrderDetail() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: '1234567890',
+        orderNo: 'DD20240306001',
+        status: 'completed',
+        createTime: '2024-03-06 10:00:00',
+        payTime: '2024-03-06 10:05:00',
+        shipTime: '2024-03-06 14:00:00',
+        total: 399.00,
+        subtotal: 389.00,
+        shippingFee: 10.00,
+        address: {
+          name: '张三',
+          phone: '13800138000',
+          address: '北京市朝阳区三里屯街道10号楼1单元801室'
+        },
+        items: [
+          {
+            id: '1',
+            name: '西洋参',
+            price: 199.00,
+            quantity: 1,
+            image: 'https://example.com/img1.jpg',
+            hasReviewed: false
+          },
+          {
+            id: '2',
+            name: '灵芝',
+            price: 190.00,
+            quantity: 1,
+            image: 'https://example.com/img2.jpg',
+            hasReviewed: true
+          }
+        ]
+      })
+    }, 300)
+  })
 }
 
 export async function createOrder(data) {
@@ -308,4 +344,24 @@ export async function getProductStats(productId) {
 export async function getProductSpecs(productId) {
   await delay()
   return generateProductSpecs()
+}
+
+// 模拟提交评价
+export function submitOrderReview(data) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ success: true })
+    }, 300)
+  })
+}
+
+// 模拟上传图片
+export function uploadReviewImage() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        url: 'https://example.com/upload/review.jpg'
+      })
+    }, 300)
+  })
 } 

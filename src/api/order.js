@@ -7,7 +7,7 @@ const USE_MOCK = true
 export function createOrder(data) {
   if (USE_MOCK) return mockApi.createOrder(data)
   return request({
-    url: '/orders',
+    url: '/order/create',
     method: 'post',
     data
   })
@@ -17,7 +17,7 @@ export function createOrder(data) {
 export function getOrderList(params) {
   if (USE_MOCK) return mockApi.getOrderList(params)
   return request({
-    url: '/orders',
+    url: '/order/list',
     method: 'get',
     params
   })
@@ -27,7 +27,7 @@ export function getOrderList(params) {
 export function getOrderDetail(id) {
   if (USE_MOCK) return mockApi.getOrderDetail(id)
   return request({
-    url: `/orders/${id}`,
+    url: `/order/${id}`,
     method: 'get'
   })
 }
@@ -35,7 +35,7 @@ export function getOrderDetail(id) {
 // 取消订单
 export function cancelOrder(id) {
   return request({
-    url: `/orders/${id}/cancel`,
+    url: `/order/${id}/cancel`,
     method: 'post'
   })
 }
@@ -43,7 +43,7 @@ export function cancelOrder(id) {
 // 确认收货
 export function confirmReceive(id) {
   return request({
-    url: `/orders/${id}/receive`,
+    url: `/order/${id}/confirm`,
     method: 'post'
   })
 }
@@ -51,7 +51,7 @@ export function confirmReceive(id) {
 // 申请退款
 export function applyRefund(id, data) {
   return request({
-    url: `/orders/${id}/refund`,
+    url: `/order/${id}/refund`,
     method: 'post',
     data
   })
@@ -95,5 +95,36 @@ export function payOrder(id, data) {
     url: `/orders/${id}/pay`,
     method: 'post',
     data
+  })
+}
+
+// 提交订单评价
+export function submitOrderReview(data) {
+  return request({
+    url: '/order/review',
+    method: 'post',
+    data
+  })
+}
+
+// 获取订单评价状态
+export function getOrderReviewStatus(orderId) {
+  return request({
+    url: `/order/${orderId}/review/status`,
+    method: 'get'
+  })
+}
+
+// 上传评价图片
+export function uploadReviewImage(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request({
+    url: '/upload/review',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 } 

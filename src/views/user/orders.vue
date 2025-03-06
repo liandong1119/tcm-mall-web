@@ -35,7 +35,7 @@
                   <span class="order-time">{{ $t('order.createTime') }}: {{ order.createTime }}</span>
                 </div>
                 <el-tag :type="getStatusType(order.status)">
-                  {{ $t(`order.status.${order.status}`) }}
+                  {{ $t(`order.statuses.${order.status}`) }}
                 </el-tag>
               </div>
 
@@ -238,11 +238,11 @@ const refundRules = {
 // 订单状态
 const orderStatuses = [
   { value: 'all', label: t('common.all') },
-  { value: 'pending', label: t('order.status.pending') },
-  { value: 'paid', label: t('order.status.paid') },
-  { value: 'shipped', label: t('order.status.shipped') },
-  { value: 'completed', label: t('order.status.completed') },
-  { value: 'cancelled', label: t('order.status.cancelled') }
+  { value: 'pending', label: t('order.statuses.pending') },
+  { value: 'paid', label: t('order.statuses.paid') },
+  { value: 'shipped', label: t('order.statuses.shipped') },
+  { value: 'completed', label: t('order.statuses.completed') },
+  { value: 'cancelled', label: t('order.statuses.cancelled') }
 ]
 
 // 获取订单列表

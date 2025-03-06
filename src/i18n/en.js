@@ -201,10 +201,18 @@ export default {
     shipping: 'Shipping',
     goShopping: 'Go Shopping',
     free: 'Free',
+    message: {
+      clearConfirm: 'Are you sure you want to clear your cart?',
+      deleteSuccess: 'Product removed',
+      clearSuccess: 'Cart cleared',
+      updateSuccess: 'Quantity updated'
+    },
     clearConfirm: 'Are you sure you want to clear your cart?',
     deleteSuccess: 'Product removed',
     clearSuccess: 'Cart cleared',
-    updateSuccess: 'Quantity updated'
+    updateSuccess: 'Quantity updated',
+    unit: 'Jin',
+    clear: 'Clear'
   },
   checkout: {
     title: 'Checkout',
@@ -361,7 +369,8 @@ export default {
     company: 'Company',
     school: 'School',
     other: 'Other',
-    noAddress: 'No Address'
+    noAddress: 'No Address',
+    confirmDelete: 'Confirm Delete?'
   },
   order: {
     title: 'My Orders',
@@ -388,7 +397,8 @@ export default {
     subtotal: 'Subtotal',
     discount: 'Discount',
     total: 'Total',
-    status: {
+    shippingInfo: 'Shipping Information',
+    statuses: {
       all: 'All',
       pending: 'Pending Payment',
       paid: 'Paid',
@@ -464,6 +474,7 @@ export default {
     reviewPlaceholder: 'Please share your experience with this product',
     uploadPhotos: 'Upload Photos',
     anonymous: 'Anonymous Review',
+    reviewed: 'Reviewed',
     rating: {
       terrible: 'Terrible',
       bad: 'Bad',

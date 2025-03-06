@@ -43,42 +43,42 @@
 
         <div class="address-list">
           <el-empty v-if="!addresses.length" :description="$t('address.noAddress')"></el-empty>
-          <el-radio-group v-else v-model="selectedAddress">
-            <div 
-              v-for="address in addresses" 
-              :key="address.id" 
-              class="address-wrapper"
-              :class="{ 'address-selected': selectedAddress === address.id }"
-            >
-              <el-radio
-                :label="address.id"
-                class="address-item"
+          <template v-else>
+            <el-radio-group v-model="selectedAddress" class="address-grid">
+              <div 
+                v-for="address in addresses" 
+                :key="address.id" 
+                class="address-wrapper"
+                :class="{ 'selected': selectedAddress === address.id }"
               >
-                <div class="address-content">
-                  <div class="address-header">
-                    <div class="info">
+                <el-radio
+                  :label="address.id"
+                  class="address-item"
+                >
+                  <div class="address-content">
+                    <div class="address-header">
                       <span class="name">{{ address.name }}</span>
                       <span class="phone">{{ address.phone }}</span>
                       <span v-if="address.isDefault" class="default-tag">
-                        <i class="el-icon-star-on"></i> {{ $t('checkout.defaultAddress') }}
+                        {{ $t('checkout.defaultAddress') }}
                       </span>
+                    </div>
+                    <div class="address-detail">
+                      {{ address.address }}
                     </div>
                     <div class="operations">
                       <el-button type="primary" link @click.stop="handleEditAddress(address)">
-                        <i class="el-icon-edit"></i> {{ $t('common.edit') }}
+                        {{ $t('common.edit') }}
                       </el-button>
                       <el-button type="danger" link @click.stop="handleDeleteAddress(address.id)">
-                        <i class="el-icon-delete"></i> {{ $t('common.delete') }}
+                        {{ $t('common.delete') }}
                       </el-button>
                     </div>
                   </div>
-                  <div class="address-detail">
-                    {{ address.address }}
-                  </div>
-                </div>
-              </el-radio>
-            </div>
-          </el-radio-group>
+                </el-radio>
+              </div>
+            </el-radio-group>
+          </template>
         </div>
       </el-card>
 
@@ -241,6 +241,27 @@ const addresses = ref([
   },
   {
     id: 3,
+    name: '王五1',
+    phone: '13700137000',
+    address: '广州市天河区珠江新城华夏路10号1504室',
+    isDefault: false
+  },
+  {
+    id: 4,
+    name: '王五1',
+    phone: '13700137000',
+    address: '广州市天河区珠江新城华夏路10号1504室',
+    isDefault: false
+  },
+  {
+    id: 5,
+    name: '王五',
+    phone: '13700137000',
+    address: '广州市天河区珠江新城华夏路10号1504室',
+    isDefault: false
+  },
+  {
+    id: 6,
     name: '王五',
     phone: '13700137000',
     address: '广州市天河区珠江新城华夏路10号1504室',
@@ -550,95 +571,101 @@ onMounted(() => {
   }
 
   .address-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
+    padding: 0 16px 16px 0;
+    
+    .address-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+    }
   }
 
   .address-wrapper {
     border: 1px solid var(--el-border-color-lighter);
-    border-radius: 4px;
+    border-radius: 8px;
     transition: all 0.3s;
-    cursor: pointer;
+    background-color: #fff;
+    height: 100%;
 
     &:hover {
       border-color: var(--el-color-primary);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     }
 
     &.selected {
       border-color: var(--el-color-primary);
       background-color: var(--el-color-primary-light-9);
     }
+
+    .el-radio {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+
+      :deep(.el-radio__label) {
+        padding-left: 16px;
+        width: calc(100% - 14px);
+      }
+    }
   }
 
-  :deep(.el-radio) {
-    width: 100%;
-    height: 100%;
-    margin-right: 0;
-    padding: 12px;
+  .address-content {
+    flex: 1;
     display: flex;
-    align-items: flex-start;
-
-    .el-radio__label {
-      padding: 0;
-      margin-left: 8px;
-      flex: 1;
-    }
+    flex-direction: column;
+    min-width: 0;
+    max-width: max-content;
   }
 
   .address-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 4px;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
 
-    .info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-
-      .name {
-        font-weight: bold;
-        color: var(--el-text-color-primary);
-      }
-
-      .phone {
-        color: var(--el-text-color-secondary);
-      }
-
-      .default-tag {
-        background-color: var(--el-color-primary-light-9);
-        color: var(--el-color-primary);
-        padding: 2px 6px;
-        border-radius: 2px;
-        font-size: 12px;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
+    .name {
+      font-size: 16px;
+      font-weight: bold;
     }
 
-    .operations {
-      display: flex;
-      gap: 8px;
-      opacity: 0;
-      transition: opacity 0.3s;
+    .phone {
+      color: var(--el-text-color-secondary);
+      font-family: monospace;
     }
-  }
 
-  .address-wrapper:hover .operations {
-    opacity: 1;
+    .default-tag {
+      background-color: var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: auto;
+    }
   }
 
   .address-detail {
     color: var(--el-text-color-regular);
-    font-size: 13px;
-    line-height: 1.4;
+    line-height: 1.5;
     margin-top: 4px;
-    padding-left: 22px;
+    padding-right: 80px;
+    position: relative;
+  }
+
+  .operations {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    gap: 8px;
+  }
+
+  .address-wrapper:hover .operations {
+    display: flex;
   }
 
   .order-items {
@@ -792,6 +819,12 @@ onMounted(() => {
   }
 }
 
+@media (max-width: 1200px) {
+  .address-list .address-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .checkout {
     .checkout-header {
@@ -857,21 +890,8 @@ onMounted(() => {
     }
   }
 
-  .address-list {
-    .address-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-
-      .info {
-        width: 100%;
-      }
-
-      .operations {
-        width: 100%;
-        justify-content: flex-end;
-      }
-    }
+  .address-list .address-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style> 

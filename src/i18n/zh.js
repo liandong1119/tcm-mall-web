@@ -201,10 +201,18 @@ export default {
     shipping: '运费',
     free: '免运费',
     goShopping: '去购物',
+    message: {
+      clearConfirm: '确定要清空购物车吗？',
+      deleteSuccess: '商品已删除',
+      clearSuccess: '购物车已清空',
+      updateSuccess: '数量已更新'
+    },
     clearConfirm: '确定要清空购物车吗？',
     deleteSuccess: '商品已删除',
     clearSuccess: '购物车已清空',
-    updateSuccess: '数量已更新'
+    updateSuccess: '数量已更新',
+    unit: '斤',
+    clear: '清空'
   },
   checkout: {
     title: '确认订单',
@@ -364,7 +372,8 @@ export default {
     company: '公司',
     school: '学校',
     other: '其他',
-    noAddress: '暂无地址'
+    noAddress: '暂无地址',
+    confirmDelete: '确认删除？'
   },
   order: {
     title: '我的订单',
@@ -381,7 +390,7 @@ export default {
     trackingNo: '快递单号',
     shippingInfo: '物流信息',
     refundReason: '退款原因',
-    status: {
+    statuses: {
       all: '全部',
       pending: '待付款',
       paid: '已付款',
@@ -473,6 +482,7 @@ export default {
     reviewPlaceholder: '请分享您的使用体验',
     uploadPhotos: '上传图片',
     anonymous: '匿名评价',
+    reviewed: '已评价',
     rating: {
       terrible: '非常差',
       bad: '差',
