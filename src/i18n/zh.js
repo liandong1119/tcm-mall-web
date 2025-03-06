@@ -200,6 +200,7 @@ export default {
     selected: '已选',
     shipping: '运费',
     free: '免运费',
+    goShopping: '去购物',
     clearConfirm: '确定要清空购物车吗？',
     deleteSuccess: '商品已删除',
     clearSuccess: '购物车已清空',
@@ -362,7 +363,8 @@ export default {
     home: '家',
     company: '公司',
     school: '学校',
-    other: '其他'
+    other: '其他',
+    noAddress: '暂无地址'
   },
   order: {
     title: '我的订单',

@@ -224,8 +224,31 @@ const cartStore = useCartStore()
 const { t } = useI18n()
 
 // 收货地址相关
-const addresses = ref([])
-const selectedAddress = ref('')
+const addresses = ref([
+  {
+    id: 1,
+    name: '张三',
+    phone: '13800138000',
+    address: '北京市朝阳区三里屯街道10号楼1单元801室',
+    isDefault: true
+  },
+  {
+    id: 2,
+    name: '李四',
+    phone: '13900139000',
+    address: '上海市浦东新区陆家嘴环路1000号1栋2201室',
+    isDefault: false
+  },
+  {
+    id: 3,
+    name: '王五',
+    phone: '13700137000',
+    address: '广州市天河区珠江新城华夏路10号1504室',
+    isDefault: false
+  }
+])
+
+const selectedAddress = ref(addresses.value.find(addr => addr.isDefault)?.id || '')
 const addressDialogVisible = ref(false)
 const addressFormRef = ref(null)
 const editingAddress = ref(null)
@@ -257,20 +280,20 @@ const submitting = ref(false)
 
 // 获取收货地址列表
 const fetchAddresses = async () => {
-  try {
-    const data = await getAddressList()
-    addresses.value = data
-    // 如果有默认地址，选中默认地址
-    const defaultAddress = data.find(addr => addr.isDefault)
-    if (defaultAddress) {
-      selectedAddress.value = defaultAddress.id
-    } else if (data.length > 0) {
-      selectedAddress.value = data[0].id
-    }
-  } catch (error) {
-    console.error('Failed to fetch addresses:', error)
-    ElMessage.error(error.message)
-  }
+  // try {
+  //   const data = await getAddressList()
+  //   addresses.value = data
+  //   // 如果有默认地址，选中默认地址
+  //   const defaultAddress = data.find(addr => addr.isDefault)
+  //   if (defaultAddress) {
+  //     selectedAddress.value = defaultAddress.id
+  //   } else if (data.length > 0) {
+  //     selectedAddress.value = data[0].id
+  //   }
+  // } catch (error) {
+  //   console.error('Failed to fetch addresses:', error)
+  //   ElMessage.error(error.message)
+  // }
 }
 
 // 添加地址
@@ -527,116 +550,95 @@ onMounted(() => {
   }
 
   .address-list {
-    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
 
-    .address-wrapper {
-      margin-bottom: 15px;
-      border-radius: 8px;
-      overflow: hidden;
-      transition: all 0.3s;
-      border: 1px solid #ebeef5;
-      
-      &:last-child {
-        margin-bottom: 0;
+  .address-wrapper {
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 4px;
+    transition: all 0.3s;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--el-color-primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.selected {
+      border-color: var(--el-color-primary);
+      background-color: var(--el-color-primary-light-9);
+    }
+  }
+
+  :deep(.el-radio) {
+    width: 100%;
+    height: 100%;
+    margin-right: 0;
+    padding: 12px;
+    display: flex;
+    align-items: flex-start;
+
+    .el-radio__label {
+      padding: 0;
+      margin-left: 8px;
+      flex: 1;
+    }
+  }
+
+  .address-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+
+    .info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+
+      .name {
+        font-weight: bold;
+        color: var(--el-text-color-primary);
       }
-      
-      &:hover {
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+      .phone {
+        color: var(--el-text-color-secondary);
       }
-      
-      &.address-selected {
-        border-color: var(--el-color-primary);
-        background-color: rgba(64, 158, 255, 0.05);
-        box-shadow: 0 2px 12px rgba(64, 158, 255, 0.2);
-        
-        .el-radio__inner {
-          border-color: var(--el-color-primary);
-          background: var(--el-color-primary);
-        }
+
+      .default-tag {
+        background-color: var(--el-color-primary-light-9);
+        color: var(--el-color-primary);
+        padding: 2px 6px;
+        border-radius: 2px;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
       }
     }
 
-    .el-radio {
-      display: block;
-      margin: 0;
-      padding: 15px;
-      width: 100%;
-      transition: all 0.3s;
-
-      .address-item {
-        width: 100%;
-      }
-
-      .address-content {
-        flex: 1;
-        min-width: 0;
-        margin-left: 10px;
-      }
-      
-      .address-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-
-      .info {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-
-        .name {
-          font-weight: bold;
-          font-size: 16px;
-        }
-
-        .phone {
-          color: #606266;
-        }
-
-        .default-tag {
-          color: var(--el-color-primary);
-          font-size: 12px;
-          background-color: rgba(64, 158, 255, 0.1);
-          padding: 2px 6px;
-          border-radius: 4px;
-          display: inline-flex;
-          align-items: center;
-
-          i {
-            margin-right: 4px;
-          }
-        }
-      }
-
-      .address-detail {
-        color: #606266;
-        font-size: 14px;
-        line-height: 1.5;
-        padding: 5px 0;
-        position: relative;
-        padding-left: 24px;
-        
-        &:before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 5px;
-          width: 16px;
-          height: 16px;
-          background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23909399"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>');
-          background-repeat: no-repeat;
-          background-size: contain;
-          opacity: 0.7;
-        }
-      }
-
-      .operations {
-        display: flex;
-        gap: 10px;
-      }
+    .operations {
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
     }
+  }
+
+  .address-wrapper:hover .operations {
+    opacity: 1;
+  }
+
+  .address-detail {
+    color: var(--el-text-color-regular);
+    font-size: 13px;
+    line-height: 1.4;
+    margin-top: 4px;
+    padding-left: 22px;
   }
 
   .order-items {
@@ -851,6 +853,23 @@ onMounted(() => {
       
       .el-button {
         width: 100%;
+      }
+    }
+  }
+
+  .address-list {
+    .address-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      .info {
+        width: 100%;
+      }
+
+      .operations {
+        width: 100%;
+        justify-content: flex-end;
       }
     }
   }

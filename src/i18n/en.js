@@ -199,6 +199,7 @@ export default {
     items: 'items',
     selected: 'Selected',
     shipping: 'Shipping',
+    goShopping: 'Go Shopping',
     free: 'Free',
     clearConfirm: 'Are you sure you want to clear your cart?',
     deleteSuccess: 'Product removed',
@@ -359,7 +360,8 @@ export default {
     home: 'Home',
     company: 'Company',
     school: 'School',
-    other: 'Other'
+    other: 'Other',
+    noAddress: 'No Address'
   },
   order: {
     title: 'My Orders',
