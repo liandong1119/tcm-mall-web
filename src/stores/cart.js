@@ -118,6 +118,7 @@ export const useCartStore = defineStore('cart', () => {
     toggleSelected,
     toggleAll,
     clear,
-    loadCart
+    loadCart,
+    saveToStorage
   }
 }) 

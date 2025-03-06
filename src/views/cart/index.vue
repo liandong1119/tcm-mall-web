@@ -226,6 +226,7 @@ const handleClearCart = () => {
 // 结算
 const handleCheckout = () => {
     if (selectedCount.value > 0) {
+        console.log("开始跳转")
         router.push('/checkout')
     }
 }

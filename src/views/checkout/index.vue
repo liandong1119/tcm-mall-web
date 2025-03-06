@@ -1,197 +1,203 @@
 <template>
-  <div class="checkout">
-    <div class="container">
-      <div class="checkout-header">
-        <h2>{{ $t('checkout.title') }}</h2>
-        <div class="checkout-steps">
-          <div class="step active">
-            <div class="step-icon">
-              <i class="el-icon-location"></i>
-              <span class="step-number">1</span>
+    <div class="checkout">
+        <div class="container">
+            <div class="checkout-header">
+                <h2>{{ $t('checkout.title') }}</h2>
+                <div class="checkout-steps">
+                    <div class="step active">
+                        <div class="step-icon">
+                            <i class="el-icon-location"></i>
+                            <span class="step-number">1</span>
+                        </div>
+                        <span class="step-text">{{ $t('checkout.shippingAddress') }}</span>
+                    </div>
+                    <div class="step-divider"></div>
+                    <div class="step active">
+                        <div class="step-icon">
+                            <i class="el-icon-shopping-cart-full"></i>
+                            <span class="step-number">2</span>
+                        </div>
+                        <span class="step-text">{{ $t('checkout.orderSummary') }}</span>
+                    </div>
+                    <div class="step-divider"></div>
+                    <div class="step">
+                        <div class="step-icon">
+                            <i class="el-icon-wallet"></i>
+                            <span class="step-number">3</span>
+                        </div>
+                        <span class="step-text">{{ $t('checkout.payment') }}</span>
+                    </div>
+                </div>
             </div>
-            <span class="step-text">{{ $t('checkout.shippingAddress') }}</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="step active">
-            <div class="step-icon">
-              <i class="el-icon-shopping-cart-full"></i>
-              <span class="step-number">2</span>
-            </div>
-            <span class="step-text">{{ $t('checkout.orderSummary') }}</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="step">
-            <div class="step-icon">
-              <i class="el-icon-wallet"></i>
-              <span class="step-number">3</span>
-            </div>
-            <span class="step-text">{{ $t('checkout.payment') }}</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- 收货地址 -->
-      <el-card class="address-card">
-        <template #header>
-          <div class="card-header">
-            <h3><i class="el-icon-location"></i> {{ $t('checkout.shippingAddress') }}</h3>
-            <el-button type="primary" size="small" @click="handleAddAddress">
-              <i class="el-icon-plus"></i> {{ $t('checkout.addAddress') }}
-            </el-button>
-          </div>
-        </template>
+            <!-- 收货地址 -->
+            <el-card class="address-card">
+                <template #header>
+                    <div class="card-header">
+                        <h3><i class="el-icon-location"></i> {{ $t('checkout.shippingAddress') }}</h3>
+                        <el-button type="primary" size="small" @click="handleAddAddress">
+                            <i class="el-icon-plus"></i> {{ $t('checkout.addAddress') }}
+                        </el-button>
+                    </div>
+                </template>
 
-        <div class="address-list">
-          <el-empty v-if="!addresses.length" :description="$t('address.noAddress')"></el-empty>
-          <el-radio-group v-else v-model="selectedAddress">
-            <div 
-              v-for="address in addresses" 
-              :key="address.id" 
-              class="address-wrapper"
-              :class="{ 'address-selected': selectedAddress === address.id }"
-            >
-              <el-radio
-                :label="address.id"
-                class="address-item"
-              >
-                <div class="address-content">
-                  <div class="address-header">
-                    <div class="info">
-                      <span class="name">{{ address.addr }}</span>
-                      <span class="phone">{{ address.contactDetail }}</span>
-                      <span v-if="address.isMainAddr" class="default-tag">
+                <div class="address-list">
+                    <el-empty v-if="!addresses.length" :description="$t('address.noAddress')"></el-empty>
+                    <el-radio-group v-else v-model="selectedAddress">
+                        <div
+                                v-for="address in addresses"
+                                :key="address.id"
+                                class="address-wrapper"
+                                :class="{ 'address-selected': selectedAddress === address.id }"
+                        >
+                            <el-radio
+                                    :label="address.id"
+                                    class="address-item"
+                            >
+                                <div class="address-content">
+                                    <div class="address-header">
+                                        <div class="info">
+                                            <span class="name">{{ address.recipient }}</span>
+                                            <span class="phone">{{ address.contactDetail }}</span>
+                                            <span v-if="address.isMainAddr" class="default-tag">
                         <i class="el-icon-star-on"></i> {{ $t('checkout.defaultAddress') }}
                       </span>
-                    </div>
-                    <div class="address-detail">
-                      {{ address.address }}
-                    </div>
-                    <div class="operations">
-                      <el-button type="primary" link @click.stop="handleEditAddress(address)">
-                        {{ $t('common.edit') }}
-                      </el-button>
-                      <el-button type="danger" link @click.stop="handleDeleteAddress(address.id)">
-                        {{ $t('common.delete') }}
-                      </el-button>
-                    </div>
-                  </div>
-                </el-radio>
-              </div>
-            </el-radio-group>
-          </template>
-        </div>
-      </el-card>
+                                        </div>
+                                        <div class="address-detail">
+                                            {{ address.addr }}
+                                        </div>
+                                        <div class="operations">
+                                            <el-button type="primary" link @click.stop="handleEditAddress(address)">
+                                                {{ $t('common.edit') }}
+                                            </el-button>
+                                            <el-button type="danger" link @click.stop="handleDeleteAddress(address.id)">
+                                                {{ $t('common.delete') }}
+                                            </el-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </el-radio>
+                        </div>
+                    </el-radio-group>
+                </div>
+            </el-card>
 
-      <!-- 订单商品 -->
-      <el-card class="order-card">
-        <template #header>
-          <div class="card-header">
-            <h3><i class="el-icon-shopping-cart-full"></i> {{ $t('checkout.orderItems') }}</h3>
-            <span class="item-count">{{ cartStore.selectedItems.length }} {{ $t('cart.items') }}</span>
-          </div>
-        </template>
+            <!-- 订单商品 -->
+            <el-card class="order-card">
+                <template #header>
+                    <div class="card-header">
+                        <h3><i class="el-icon-shopping-cart-full"></i> {{ $t('checkout.orderItems') }}</h3>
+                        <span class="item-count">{{ cartStore.selectedItems.length }} {{ $t('cart.items') }}</span>
+                    </div>
+                </template>
 
-        <div class="order-items">
-          <div class="item-header">
-            <span class="column-product">{{ $t('cart.product') }}</span>
-            <span class="column-price">{{ $t('cart.price') }}</span>
-            <span class="column-quantity">{{ $t('cart.quantity') }}</span>
-            <span class="column-subtotal">{{ $t('cart.subtotal') }}</span>
-          </div>
+                <div class="order-items">
+                    <div class="item-header">
+                        <span class="column-product">{{ $t('cart.product') }}</span>
+                        <span class="column-price">{{ $t('cart.price') }}</span>
+                        <span class="column-quantity">{{ $t('cart.quantity') }}</span>
+                        <span class="column-subtotal">{{ $t('cart.subtotal') }}</span>
+                    </div>
 
-          <div
-            v-for="item in cartStore.selectedItems"
-            :key="item.id"
-            class="item"
-          >
-            <div class="product-info">
-              <img :src="item.image" :alt="item.name">
-              <div class="product-name">{{ item.name }}</div>
+                    <div
+                            v-for="item in cartStore.selectedItems"
+                            :key="item.id"
+                            class="item"
+                    >
+                        <div class="product-info">
+                            <img :src="item.image" :alt="item.name">
+                            <div class="product-name">{{ item.name }}</div>
+                        </div>
+                        <div class="price" :data-label="$t('cart.price')">{{
+                            $t('common.currency')
+                            }}{{ item.price.toFixed(2) }}
+                        </div>
+                        <div class="quantity" :data-label="$t('cart.quantity')">{{ item.quantity }}</div>
+                        <div class="subtotal" :data-label="$t('cart.subtotal')">{{
+                            $t('common.currency')
+                            }}{{ (item.price * item.quantity).toFixed(2) }}
+                        </div>
+                    </div>
+                </div>
+            </el-card>
+
+            <!-- 订单备注 -->
+            <el-card class="remark-card">
+                <template #header>
+                    <div class="card-header">
+                        <h3><i class="el-icon-document"></i> {{ $t('checkout.orderRemark') }}</h3>
+                    </div>
+                </template>
+
+                <el-input
+                        v-model="remark"
+                        type="textarea"
+                        :rows="3"
+                        :placeholder="$t('checkout.remarkPlaceholder')"
+                />
+            </el-card>
+
+            <!-- 订单提交 -->
+            <div class="checkout-footer">
+                <div class="order-summary">
+                    <div class="summary-item">
+                        <span class="label">{{ $t('cart.subtotal') }}:</span>
+                        <span class="value">{{ $t('common.currency') }}{{ cartStore.selectedAmount.toFixed(2) }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">{{ $t('cart.shipping') }}:</span>
+                        <span class="value">{{ $t('cart.free') }}</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span class="label">{{ $t('checkout.total') }}:</span>
+                        <span class="amount">{{ $t('common.currency') }}{{ cartStore.selectedAmount.toFixed(2) }}</span>
+                    </div>
+                </div>
+                <el-button
+                        type="primary"
+                        size="large"
+                        :loading="submitting"
+                        :disabled="!selectedAddress || !cartStore.selectedItems.length"
+                        @click="handleSubmitOrder"
+                >
+                    <i class="el-icon-check"></i> {{ $t('checkout.submitOrder') }}
+                </el-button>
             </div>
-            <div class="price" data-label="{{ $t('cart.price') }}">{{ $t('common.currency') }}{{ item.price.toFixed(2) }}</div>
-            <div class="quantity" data-label="{{ $t('cart.quantity') }}">{{ item.quantity }}</div>
-            <div class="subtotal" data-label="{{ $t('cart.subtotal') }}">{{ $t('common.currency') }}{{ (item.price * item.quantity).toFixed(2) }}</div>
-          </div>
         </div>
-      </el-card>
 
-      <!-- 订单备注 -->
-      <el-card class="remark-card">
-        <template #header>
-          <div class="card-header">
-            <h3><i class="el-icon-document"></i> {{ $t('checkout.orderRemark') }}</h3>
-          </div>
-        </template>
-
-        <el-input
-          v-model="remark"
-          type="textarea"
-          :rows="3"
-          :placeholder="$t('checkout.remarkPlaceholder')"
-        />
-      </el-card>
-
-      <!-- 订单提交 -->
-      <div class="checkout-footer">
-        <div class="order-summary">
-          <div class="summary-item">
-            <span class="label">{{ $t('cart.subtotal') }}:</span>
-            <span class="value">{{ $t('common.currency') }}{{ cartStore.selectedAmount.toFixed(2) }}</span>
-          </div>
-          <div class="summary-item">
-            <span class="label">{{ $t('cart.shipping') }}:</span>
-            <span class="value">{{ $t('cart.free') }}</span>
-          </div>
-          <div class="summary-item total">
-            <span class="label">{{ $t('checkout.total') }}:</span>
-            <span class="amount">{{ $t('common.currency') }}{{ cartStore.selectedAmount.toFixed(2) }}</span>
-          </div>
-        </div>
-        <el-button
-          type="primary"
-          size="large"
-          :loading="submitting"
-          :disabled="!selectedAddress || !cartStore.selectedItems.length"
-          @click="handleSubmitOrder"
+        <!-- 地址编辑对话框 -->
+        <el-dialog
+                v-model="addressDialogVisible"
+                :title="editingAddress ? $t('address.editAddress') : $t('address.addAddress')"
+                width="500px"
+                destroy-on-close
         >
-          <i class="el-icon-check"></i> {{ $t('checkout.submitOrder') }}
-        </el-button>
-      </div>
-    </div>
-
-    <!-- 地址编辑对话框 -->
-    <el-dialog
-      v-model="addressDialogVisible"
-      :title="editingAddress ? $t('address.editAddress') : $t('address.addAddress')"
-      width="500px"
-      destroy-on-close
-    >
-      <el-form
-        ref="addressFormRef"
-        :model="addressForm"
-        :rules="addressRules"
-        label-width="100px"
-      >
-        <el-form-item :label="$t('address.receiver')" prop="name">
-          <el-input v-model="addressForm.name" />
-        </el-form-item>
-        <el-form-item :label="$t('address.receiverPhone')" prop="phone">
-          <el-input v-model="addressForm.phone" />
-        </el-form-item>
-        <el-form-item :label="$t('address.detailAddress')" prop="address">
-          <el-input
-            v-model="addressForm.address"
-            type="textarea"
-            :rows="3"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-checkbox v-model="addressForm.isDefault">
-            {{ $t('address.setDefault') }}
-          </el-checkbox>
-        </el-form-item>
-      </el-form>
-      <template #footer>
+            <el-form
+                    ref="addressFormRef"
+                    :model="addressForm"
+                    :rules="addressRules"
+                    label-width="100px"
+            >
+                <el-form-item :label="$t('address.receiver')" prop="name">
+                    <el-input v-model="addressForm.name"/>
+                </el-form-item>
+                <el-form-item :label="$t('address.receiverPhone')" prop="phone">
+                    <el-input v-model="addressForm.phone"/>
+                </el-form-item>
+                <el-form-item :label="$t('address.detailAddress')" prop="address">
+                    <el-input
+                            v-model="addressForm.address"
+                            type="textarea"
+                            :rows="3"
+                    />
+                </el-form-item>
+                <el-form-item>
+                    <el-checkbox v-model="addressForm.isDefault">
+                        {{ $t('address.setDefault') }}
+                    </el-checkbox>
+                </el-form-item>
+            </el-form>
+            <template #footer>
         <span class="dialog-footer">
           <el-button @click="addressDialogVisible = false">
             {{ $t('common.cancel') }}
@@ -200,73 +206,73 @@
             {{ $t('common.confirm') }}
           </el-button>
         </span>
-      </template>
-    </el-dialog>
-  </div>
+            </template>
+        </el-dialog>
+    </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { useCartStore } from '@/stores/cart'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {ref, onMounted} from 'vue'
+import {useRouter} from 'vue-router'
+import {useI18n} from 'vue-i18n'
+import {useCartStore} from '@/stores/cart'
+import {ElMessage, ElMessageBox} from 'element-plus'
 import {
-  getAddressList,
-  addAddress,
-  updateAddress,
-  deleteAddress
+    getAddressList,
+    addAddress,
+    updateAddress,
+    deleteAddress
 } from '@/api/user'
-import { createOrder } from '@/api/order'
+import {createOrder} from '@/api/order'
 
 const router = useRouter()
 const cartStore = useCartStore()
-const { t } = useI18n()
+const {t} = useI18n()
 
 // 收货地址相关
 const addresses = ref([
-  {
-    id: 1,
-    name: '张三',
-    phone: '13800138000',
-    address: '北京市朝阳区三里屯街道10号楼1单元801室',
-    isDefault: true
-  },
-  {
-    id: 2,
-    name: '李四',
-    phone: '13900139000',
-    address: '上海市浦东新区陆家嘴环路1000号1栋2201室',
-    isDefault: false
-  },
-  {
-    id: 3,
-    name: '王五1',
-    phone: '13700137000',
-    address: '广州市天河区珠江新城华夏路10号1504室',
-    isDefault: false
-  },
-  {
-    id: 4,
-    name: '王五1',
-    phone: '13700137000',
-    address: '广州市天河区珠江新城华夏路10号1504室',
-    isDefault: false
-  },
-  {
-    id: 5,
-    name: '王五',
-    phone: '13700137000',
-    address: '广州市天河区珠江新城华夏路10号1504室',
-    isDefault: false
-  },
-  {
-    id: 6,
-    name: '王五',
-    phone: '13700137000',
-    address: '广州市天河区珠江新城华夏路10号1504室',
-    isDefault: false
-  }
+    {
+        id: 1,
+        name: '张三',
+        phone: '13800138000',
+        address: '北京市朝阳区三里屯街道10号楼1单元801室',
+        isDefault: true
+    },
+    {
+        id: 2,
+        name: '李四',
+        phone: '13900139000',
+        address: '上海市浦东新区陆家嘴环路1000号1栋2201室',
+        isDefault: false
+    },
+    {
+        id: 3,
+        name: '王五1',
+        phone: '13700137000',
+        address: '广州市天河区珠江新城华夏路10号1504室',
+        isDefault: false
+    },
+    {
+        id: 4,
+        name: '王五1',
+        phone: '13700137000',
+        address: '广州市天河区珠江新城华夏路10号1504室',
+        isDefault: false
+    },
+    {
+        id: 5,
+        name: '王五',
+        phone: '13700137000',
+        address: '广州市天河区珠江新城华夏路10号1504室',
+        isDefault: false
+    },
+    {
+        id: 6,
+        name: '王五',
+        phone: '13700137000',
+        address: '广州市天河区珠江新城华夏路10号1504室',
+        isDefault: false
+    }
 ])
 
 const selectedAddress = ref(addresses.value.find(addr => addr.isDefault)?.id || '')
@@ -274,25 +280,25 @@ const addressDialogVisible = ref(false)
 const addressFormRef = ref(null)
 const editingAddress = ref(null)
 const addressForm = ref({
-  name: '',
-  phone: '',
-  address: '',
-  isDefault: false
+    name: '',
+    phone: '',
+    address: '',
+    isDefault: false
 })
 
 const addressRules = {
-  name: [
-    { required: true, message: t('validate.nameRequired'), trigger: 'blur' },
-    { min: 2, max: 20, message: t('validate.nameLength'), trigger: 'blur' }
-  ],
-  phone: [
-    { required: true, message: t('validate.phoneRequired'), trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: t('validate.phoneFormat'), trigger: 'blur' }
-  ],
-  address: [
-    { required: true, message: t('validate.addressRequired'), trigger: 'blur' },
-    { min: 5, max: 100, message: t('validate.addressLength'), trigger: 'blur' }
-  ]
+    name: [
+        {required: true, message: t('validate.nameRequired'), trigger: 'blur'},
+        {min: 2, max: 20, message: t('validate.nameLength'), trigger: 'blur'}
+    ],
+    phone: [
+        {required: true, message: t('validate.phoneRequired'), trigger: 'blur'},
+        {pattern: /^1[3-9]\d{9}$/, message: t('validate.phoneFormat'), trigger: 'blur'}
+    ],
+    address: [
+        {required: true, message: t('validate.addressRequired'), trigger: 'blur'},
+        {min: 5, max: 100, message: t('validate.addressLength'), trigger: 'blur'}
+    ]
 }
 
 // 订单相关
@@ -301,119 +307,120 @@ const submitting = ref(false)
 
 // 获取收货地址列表
 const fetchAddresses = async () => {
-  try {
-    const {list:data} = await getAddressList({pageNum: 1,pageSize:10})
-    addresses.value = data
-    // 如果有默认地址，选中默认地址
-    const defaultAddress = data.find(addr => addr.isMainAddr)
-    if (defaultAddress) {
-      selectedAddress.value = defaultAddress.id
-    } else if (data.length > 0) {
-      selectedAddress.value = data[0].id
+    try {
+        const {list: data} = await getAddressList({pageNum: 1, pageSize: 10})
+        addresses.value = data
+        // 如果有默认地址，选中默认地址
+        const defaultAddress = data.find(addr => addr.isMainAddr)
+        if (defaultAddress) {
+            selectedAddress.value = defaultAddress.id
+        } else if (data.length > 0) {
+            selectedAddress.value = data[0].id
+        }
+    } catch (error) {
+        console.error('Failed to fetch addresses:', error)
+        ElMessage.error(error.message)
     }
-  } catch (error) {
-    console.error('Failed to fetch addresses:', error)
-    ElMessage.error(error.message)
-  }
 }
 
 // 添加地址
 const handleAddAddress = () => {
-  editingAddress.value = null
-  addressForm.value = {
-    name: '',
-    phone: '',
-    address: '',
-    isDefault: false
-  }
-  addressDialogVisible.value = true
+    editingAddress.value = null
+    addressForm.value = {
+        name: '',
+        phone: '',
+        address: '',
+        isDefault: false
+    }
+    addressDialogVisible.value = true
 }
 
 // 编辑地址
 const handleEditAddress = (address) => {
-  editingAddress.value = address
-  addressForm.value = { ...address }
-  addressDialogVisible.value = true
+    editingAddress.value = address
+    addressForm.value = {...address}
+    addressDialogVisible.value = true
 }
 
 // 删除地址
 const handleDeleteAddress = (id) => {
-  ElMessageBox.confirm(
-    t('address.confirmDelete'),
-    t('common.warning'),
-    {
-      confirmButtonText: t('common.confirm'),
-      cancelButtonText: t('common.cancel'),
-      type: 'warning'
-    }
-  ).then(async () => {
-    try {
-      await deleteAddress(id)
-      ElMessage.success(t('address.deleteSuccess'))
-      fetchAddresses()
-    } catch (error) {
-      console.error('Failed to delete address:', error)
-      ElMessage.error(error.message)
-    }
-  })
+    ElMessageBox.confirm(
+        t('address.confirmDelete'),
+        t('common.warning'),
+        {
+            confirmButtonText: t('common.confirm'),
+            cancelButtonText: t('common.cancel'),
+            type: 'warning'
+        }
+    ).then(async () => {
+        try {
+            await deleteAddress(id)
+            ElMessage.success(t('address.deleteSuccess'))
+            fetchAddresses()
+        } catch (error) {
+            console.error('Failed to delete address:', error)
+            ElMessage.error(error.message)
+        }
+    })
 }
 
 // 保存地址
 const handleSaveAddress = async () => {
-  if (!addressFormRef.value) return
+    if (!addressFormRef.value) return
 
-  await addressFormRef.value.validate(async (valid) => {
-    if (valid) {
-      try {
-        if (editingAddress.value) {
-          await updateAddress(editingAddress.value.id, addressForm.value)
-        } else {
-          await addAddress(addressForm.value)
+    await addressFormRef.value.validate(async (valid) => {
+        if (valid) {
+            try {
+                if (editingAddress.value) {
+                    await updateAddress(editingAddress.value.id, addressForm.value)
+                } else {
+                    await addAddress(addressForm.value)
+                }
+                ElMessage.success(t('address.saveSuccess'))
+                addressDialogVisible.value = false
+                fetchAddresses()
+            } catch (error) {
+                console.error('Failed to save address:', error)
+                ElMessage.error(error.message)
+            }
         }
-        ElMessage.success(t('address.saveSuccess'))
-        addressDialogVisible.value = false
-        fetchAddresses()
-      } catch (error) {
-        console.error('Failed to save address:', error)
-        ElMessage.error(error.message)
-      }
-    }
-  })
+    })
 }
 
 // 提交订单
 const handleSubmitOrder = async () => {
-  if (!selectedAddress.value) {
-    ElMessage.warning(t('checkout.selectAddress'))
-    return
-  }
-
-  submitting.value = true
-  try {
-    const orderData = {
-      addressId: selectedAddress.value,
-      items: cartStore.selectedItems.map(item => ({
-        id: item.id,
-        quantity: item.quantity
-      })),
-      remark: remark.value
+    if (!selectedAddress.value) {
+        ElMessage.warning(t('checkout.selectAddress'))
+        return
     }
-    const { orderId } = await createOrder(orderData)
-    ElMessage.success(t('checkout.createSuccess'))
-    // 清除已购买的商品
-    cartStore.clear()
-    // 跳转到支付页面
-    router.push(`/pay/${orderId}`)
-  } catch (error) {
-    console.error('Failed to create order:', error)
-    ElMessage.error(error.message)
-  } finally {
-    submitting.value = false
-  }
+
+    submitting.value = true
+    try {
+        const orderData = {
+            addressId: selectedAddress.value,
+            orders: cartStore.selectedItems.map(item => ({
+                goodsId: item.id,
+                buyNum: item.quantity
+            })),
+            remark: remark.value
+        }
+        const {orderId} = await createOrder(orderData)
+        ElMessage.success(t('checkout.createSuccess'))
+        // 清除已购买的商品
+        cartStore.clear()
+        // 跳转到支付页面
+        router.push(`/pay/${orderId}`)
+    } catch (error) {
+        console.error('Failed to create order:', error)
+        ElMessage.error(error.message)
+    } finally {
+        submitting.value = false
+    }
 }
 
 onMounted(() => {
-  fetchAddresses()
+    fetchAddresses()
+    console.log("初始化操作")
 })
 </script>
 
@@ -452,7 +459,7 @@ onMounted(() => {
         flex-direction: column;
         align-items: center;
         position: relative;
-        
+
         .step-icon {
           width: 50px;
           height: 50px;
@@ -464,14 +471,14 @@ onMounted(() => {
           position: relative;
           margin-bottom: 10px;
           transition: all 0.3s;
-          
+
           i {
             font-size: 20px;
             color: #909399;
             position: absolute;
             transition: all 0.3s;
           }
-          
+
           .step-number {
             font-size: 18px;
             font-weight: 600;
@@ -480,30 +487,30 @@ onMounted(() => {
             z-index: 1;
           }
         }
-        
+
         .step-text {
           font-size: 14px;
           color: #909399;
           transition: all 0.3s;
         }
-        
+
         &.active {
           .step-icon {
             background-color: var(--el-color-primary);
             box-shadow: 0 0 0 5px rgba(64, 158, 255, 0.2);
-            
+
             i {
               color: white;
               transform: scale(0);
               opacity: 0;
             }
-            
+
             .step-number {
               color: white;
               transform: scale(1.2);
             }
           }
-          
+
           .step-text {
             color: var(--el-color-primary);
             font-weight: 600;
@@ -526,16 +533,16 @@ onMounted(() => {
     border-radius: 8px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
     transition: all 0.3s;
-    
+
     &:hover {
       box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
     }
-    
+
     :deep(.el-card__header) {
       padding: 18px 20px;
       border-bottom: 1px solid #ebeef5;
     }
-    
+
     :deep(.el-card__body) {
       padding: 20px;
     }
@@ -746,7 +753,7 @@ onMounted(() => {
       border-radius: 4px;
       padding: 12px;
       font-size: 14px;
-      
+
       &:focus {
         border-color: var(--el-color-primary);
       }
@@ -768,7 +775,7 @@ onMounted(() => {
         display: flex;
         justify-content: flex-end;
         margin-bottom: 10px;
-        
+
         .label {
           font-size: 14px;
           color: #606266;
@@ -776,7 +783,7 @@ onMounted(() => {
           min-width: 80px;
           text-align: right;
         }
-        
+
         .value {
           font-size: 14px;
           color: #303133;
@@ -784,17 +791,17 @@ onMounted(() => {
           min-width: 80px;
           text-align: right;
         }
-        
+
         &.total {
           margin-top: 15px;
           padding-top: 15px;
           border-top: 1px solid #ebeef5;
-          
+
           .label {
             font-size: 16px;
             font-weight: bold;
           }
-          
+
           .amount {
             font-size: 24px;
             color: var(--el-color-danger);
@@ -811,7 +818,7 @@ onMounted(() => {
       height: 48px;
       font-size: 16px;
       border-radius: 24px;
-      
+
       i {
         margin-right: 6px;
       }
@@ -832,41 +839,41 @@ onMounted(() => {
         .step-divider {
           width: 50px;
         }
-        
+
         .step {
           .step-icon {
             width: 40px;
             height: 40px;
-            
+
             i, .step-number {
               font-size: 16px;
             }
           }
-          
+
           .step-text {
             font-size: 12px;
           }
         }
       }
     }
-    
+
     .order-items {
       .item-header {
         display: none;
       }
-      
+
       .item {
         grid-template-columns: 1fr;
         gap: 10px;
-        
+
         .product-info {
           grid-column: 1 / -1;
         }
-        
+
         .price, .quantity, .subtotal {
           display: flex;
           justify-content: space-between;
-          
+
           &::before {
             content: attr(data-label);
             font-weight: 500;
@@ -875,15 +882,15 @@ onMounted(() => {
         }
       }
     }
-    
+
     .checkout-footer {
       flex-direction: column;
       gap: 20px;
-      
+
       .order-summary {
         width: 100%;
       }
-      
+
       .el-button {
         width: 100%;
       }

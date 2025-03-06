@@ -250,7 +250,7 @@ const fetchOrders = async () => {
   loading.value = true
   try {
     const params = {
-      page: currentPage.value,
+      pageNum: currentPage.value,
       pageSize: pageSize.value,
       status: activeStatus.value === 'all' ? undefined : activeStatus.value
     }
