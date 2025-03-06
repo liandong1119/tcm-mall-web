@@ -57,9 +57,9 @@
                 <div class="address-content">
                   <div class="address-header">
                     <div class="info">
-                      <span class="name">{{ address.name }}</span>
-                      <span class="phone">{{ address.phone }}</span>
-                      <span v-if="address.isDefault" class="default-tag">
+                      <span class="name">{{ address.addr }}</span>
+                      <span class="phone">{{ address.contactDetail }}</span>
+                      <span v-if="address.isMainAddr" class="default-tag">
                         <i class="el-icon-star-on"></i> {{ $t('checkout.defaultAddress') }}
                       </span>
                     </div>
@@ -258,10 +258,10 @@ const submitting = ref(false)
 // 获取收货地址列表
 const fetchAddresses = async () => {
   try {
-    const data = await getAddressList({pageNum: 1,pageSize:10}).list
+    const {list:data} = await getAddressList({pageNum: 1,pageSize:10})
     addresses.value = data
     // 如果有默认地址，选中默认地址
-    const defaultAddress = data.find(addr => addr.isDefault)
+    const defaultAddress = data.find(addr => addr.isMainAddr)
     if (defaultAddress) {
       selectedAddress.value = defaultAddress.id
     } else if (data.length > 0) {

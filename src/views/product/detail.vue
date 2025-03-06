@@ -258,10 +258,13 @@ const fetchProductDetail = async () => {
     try {
         // 模拟数据，实际项目中应该从API获取
         const data = await getProductDetail(route.params.id)
+        data.specifications = JSON.parse(data.specifications)
+        data.skus.forEach(sku => {
+            sku.specs = JSON.parse(sku.specs)
+        })
         product.value = data
-        console.log("这是加载的数据：：：：",data)
 
-        // 使用模拟数据
+        // // 使用模拟数据
         // product.value = {
         //   id: 1,
         //   name: '高品质人参',

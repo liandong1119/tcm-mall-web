@@ -7,7 +7,7 @@ const USE_MOCK = false
 export function createOrder(data) {
   if (USE_MOCK) return mockApi.createOrder(data)
   return request({
-    url: '/orders',
+    url: '/order',
     method: 'post',
     data
   })
@@ -17,7 +17,7 @@ export function createOrder(data) {
 export function getOrderList(params) {
   if (USE_MOCK) return mockApi.getOrderList(params)
   return request({
-    url: '/orders',
+    url: '/order',
     method: 'get',
     params
   })
@@ -27,7 +27,7 @@ export function getOrderList(params) {
 export function getOrderDetail(id) {
   if (USE_MOCK) return mockApi.getOrderDetail(id)
   return request({
-    url: `/orders/${id}`,
+    url: `/order/${id}`,
     method: 'get'
   })
 }
@@ -35,7 +35,7 @@ export function getOrderDetail(id) {
 // 取消订单
 export function cancelOrder(id) {
   return request({
-    url: `/orders/${id}/cancel`,
+    url: `/order/${id}/cancel`,
     method: 'post'
   })
 }
@@ -43,7 +43,7 @@ export function cancelOrder(id) {
 // 确认收货
 export function confirmReceive(id) {
   return request({
-    url: `/orders/${id}/receive`,
+    url: `/order/${id}/receive`,
     method: 'post'
   })
 }
@@ -51,7 +51,7 @@ export function confirmReceive(id) {
 // 申请退款
 export function applyRefund(id, data) {
   return request({
-    url: `/orders/${id}/refund`,
+    url: `/order/${id}/refund`,
     method: 'post',
     data
   })
@@ -60,7 +60,7 @@ export function applyRefund(id, data) {
 // 获取退款详情
 export function getRefundDetail(id) {
   return request({
-    url: `/orders/${id}/refund`,
+    url: `/order/${id}/refund`,
     method: 'get'
   })
 }
@@ -68,7 +68,7 @@ export function getRefundDetail(id) {
 // 取消退款申请
 export function cancelRefund(id) {
   return request({
-    url: `/orders/${id}/refund/cancel`,
+    url: `/order/${id}/refund/cancel`,
     method: 'post'
   })
 }
@@ -84,7 +84,7 @@ export function getShippingInfo(id) {
 // 获取支付信息
 export function getPaymentInfo(id) {
   return request({
-    url: `/orders/${id}/payment`,
+    url: `/order/${id}/payment`,
     method: 'get'
   })
 }
@@ -92,7 +92,7 @@ export function getPaymentInfo(id) {
 // 支付订单
 export function payOrder(id, data) {
   return request({
-    url: `/orders/${id}/pay`,
+    url: `/order/${id}/pay`,
     method: 'post',
     data
   })
