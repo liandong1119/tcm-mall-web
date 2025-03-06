@@ -1,238 +1,286 @@
 <template>
   <div class="order-detail">
     <div class="container">
-      <el-card class="detail-card">
+      <el-card class="order-info" v-loading="loading">
         <template #header>
           <div class="card-header">
             <h3>{{ $t('order.detail') }}</h3>
-            <el-tag :type="orderStatusType">{{ orderStatusText }}</el-tag>
+            <el-tag :type="getOrderStatusType(orderInfo.status)">
+              {{ $t(`order.statuses.${orderInfo.status}`) }}
+            </el-tag>
           </div>
         </template>
 
-        <!-- 订单信息 -->
-        <div class="section">
-          <h4>{{ $t('order.info') }}</h4>
-          <el-descriptions :column="2" border>
-            <el-descriptions-item :label="$t('order.number')">
-              {{ order.orderNo }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.createTime')">
-              {{ order.createTime }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.payTime')" v-if="order.payTime">
-              {{ order.payTime }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.shipTime')" v-if="order.shipTime">
-              {{ order.shipTime }}
-            </el-descriptions-item>
-          </el-descriptions>
+        <!-- 订单基本信息 -->
+        <el-descriptions :column="2" border>
+          <el-descriptions-item :label="$t('order.orderNo')">
+            {{ orderInfo.orderNo }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="$t('order.createTime')">
+            {{ orderInfo.createTime }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="$t('order.payTime')" v-if="orderInfo.payTime">
+            {{ orderInfo.payTime }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="$t('order.shipTime')" v-if="orderInfo.shipTime">
+            {{ orderInfo.shipTime }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <!-- 收货地址信息 -->
+        <div class="section-title">{{ $t('order.shipping') }}</div>
+        <el-descriptions :column="1" border>
+          <el-descriptions-item :label="$t('order.recipient')">
+            {{ orderInfo.address?.name }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="$t('order.phone')">
+            {{ orderInfo.address?.phone }}
+          </el-descriptions-item>
+          <el-descriptions-item :label="$t('order.address')">
+            {{ orderInfo.address?.address }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <!-- 商品列表 -->
+        <div class="section-title">{{ $t('order.items') }}</div>
+        <div class="order-items">
+          <div v-for="item in orderInfo.items" :key="item.id" class="order-item">
+            <div class="item-info">
+              <el-image :src="item.image" class="item-image" fit="cover">
+                <template #error>
+                  <div class="image-placeholder">
+                    <el-icon><Picture /></el-icon>
+                  </div>
+                </template>
+              </el-image>
+              <div class="item-details">
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-price">
+                  <span class="price">¥{{ item.price.toFixed(2) }}</span>
+                  <span class="quantity">x {{ item.quantity }}</span>
+                </div>
+              </div>
+            </div>
+            <!-- 评价按钮 -->
+            <div class="item-actions" v-if="orderInfo.status === 'completed'">
+              <el-button 
+                v-if="!item.hasReviewed"
+                type="primary" 
+                size="small" 
+                @click="handleReview(item)"
+              >
+                {{ $t('review.writeReview') }}
+              </el-button>
+              <el-tag v-else type="info" size="small">{{ $t('review.reviewed') }}</el-tag>
+            </div>
+          </div>
         </div>
 
-        <!-- 收货信息 -->
-        <div class="section">
-          <h4>{{ $t('order.shipping') }}</h4>
-          <el-descriptions :column="1" border>
-            <el-descriptions-item :label="$t('order.recipient')">
-              {{ order.address.name }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.phone')">
-              {{ order.address.phone }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.address')">
-              {{ order.address.address }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.tracking')" v-if="order.trackingNo">
-              {{ order.trackingNo }}
-            </el-descriptions-item>
-          </el-descriptions>
-        </div>
-
-        <!-- 商品信息 -->
-        <div class="section">
-          <h4>{{ $t('order.items') }}</h4>
-          <el-table :data="order.items" border>
-            <el-table-column prop="image" :label="$t('product.image')" width="100">
-              <template #default="{ row }">
-                <img :src="row.image" :alt="row.name" class="product-image">
-              </template>
-            </el-table-column>
-            <el-table-column prop="name" :label="$t('product.name')" />
-            <el-table-column prop="price" :label="$t('product.price')" width="120">
-              <template #default="{ row }">
-                ¥{{ row.price }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="quantity" :label="$t('product.quantity')" width="120" />
-            <el-table-column :label="$t('product.subtotal')" width="120">
-              <template #default="{ row }">
-                ¥{{ row.price * row.quantity }}
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-
-        <!-- 订单金额 -->
-        <div class="section amount-section">
-          <el-descriptions :column="1" border>
-            <el-descriptions-item :label="$t('order.subtotal')">
-              ¥{{ order.subtotal }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.shipping')" v-if="order.shippingFee">
-              ¥{{ order.shippingFee }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.discount')" v-if="order.discount">
-              -¥{{ order.discount }}
-            </el-descriptions-item>
-            <el-descriptions-item :label="$t('order.total')">
-              <span class="total-amount">¥{{ order.total }}</span>
-            </el-descriptions-item>
-          </el-descriptions>
-        </div>
-
-        <!-- 操作按钮 -->
-        <div class="section operations">
-          <el-button v-if="canPay" type="primary" @click="handlePay">
-            {{ $t('order.pay') }}
-          </el-button>
-          <el-button v-if="canCancel" @click="handleCancel">
-            {{ $t('order.cancel') }}
-          </el-button>
-          <el-button v-if="canConfirm" type="success" @click="handleConfirm">
-            {{ $t('order.confirm') }}
-          </el-button>
-          <el-button v-if="canRefund" type="warning" @click="handleRefund">
-            {{ $t('order.refund') }}
-          </el-button>
+        <!-- 订单金额信息 -->
+        <div class="order-amount">
+          <div class="amount-item">
+            <span>{{ $t('order.subtotal') }}:</span>
+            <span>¥{{ orderInfo.subtotal?.toFixed(2) }}</span>
+          </div>
+          <div class="amount-item">
+            <span>{{ $t('order.shipping') }}:</span>
+            <span>¥{{ orderInfo.shippingFee?.toFixed(2) }}</span>
+          </div>
+          <div class="amount-item total">
+            <span>{{ $t('order.total') }}:</span>
+            <span class="total-price">¥{{ orderInfo.total?.toFixed(2) }}</span>
+          </div>
         </div>
       </el-card>
     </div>
+
+    <!-- 评价对话框 -->
+    <el-dialog
+      v-model="reviewDialogVisible"
+      :title="$t('review.writeReview')"
+      width="500px"
+    >
+      <el-form
+        ref="reviewFormRef"
+        :model="reviewForm"
+        :rules="reviewRules"
+        label-position="top"
+      >
+        <el-form-item :label="$t('review.rating')" prop="rating">
+          <el-rate
+            v-model="reviewForm.rating"
+            :texts="ratingTexts"
+            show-text
+          />
+        </el-form-item>
+        <el-form-item :label="$t('review.content')" prop="content">
+          <el-input
+            v-model="reviewForm.content"
+            type="textarea"
+            :rows="4"
+            :placeholder="$t('review.reviewPlaceholder')"
+          />
+        </el-form-item>
+        <el-form-item :label="$t('review.uploadPhotos')">
+          <el-upload
+            action="/api/upload"
+            list-type="picture-card"
+            :limit="5"
+            :on-success="handleUploadSuccess"
+            :on-remove="handleUploadRemove"
+            :auto-upload="false"
+            :http-request="handleUpload"
+          >
+            <el-icon><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="reviewDialogVisible = false">
+            {{ $t('common.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="submitReview" :loading="submitting">
+            {{ $t('common.submit') }}
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { getOrderDetail, cancelOrder, confirmReceive, applyRefund } from '@/api/order'
+import { ElMessage } from 'element-plus'
+import { Plus, Picture } from '@element-plus/icons-vue'
+import { getOrderDetail, submitOrderReview, uploadReviewImage } from '@/api/order'
 
 const route = useRoute()
-const router = useRouter()
 const { t } = useI18n()
-const order = ref({})
+
+// 订单数据
+const orderInfo = ref({})
 const loading = ref(false)
 
-// 订单状态类型
-const orderStatusType = computed(() => {
-  const statusMap = {
+// 评价相关
+const reviewDialogVisible = ref(false)
+const reviewFormRef = ref(null)
+const currentReviewItem = ref(null)
+const submitting = ref(false)
+
+const reviewForm = ref({
+  rating: 5,
+  content: '',
+  images: []
+})
+
+const reviewRules = {
+  rating: [
+    { required: true, message: t('validate.ratingRequired'), trigger: 'change' }
+  ],
+  content: [
+    { required: true, message: t('validate.reviewContentRequired'), trigger: 'blur' },
+    { min: 5, max: 500, message: t('validate.reviewContentLength'), trigger: 'blur' }
+  ]
+}
+
+const ratingTexts = [
+  t('review.rating.terrible'),
+  t('review.rating.bad'),
+  t('review.rating.normal'),
+  t('review.rating.good'),
+  t('review.rating.excellent')
+]
+
+// 获取订单状态样式
+const getOrderStatusType = (status) => {
+  const types = {
     pending: 'warning',
-    paid: 'info',
-    shipped: 'primary',
-    completed: 'success',
-    cancelled: 'danger',
-    refunding: 'warning',
-    refunded: 'info'
+    paid: 'primary',
+    shipped: 'success',
+    completed: 'info',
+    cancelled: 'danger'
   }
-  return statusMap[order.value.status] || 'info'
-})
-
-// 订单状态文本
-const orderStatusText = computed(() => {
-  return order.value.status ? t(`order.status.${order.value.status}`) : ''
-})
-
-// 操作按钮显示逻辑
-const canPay = computed(() => order.value.status === 'pending')
-const canCancel = computed(() => ['pending', 'paid'].includes(order.value.status))
-const canConfirm = computed(() => order.value.status === 'shipped')
-const canRefund = computed(() => ['paid', 'shipped'].includes(order.value.status))
+  return types[status] || 'info'
+}
 
 // 获取订单详情
 const fetchOrderDetail = async () => {
   loading.value = true
   try {
     const data = await getOrderDetail(route.params.id)
-    order.value = data
+    orderInfo.value = data
   } catch (error) {
     console.error('Failed to fetch order detail:', error)
-    ElMessage.error(error.message || 'Failed to fetch order detail')
+    ElMessage.error(t('message.fetchFailed'))
   } finally {
     loading.value = false
   }
 }
 
-// 支付订单
-const handlePay = () => {
-  router.push(`/payment/${order.value.id}`)
+// 处理评价
+const handleReview = (item) => {
+  currentReviewItem.value = item
+  reviewForm.value = {
+    rating: 5,
+    content: '',
+    images: []
+  }
+  reviewDialogVisible.value = true
 }
 
-// 取消订单
-const handleCancel = async () => {
+// 处理图片上传
+const handleUpload = async ({ file }) => {
   try {
-    await ElMessageBox.confirm(
-      t('order.confirmCancel'),
-      t('common.warning'),
-      {
-        confirmButtonText: t('common.confirm'),
-        cancelButtonText: t('common.cancel'),
-        type: 'warning'
-      }
-    )
-    await cancelOrder(order.value.id)
-    ElMessage.success(t('order.cancelSuccess'))
-    fetchOrderDetail()
+    const { url } = await uploadReviewImage(file)
+    reviewForm.value.images.push(url)
+    return { url }
   } catch (error) {
-    if (error !== 'cancel') {
-      console.error('Failed to cancel order:', error)
-      ElMessage.error(error.message || t('order.cancelFailed'))
-    }
+    ElMessage.error(t('message.uploadFailed'))
+    return false
   }
 }
 
-// 确认收货
-const handleConfirm = async () => {
-  try {
-    await ElMessageBox.confirm(
-      t('order.confirmReceipt'),
-      t('common.warning'),
-      {
-        confirmButtonText: t('common.confirm'),
-        cancelButtonText: t('common.cancel'),
-        type: 'warning'
-      }
-    )
-    await confirmReceive(order.value.id)
-    ElMessage.success(t('order.confirmSuccess'))
-    fetchOrderDetail()
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('Failed to confirm order:', error)
-      ElMessage.error(error.message || t('order.confirmFailed'))
-    }
+const handleUploadSuccess = (response) => {
+  if (response.url) {
+    reviewForm.value.images.push(response.url)
   }
 }
 
-// 申请退款
-const handleRefund = async () => {
-  try {
-    const { value } = await ElMessageBox.prompt(
-      t('order.enterRefundReason'),
-      t('order.refundApplication'),
-      {
-        confirmButtonText: t('common.submit'),
-        cancelButtonText: t('common.cancel'),
-        inputPlaceholder: t('order.refundReasonPlaceholder')
-      }
-    )
-    await applyRefund(order.value.id, { reason: value })
-    ElMessage.success(t('order.refundSuccess'))
-    fetchOrderDetail()
-  } catch (error) {
-    if (error !== 'cancel') {
-      console.error('Failed to apply refund:', error)
-      ElMessage.error(error.message || t('order.refundFailed'))
-    }
+const handleUploadRemove = (file) => {
+  const index = reviewForm.value.images.indexOf(file.url)
+  if (index > -1) {
+    reviewForm.value.images.splice(index, 1)
   }
+}
+
+// 提交评价
+const submitReview = async () => {
+  if (!reviewFormRef.value) return
+
+  await reviewFormRef.value.validate(async (valid) => {
+    if (valid) {
+      submitting.value = true
+      try {
+        await submitOrderReview({
+          orderId: orderInfo.value.id,
+          itemId: currentReviewItem.value.id,
+          ...reviewForm.value
+        })
+        ElMessage.success(t('message.reviewSuccess'))
+        reviewDialogVisible.value = false
+        // 刷新订单详情
+        fetchOrderDetail()
+      } catch (error) {
+        console.error('Submit review failed:', error)
+        ElMessage.error(t('message.reviewFailed'))
+      } finally {
+        submitting.value = false
+      }
+    }
+  })
 }
 
 onMounted(() => {
@@ -243,16 +291,13 @@ onMounted(() => {
 <style lang="scss" scoped>
 .order-detail {
   padding: 20px 0;
-  background-color: var(--el-bg-color-page);
-}
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
 
-.detail-card {
   .card-header {
     display: flex;
     justify-content: space-between;
@@ -261,47 +306,120 @@ onMounted(() => {
     h3 {
       margin: 0;
       font-size: 18px;
-      color: var(--el-text-color-primary);
+    }
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 20px 0 12px;
+    color: var(--el-text-color-primary);
+  }
+
+  .order-items {
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 4px;
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--el-border-color-lighter);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .item-info {
+        display: flex;
+        align-items: center;
+        flex: 1;
+
+        .item-image {
+          width: 80px;
+          height: 80px;
+          border-radius: 4px;
+          margin-right: 12px;
+        }
+
+        .image-placeholder {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: var(--el-fill-color-lighter);
+          color: var(--el-text-color-secondary);
+          font-size: 24px;
+        }
+
+        .item-details {
+          flex: 1;
+
+          .item-name {
+            font-size: 14px;
+            color: var(--el-text-color-primary);
+            margin-bottom: 8px;
+          }
+
+          .item-price {
+            color: var(--el-text-color-regular);
+
+            .price {
+              color: var(--el-color-danger);
+              margin-right: 8px;
+            }
+          }
+        }
+      }
+
+      .item-actions {
+        margin-left: 16px;
+      }
+    }
+  }
+
+  .order-amount {
+    margin-top: 20px;
+    padding: 16px;
+    background-color: var(--el-fill-color-lighter);
+    border-radius: 4px;
+
+    .amount-item {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      span {
+        &:first-child {
+          margin-right: 16px;
+          color: var(--el-text-color-regular);
+        }
+      }
+
+      &.total {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--el-border-color-lighter);
+
+        .total-price {
+          font-size: 18px;
+          color: var(--el-color-danger);
+          font-weight: bold;
+        }
+      }
     }
   }
 }
 
-.section {
-  margin-bottom: 24px;
-
-  h4 {
-    margin: 0 0 16px;
-    font-size: 16px;
-    color: var(--el-text-color-primary);
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.product-image {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.amount-section {
-  max-width: 400px;
-  margin-left: auto;
-
-  .total-amount {
-    color: var(--el-color-danger);
-    font-size: 20px;
-    font-weight: bold;
-  }
-}
-
-.operations {
-  text-align: right;
-  border-top: 1px solid var(--el-border-color-light);
-  padding-top: 24px;
-  margin-top: 24px;
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 </style> 

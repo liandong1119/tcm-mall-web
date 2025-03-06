@@ -1,57 +1,63 @@
 <!-- 主布局组件 -->
 <template>
-  <div class="app-container">
-    <Header />
-    <main class="main-content">
-      <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-    </main>
-    <Footer />
+  <div class="app-layout">
+    <el-container>
+      <el-header height="auto" class="app-header">
+        <Header />
+      </el-header>
+      
+      <el-main>
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+      </el-main>
+
+      <el-footer height="auto">
+        <Footer />
+      </el-footer>
+    </el-container>
+
+    <!-- 用户引导组件 -->
+    <UserGuide />
   </div>
 </template>
 
 <script setup>
-import Header from './components/Header.vue'
-import Footer from './components/Footer.vue'
+import Header from '@/layout/components/Header.vue'
+import Footer from '@/layout/components/Footer.vue'
+import UserGuide from '@/components/UserGuide.vue'
 </script>
 
 <style lang="scss" scoped>
-.app-container {
+.app-layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
-}
 
-.main-content {
-  flex: 1;
-  padding: 20px 0;
-  min-height: calc(100vh - var(--app-header-height) - var(--app-footer-height));
-  
-  // 添加渐变背景
-  background: linear-gradient(
-    135deg,
-    rgba(43, 153, 57, 0.05) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  
-  // 添加网格背景
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
+  .el-container {
+    flex: 1;
+  }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity var(--app-transition-duration) ease;
-}
+  .app-header {
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+  .el-main {
+    padding: 20px;
+    background-color: var(--el-bg-color-page);
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 }
 </style> 

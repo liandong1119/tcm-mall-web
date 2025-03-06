@@ -63,22 +63,22 @@
                         <i class="el-icon-star-on"></i> {{ $t('checkout.defaultAddress') }}
                       </span>
                     </div>
+                    <div class="address-detail">
+                      {{ address.address }}
+                    </div>
                     <div class="operations">
                       <el-button type="primary" link @click.stop="handleEditAddress(address)">
-                        <i class="el-icon-edit"></i> {{ $t('common.edit') }}
+                        {{ $t('common.edit') }}
                       </el-button>
                       <el-button type="danger" link @click.stop="handleDeleteAddress(address.id)">
-                        <i class="el-icon-delete"></i> {{ $t('common.delete') }}
+                        {{ $t('common.delete') }}
                       </el-button>
                     </div>
                   </div>
-                  <div class="address-detail">
-                    {{ address.address }}
-                  </div>
-                </div>
-              </el-radio>
-            </div>
-          </el-radio-group>
+                </el-radio>
+              </div>
+            </el-radio-group>
+          </template>
         </div>
       </el-card>
 
@@ -224,8 +224,52 @@ const cartStore = useCartStore()
 const { t } = useI18n()
 
 // 收货地址相关
-const addresses = ref([])
-const selectedAddress = ref('')
+const addresses = ref([
+  {
+    id: 1,
+    name: '张三',
+    phone: '13800138000',
+    address: '北京市朝阳区三里屯街道10号楼1单元801室',
+    isDefault: true
+  },
+  {
+    id: 2,
+    name: '李四',
+    phone: '13900139000',
+    address: '上海市浦东新区陆家嘴环路1000号1栋2201室',
+    isDefault: false
+  },
+  {
+    id: 3,
+    name: '王五1',
+    phone: '13700137000',
+    address: '广州市天河区珠江新城华夏路10号1504室',
+    isDefault: false
+  },
+  {
+    id: 4,
+    name: '王五1',
+    phone: '13700137000',
+    address: '广州市天河区珠江新城华夏路10号1504室',
+    isDefault: false
+  },
+  {
+    id: 5,
+    name: '王五',
+    phone: '13700137000',
+    address: '广州市天河区珠江新城华夏路10号1504室',
+    isDefault: false
+  },
+  {
+    id: 6,
+    name: '王五',
+    phone: '13700137000',
+    address: '广州市天河区珠江新城华夏路10号1504室',
+    isDefault: false
+  }
+])
+
+const selectedAddress = ref(addresses.value.find(addr => addr.isDefault)?.id || '')
 const addressDialogVisible = ref(false)
 const addressFormRef = ref(null)
 const editingAddress = ref(null)
@@ -527,116 +571,101 @@ onMounted(() => {
   }
 
   .address-list {
-    padding: 10px 0;
+    padding: 0 16px 16px 0;
 
-    .address-wrapper {
-      margin-bottom: 15px;
-      border-radius: 8px;
-      overflow: hidden;
-      transition: all 0.3s;
-      border: 1px solid #ebeef5;
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-      
-      &:hover {
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-      }
-      
-      &.address-selected {
-        border-color: var(--el-color-primary);
-        background-color: rgba(64, 158, 255, 0.05);
-        box-shadow: 0 2px 12px rgba(64, 158, 255, 0.2);
-        
-        .el-radio__inner {
-          border-color: var(--el-color-primary);
-          background: var(--el-color-primary);
-        }
-      }
+    .address-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+    }
+  }
+
+  .address-wrapper {
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 8px;
+    transition: all 0.3s;
+    background-color: #fff;
+    height: 100%;
+
+    &:hover {
+      border-color: var(--el-color-primary);
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    &.selected {
+      border-color: var(--el-color-primary);
+      background-color: var(--el-color-primary-light-9);
     }
 
     .el-radio {
-      display: block;
-      margin: 0;
-      padding: 15px;
       width: 100%;
-      transition: all 0.3s;
+      height: 100%;
+      margin: 0;
+      padding: 16px;
+      display: flex;
 
-      .address-item {
-        width: 100%;
-      }
-
-      .address-content {
-        flex: 1;
-        min-width: 0;
-        margin-left: 10px;
-      }
-      
-      .address-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-
-      .info {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-
-        .name {
-          font-weight: bold;
-          font-size: 16px;
-        }
-
-        .phone {
-          color: #606266;
-        }
-
-        .default-tag {
-          color: var(--el-color-primary);
-          font-size: 12px;
-          background-color: rgba(64, 158, 255, 0.1);
-          padding: 2px 6px;
-          border-radius: 4px;
-          display: inline-flex;
-          align-items: center;
-
-          i {
-            margin-right: 4px;
-          }
-        }
-      }
-
-      .address-detail {
-        color: #606266;
-        font-size: 14px;
-        line-height: 1.5;
-        padding: 5px 0;
-        position: relative;
-        padding-left: 24px;
-        
-        &:before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 5px;
-          width: 16px;
-          height: 16px;
-          background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23909399"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>');
-          background-repeat: no-repeat;
-          background-size: contain;
-          opacity: 0.7;
-        }
-      }
-
-      .operations {
-        display: flex;
-        gap: 10px;
+      :deep(.el-radio__label) {
+        padding-left: 16px;
+        width: calc(100% - 14px);
       }
     }
+  }
+
+  .address-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    max-width: max-content;
+  }
+
+  .address-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+
+    .name {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .phone {
+      color: var(--el-text-color-secondary);
+      font-family: monospace;
+    }
+
+    .default-tag {
+      background-color: var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-left: auto;
+    }
+  }
+
+  .address-detail {
+    color: var(--el-text-color-regular);
+    line-height: 1.5;
+    margin-top: 4px;
+    padding-right: 80px;
+    position: relative;
+  }
+
+  .operations {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    gap: 8px;
+  }
+
+  .address-wrapper:hover .operations {
+    display: flex;
   }
 
   .order-items {
@@ -790,6 +819,12 @@ onMounted(() => {
   }
 }
 
+@media (max-width: 1200px) {
+  .address-list .address-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .checkout {
     .checkout-header {
@@ -853,6 +888,10 @@ onMounted(() => {
         width: 100%;
       }
     }
+  }
+
+  .address-list .address-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style> 

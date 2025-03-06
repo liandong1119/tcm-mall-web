@@ -76,10 +76,22 @@ const routes = [
         ]
       },
       {
-        path: 'order/:id',
-        name: 'OrderDetail',
-        component: () => import('@/views/order/detail.vue'),
-        meta: { title: 'order.detail', requiresAuth: true }
+        path: 'order',
+        // component: () => import('@/layout/index.vue'),
+        children: [
+          {
+            path: '',
+            name: 'OrderList',
+            component: () => import('@/views/order/index.vue'),
+            meta: { title: 'order.list', requiresAuth: true }
+          },
+          {
+            path: ':id',
+            name: 'OrderDetail',
+            component: () => import('@/views/order/detail.vue'),
+            meta: { title: 'order.detail', requiresAuth: true }
+          }
+        ]
       },
       {
         path: 'guide',

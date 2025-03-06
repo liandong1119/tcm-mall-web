@@ -74,6 +74,7 @@ export default {
     accountLength: '账号长度应为3-20个字符',
     passwordRequired: '请输入密码',
     passwordLength: '密码长度应为6-20个字符',
+    confirmPasswordRequired: '请确认密码',
     passwordNotMatch: '两次输入的密码不一致',
     emailRequired: '请输入邮箱',
     emailFormat: '请输入正确的邮箱格式',
@@ -189,7 +190,7 @@ export default {
     checkout: '去结算',
     selectAll: '全选',
     deleteSelected: '删除选中',
-    clear: '清空购物车',
+    clearCart: '清空购物车',
     product: '商品',
     price: '单价',
     quantity: '数量',
@@ -199,11 +200,19 @@ export default {
     selected: '已选',
     shipping: '运费',
     free: '免运费',
-    unit:'斤',
+    goShopping: '去购物',
+    message: {
+      clearConfirm: '确定要清空购物车吗？',
+      deleteSuccess: '商品已删除',
+      clearSuccess: '购物车已清空',
+      updateSuccess: '数量已更新'
+    },
     clearConfirm: '确定要清空购物车吗？',
     deleteSuccess: '商品已删除',
     clearSuccess: '购物车已清空',
-    updateSuccess: '数量已更新'
+    updateSuccess: '数量已更新',
+    unit: '斤',
+    clear: '清空'
   },
   checkout: {
     title: '确认订单',
@@ -222,6 +231,7 @@ export default {
   },
   user: {
     login: '登录',
+    register: '注册账号',
     logout: '退出登录',
     profile: '个人中心',
     orders: '我的订单',
@@ -231,6 +241,10 @@ export default {
     passwordPlaceholder: '请输入密码',
     confirmPasswordPlaceholder: '请确认密码',
     captchaPlaceholder: '请输入验证码',
+    rememberMe: '记住我',
+    forgotPassword: '忘记密码？',
+    noAccount: '还没有账号？',
+    hasAccount: '已有账号？',
     settings: '账号设置',
     registerTip: '欢迎加入中药商城，请填写以下信息完成注册',
     welcomeJoin: '欢迎加入中药商城',
@@ -240,6 +254,7 @@ export default {
     emailPlaceholder: '请输入邮箱',
     agreement: '我已阅读并同意',
     agreementText: '《用户服务协议》',
+    login: '立即登录',
     emailCodePlaceholder: '请输入邮箱验证码',
     sendEmailCode: '发送验证码',
     resetPassword: '重置密码',
@@ -263,6 +278,7 @@ export default {
     secret: '保密',
     loginTip: '欢迎回来，请登录您的账号',
     loginWith: '其他登录方式',
+    registerNow: '立即注册',
     quickLogin: '快捷登录',
     accountLogin: '账号登录',
     scanLogin: '扫码登录',
@@ -296,8 +312,10 @@ export default {
     nicknameLength: '昵称长度应为2-20个字符',
     emailRequired: '请输入邮箱',
     emailInvalid: '请输入正确的邮箱格式',
+    phoneRequired: '请输入手机号码',
     phoneInvalid: '请输入正确的手机号码格式',
     oldPassword: '原密码',
+    newPassword: '新密码',
     confirmPassword: '确认密码',
     passwordRequired: '请输入密码',
     oldPasswordRequired: '请输入原密码',
@@ -305,6 +323,7 @@ export default {
     confirmPasswordRequired: '请确认新密码',
     passwordLength: '密码长度应为6-20个字符',
     passwordMismatch: '两次输入的密码不一致',
+    changePassword: '修改密码',
     address: '收货地址',
     addressList: '地址列表',
     addAddress: '添加地址',
@@ -320,6 +339,7 @@ export default {
     regionRequired: '请选择所在地区',
     addressRequired: '请输入详细地址',
     phoneRequired: '请输入联系电话',
+    login: '登录',
     register: '注册',
     forgotPassword: '忘记密码',
     rememberMe: '记住我',
@@ -351,7 +371,9 @@ export default {
     home: '家',
     company: '公司',
     school: '学校',
-    other: '其他'
+    other: '其他',
+    noAddress: '暂无地址',
+    confirmDelete: '确认删除？'
   },
   order: {
     title: '我的订单',
@@ -368,7 +390,7 @@ export default {
     trackingNo: '快递单号',
     shippingInfo: '物流信息',
     refundReason: '退款原因',
-    status: {
+    statuses: {
       all: '全部',
       pending: '待付款',
       paid: '已付款',
@@ -460,6 +482,7 @@ export default {
     reviewPlaceholder: '请分享您的使用体验',
     uploadPhotos: '上传图片',
     anonymous: '匿名评价',
+    reviewed: '已评价',
     rating: {
       terrible: '非常差',
       bad: '差',
@@ -516,6 +539,21 @@ export default {
     setDefault: '设为默认',
     setAsDefault: '设为默认地址'
   },
+  validation: {
+    required: '此项为必填项',
+    email: '请输入有效的邮箱地址',
+    phone: '请输入有效的电话号码',
+    password: '密码长度必须在6-20个字符之间',
+    passwordMatch: '两次输入的密码不一致',
+    number: '请输入有效的数字',
+    integer: '请输入整数',
+    positive: '请输入正数',
+    url: '请输入有效的URL地址',
+    max: '输入值不能大于{max}',
+    min: '输入值不能小于{min}',
+    maxLength: '长度不能超过{max}个字符',
+    minLength: '长度不能少于{min}个字符'
+  },
   guide: {
     title: '新手购物指南',
     registerLogin: {
@@ -538,10 +576,7 @@ export default {
     },
     cart: {
       title: '购物车',
-      desc: '购物车中可以：',
-      modify: '修改商品数量',
-      delete: '删除不需要的商品',
-      select: '选择要结算的商品'
+      description: '查看购物车中的商品，管理商品数量并进行结算'
     },
     order: {
       title: '提交订单',
@@ -559,6 +594,42 @@ export default {
       consult: '如有特殊情况请咨询专业医师'
     },
     startShopping: '开始购物',
-    browseAll: '浏览商品'
+    browseAll: '浏览商品',
+    startGuide: '开始引导',
+    done: '完成',
+    close: '关闭',
+    next: '下一步',
+    prev: '上一步',
+    search: {
+      title: '搜索功能',
+      description: '在这里可以搜索您需要的中药材和相关产品'
+    },
+    category: {
+      title: '分类导航',
+      description: '浏览不同类别的中药材，快速找到您需要的商品'
+    },
+    logo: {
+      title: '网站首页',
+      description: '点击这里随时回到首页'
+    },
+    userCenter: {
+      title: '个人中心',
+      description: '点击头像打开个人中心菜单'
+    },
+    userMenu: {
+      description: '这里可以：\n• 查看/修改个人资料\n• 管理订单记录\n• 管理收藏商品\n• 管理收货地址\n• 修改账户设置'
+    },
+    profile: {
+      title: '个人资料',
+      description: '查看和修改您的个人信息、密码等'
+    },
+    service: {
+      title: '服务保障',
+      description: '我们提供正品保障、极速配送、专业服务等多重保障'
+    },
+    footerNav: {
+      title: '底部导航',
+      description: '了解更多关于我们的信息，获取帮助和客户服务'
+    }
   }
 } 
