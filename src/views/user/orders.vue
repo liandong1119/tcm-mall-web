@@ -41,18 +41,18 @@
 
               <div class="order-products">
                 <div
-                  v-for="product in order.items"
+                  v-for="product in order.orderProductVoList"
                   :key="product.id"
                   class="product-item"
                 >
-                  <img :src="product.image" :alt="product.name">
+                  <img :src="product.img" :alt="product.name">
                   <div class="product-info">
                     <router-link :to="`/product/${product.id}`" class="product-name">
                       {{ product.name }}
                     </router-link>
                     <div class="product-meta">
                       <span class="price">{{ $t('common.currency') }}{{ (product.price || 0).toFixed(2) }}</span>
-                      <span class="quantity">x{{ product.quantity }}{{ product.unit || $t('product.detail.unit') }}</span>
+                      <span class="quantity">x{{ product.num }}{{ product.unit || $t('product.detail.unit') }}</span>
                     </div>
                   </div>
                 </div>
@@ -61,7 +61,7 @@
               <div class="order-footer">
                 <div class="order-amount">
                   {{ $t('order.total') }}: 
-                  <span class="amount">{{ $t('common.currency') }}{{ (order.amount || 0).toFixed(2) }}</span>
+                  <span class="amount">{{ $t('common.currency') }}{{ (order.totalAmount || 0).toFixed(2) }}</span>
                 </div>
                 <div class="order-operations">
                   <el-button
@@ -101,7 +101,7 @@
                   <el-button
                     type="info"
                     link
-                    @click="$router.push(`/order/${order.id}`)"
+                    @click="$router.push(`/order/${order.orderCode}`)"
                   >
                     {{ $t('order.detail') }}
                   </el-button>

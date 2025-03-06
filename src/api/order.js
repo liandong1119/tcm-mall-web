@@ -24,11 +24,12 @@ export function getOrderList(params) {
 }
 
 // 获取订单详情
-export function getOrderDetail(id) {
+export function getOrderDetail(params) {
   if (USE_MOCK) return mockApi.getOrderDetail(id)
   return request({
-    url: `/order/${id}`,
-    method: 'get'
+    url: `/order`,
+    method: 'get',
+    params
   })
 }
 

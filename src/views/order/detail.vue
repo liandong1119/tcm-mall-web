@@ -14,7 +14,7 @@
         <!-- 订单基本信息 -->
         <el-descriptions :column="2" border>
           <el-descriptions-item :label="$t('order.orderNo')">
-            {{ orderInfo.orderNo }}
+            {{ orderInfo.orderCode }}
           </el-descriptions-item>
           <el-descriptions-item :label="$t('order.createTime')">
             {{ orderInfo.createTime }}
@@ -22,8 +22,8 @@
           <el-descriptions-item :label="$t('order.payTime')" v-if="orderInfo.payTime">
             {{ orderInfo.payTime }}
           </el-descriptions-item>
-          <el-descriptions-item :label="$t('order.shipTime')" v-if="orderInfo.shipTime">
-            {{ orderInfo.shipTime }}
+          <el-descriptions-item :label="$t('order.shipTime')" v-if="orderInfo.shippingTime">
+            {{ orderInfo.shippingTime }}
           </el-descriptions-item>
         </el-descriptions>
 
@@ -31,22 +31,22 @@
         <div class="section-title">{{ $t('order.shipping') }}</div>
         <el-descriptions :column="1" border>
           <el-descriptions-item :label="$t('order.recipient')">
-            {{ orderInfo.address?.name }}
+            {{ orderInfo.addr }}
           </el-descriptions-item>
           <el-descriptions-item :label="$t('order.phone')">
-            {{ orderInfo.address?.phone }}
+            {{ orderInfo.contactDetailInfo }}
           </el-descriptions-item>
           <el-descriptions-item :label="$t('order.address')">
-            {{ orderInfo.address?.address }}
+            {{ orderInfo.receipt }}
           </el-descriptions-item>
         </el-descriptions>
 
         <!-- 商品列表 -->
         <div class="section-title">{{ $t('order.items') }}</div>
         <div class="order-items">
-          <div v-for="item in orderInfo.items" :key="item.id" class="order-item">
+          <div v-for="item in orderInfo.orderProductVoList" :key="item.id" class="order-item">
             <div class="item-info">
-              <el-image :src="item.image" class="item-image" fit="cover">
+              <el-image :src="item.img" class="item-image" fit="cover">
                 <template #error>
                   <div class="image-placeholder">
                     <el-icon><Picture /></el-icon>
@@ -57,7 +57,7 @@
                 <div class="item-name">{{ item.name }}</div>
                 <div class="item-price">
                   <span class="price">¥{{ item.price.toFixed(2) }}</span>
-                  <span class="quantity">x {{ item.quantity }}</span>
+                  <span class="quantity">x {{ item.num }}</span>
                 </div>
               </div>
             </div>
@@ -80,7 +80,7 @@
         <div class="order-amount">
           <div class="amount-item">
             <span>{{ $t('order.subtotal') }}:</span>
-            <span>¥{{ orderInfo.subtotal?.toFixed(2) }}</span>
+            <span>¥{{ orderInfo.totalAmount?.toFixed(2) }}</span>
           </div>
           <div class="amount-item">
             <span>{{ $t('order.shipping') }}:</span>
@@ -88,7 +88,7 @@
           </div>
           <div class="amount-item total">
             <span>{{ $t('order.total') }}:</span>
-            <span class="total-price">¥{{ orderInfo.total?.toFixed(2) }}</span>
+            <span class="total-price">¥{{ orderInfo.totalAmount?.toFixed(2) }}</span>
           </div>
         </div>
       </el-card>
@@ -210,7 +210,7 @@ const getOrderStatusType = (status) => {
 const fetchOrderDetail = async () => {
   loading.value = true
   try {
-    const data = await getOrderDetail(route.params.id)
+    const data = await getOrderDetail({orderCode:route.params.id})
     orderInfo.value = data
   } catch (error) {
     console.error('Failed to fetch order detail:', error)
