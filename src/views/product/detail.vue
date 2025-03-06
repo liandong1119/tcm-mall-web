@@ -409,11 +409,29 @@ const fetchReviews = async () => {
 
 // 添加到购物车
 const addToCart = () => {
+    // 检查是否选择了所有必要的规格
+    if (product.value.specifications && product.value.specifications.length > 0) {
+        const allSpecsSelected = product.value.specifications.every(spec => selectedSpecs[spec.name])
+        if (!allSpecsSelected) {
+            ElMessage.warning(t('product.message.selectAllSpecs'))
+            return
+        }
+    }
+
+    // 检查是否找到对应的 SKU
+    if (!currentSku.value) {
+        ElMessage.warning(t('product.message.skuNotFound'))
+        return
+    }
+
     // 创建包含规格信息的商品对象
     const productToAdd = {
         ...product.value,
         selectedSpecs: {...selectedSpecs},
-        sku: currentSku.value ? currentSku.value.id : null
+        sku: currentSku.value.id,
+        price: currentSku.value.price,
+        stock: currentSku.value.stock,
+        image: currentSku.value.image || product.value.image
     }
 
     cartStore.addItem(productToAdd, quantity.value)
@@ -422,13 +440,32 @@ const addToCart = () => {
 
 // 立即购买
 const buyNow = () => {
+    // 检查是否选择了所有必要的规格
+    if (product.value.specifications && product.value.specifications.length > 0) {
+        const allSpecsSelected = product.value.specifications.every(spec => selectedSpecs[spec.name])
+        if (!allSpecsSelected) {
+            ElMessage.warning(t('product.message.selectAllSpecs'))
+            return
+        }
+    }
+
+    // 检查是否找到对应的 SKU
+    if (!currentSku.value) {
+        ElMessage.warning(t('product.message.skuNotFound'))
+        return
+    }
+
     // 创建包含规格信息的商品对象
     const productToAdd = {
         ...product.value,
         selectedSpecs: {...selectedSpecs},
-        sku: currentSku.value ? currentSku.value.id : null
+        sku: currentSku.value.id,
+        price: currentSku.value.price,
+        stock: currentSku.value.stock,
+        image: currentSku.value.image || product.value.image
     }
 
+    cartStore.clear() // 清空购物车
     cartStore.addItem(productToAdd, quantity.value)
     router.push('/checkout')
 }
