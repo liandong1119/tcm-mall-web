@@ -7,11 +7,11 @@ export const useCartStore = defineStore('cart', () => {
 
   // 计算属性
   const totalCount = computed(() => {
-    return items.value.reduce((total, item) => total + item.quantity, 0)
+    return items.value.reduce((total, item) => total + Number(item.quantity || 0), 0)
   })
 
   const totalAmount = computed(() => {
-    return items.value.reduce((total, item) => total + item.price * item.quantity, 0)
+    return items.value.reduce((total, item) => total + Number(item.price || 0) * Number(item.quantity || 0), 0)
   })
 
   const selectedItems = computed(() => {
@@ -19,33 +19,34 @@ export const useCartStore = defineStore('cart', () => {
   })
 
   const selectedCount = computed(() => {
-    return selectedItems.value.reduce((total, item) => total + item.quantity, 0)
+    return selectedItems.value.reduce((total, item) => total + Number(item.quantity || 0), 0)
   })
 
   const selectedAmount = computed(() => {
-    return selectedItems.value.reduce((total, item) => total + item.price * item.quantity, 0)
+    return selectedItems.value.reduce((total, item) => total + Number(item.price || 0) * Number(item.quantity || 0), 0)
   })
 
   /**
    * 从服务端加载数据
    */
-  async function loadCart() {
+  async function loadCart(queryPage) {
     try {
-      const res = await getCartList({pageNum: 1, pageSize: 7})
-      if (res && res.list) {
+      const res = await getCartList(queryPage)
+      if (res && res.data && res.data.list) {
         // 确保每个商品项都有必要的字段
-        const cartItems = res.list.map(item => ({
+        const cartItems = res.data.list.map(item => ({
           id: item.id,
-          name: item.medicinalName || item.name,
+          name: item.name || item.medicinalName,
           price: Number(item.price || 0),
           image: item.image || '',
           quantity: Number(item.quantity || 1),
-          selected: true,
-          // 保留其他可能的字段
-          ...item
+          selected: true, // 默认选中
+          productId: item.productId,
+          stock: item.stock,
+          unit: item.unit || '克'
         }))
-        localStorage.setItem('cartItems', JSON.stringify(cartItems))
         items.value = cartItems
+        saveToStorage()
       }
     } catch (error) {
       console.error('Failed to load cart:', error)
@@ -58,17 +59,18 @@ export const useCartStore = defineStore('cart', () => {
   function addItem(product, quantity = 1) {
     const existingItem = items.value.find(item => item.id === product.id)
     if (existingItem) {
-      existingItem.quantity += quantity
+      existingItem.quantity = Number(existingItem.quantity) + Number(quantity)
     } else {
       items.value.push({
         id: product.id,
         name: product.name,
         price: Number(product.price || 0),
-        image: product.images?.[0] || product.image || '',
-        quantity,
+        image: product.image || '',
+        quantity: Number(quantity),
         selected: true,
-        skuId: product.sku,
-        selectedSpecs: product.selectedSpecs || {}
+        productId: product.productId,
+        stock: product.stock,
+        unit: product.unit || '克'
       })
     }
     saveToStorage()
