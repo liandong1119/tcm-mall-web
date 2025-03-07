@@ -1,244 +1,221 @@
 <template>
-    <div class="product-detail">
-        <div class="container">
-            <!-- 商品基本信息 -->
-            <el-card class="product-info">
-                <el-row :gutter="40">
-                    <!-- 左侧主图 -->
-                    <el-col :span="12">
-                        <div class="product-image">
-                            <el-image
-                                :src="getImageUrl(product.image)"
-                                :preview-src-list="product.images?.map(img => getImageUrl(img))"
-                                fit="cover"
-                                class="product-image"
-                            />
-                        </div>
-                    </el-col>
+  <div class="product-detail">
+    <div class="container">
+      <!-- 商品基本信息 -->
+      <el-card class="product-info">
+        <el-row :gutter="40">
+          <!-- 左侧主图 -->
+          <el-col :span="12">
+            <div class="product-image">
+              <el-image :src="getImageUrl(product.image)"
+                :preview-src-list="product.images?.map(img => getImageUrl(img))" fit="cover" class="product-image" />
+            </div>
+          </el-col>
 
-                    <!-- 右侧信息 -->
-                    <el-col :span="12">
-                        <div class="product-summary">
-                            <h1 class="product-name">{{ product.name }}</h1>
+          <!-- 右侧信息 -->
+          <el-col :span="12">
+            <div class="product-summary">
+              <h1 class="product-name">{{ product.name }}</h1>
 
-                            <!-- 评分展示 -->
-                            <div class="product-rating">
-                                <el-rate
-                                        v-model="product.rating"
-                                        disabled
-                                        show-score
-                                        text-color="#ff9900"
-                                        score-template="{value}"
-                                />
-                                <span class="rating-count">{{ product.ratingCount || 0 }} {{
-                                    $t('product.ratingCount')
-                                    }}</span>
-                            </div>
+              <!-- 评分展示 -->
+              <div class="product-rating">
+                <el-rate v-model="product.rating" disabled show-score text-color="#ff9900" score-template="{value}" />
+                <span class="rating-count">{{ product.ratingCount || 0 }} {{
+                  $t('product.ratingCount')
+                }}</span>
+              </div>
 
-                            <!-- 商品规格 -->
-                            <div class="product-specs-brief">
-                                <div class="spec-item">
-                                    <span class="label">{{ $t('product.brand') }}:</span>
-                                    <span class="value">{{ product.brand || $t('product.defaultBrand') }}</span>
-                                </div>
-                                <div class="spec-item">
-                                    <span class="label">{{ $t('product.origin') }}:</span>
-                                    <span class="value">{{ product.productionLocation || $t('product.defaultOrigin') }}</span>
-                                </div>
-                                <div class="spec-item">
-                                    <span class="label">{{ $t('product.stock') }}:</span>
-                                    <span class="value">{{ product.stock || $t('product.defaultStock') }}</span>
-                                </div>
-                            </div>
+              <!-- 商品规格 -->
+              <div class="product-specs-brief">
+                <div class="spec-item">
+                  <span class="label">{{ $t('product.brand') }}:</span>
+                  <span class="value">{{ product.brand || $t('product.defaultBrand') }}</span>
+                </div>
+                <div class="spec-item">
+                  <span class="label">{{ $t('product.origin') }}:</span>
+                  <span class="value">{{ product.productionLocation || $t('product.defaultOrigin') }}</span>
+                </div>
+                <div class="spec-item">
+                  <span class="label">{{ $t('product.stock') }}:</span>
+                  <span class="value">{{ product.stock || $t('product.defaultStock') }}</span>
+                </div>
+              </div>
 
-                            <!-- 规格选择 -->
-                            <div class="product-sku" v-if="product.specifications && product.specifications.length > 0">
-                                <div v-for="(spec, specIndex) in product.specifications" :key="specIndex"
-                                     class="sku-item">
-                                    <div class="sku-title">{{ spec.name }}:</div>
-                                    <div class="sku-options">
-                                        <el-radio-group v-model="selectedSpecs[spec.name]" @change="handleSpecChange">
-                                            <el-radio
-                                                    v-for="(option, optionIndex) in spec.options"
-                                                    :key="optionIndex"
-                                                    :label="option.value"
-                                                    :disabled="!option.available"
-                                                    class="sku-option"
-                                            >
-                                                {{ option.text }}
-                                                <span v-if="option.price_increment > 0" class="price-increment">+{{
-                                                    $t('common.currency')
-                                                    }}{{ option.price_increment }}</span>
-                                            </el-radio>
-                                        </el-radio-group>
-                                    </div>
-                                </div>
-                            </div>
+              <!-- 规格选择 -->
+              <div class="product-sku" v-if="product.specifications && product.specifications.length > 0">
+                <div v-for="(spec, specIndex) in product.specifications" :key="specIndex" class="sku-item">
+                  <div class="sku-title">{{ spec.name }}:</div>
+                  <div class="sku-options">
+                    <el-radio-group v-model="selectedSpecs[spec.name]" @change="handleSpecChange">
+                      <el-radio v-for="(option, optionIndex) in spec.options" :key="optionIndex" :label="option.value"
+                        :disabled="!option.available" class="sku-option">
+                        {{ option.text }}
+                        <span v-if="option.price_increment > 0" class="price-increment">+{{
+                          $t('common.currency')
+                        }}{{ option.price_increment }}</span>
+                      </el-radio>
+                    </el-radio-group>
+                  </div>
+                </div>
+              </div>
 
-                            <!-- 功能描述 -->
-                            <div class="product-function">
-                                <h3>{{ $t('product.detail.functionTitle') }}</h3>
-                                <div class="function-list">
-                                    <p v-for="(func, index) in product.functions" :key="index">
-                                        <el-icon>
-                                            <Check/>
-                                        </el-icon>
-                                        {{ func }}
-                                    </p>
-                                </div>
-                            </div>
+              <!-- 功能描述 -->
+              <div class="product-function">
+                <h3>{{ $t('product.detail.functionTitle') }}</h3>
+                <div class="function-list">
+                  <p v-for="(func, index) in product.functions" :key="index">
+                    <el-icon>
+                      <Check />
+                    </el-icon>
+                    {{ func }}
+                  </p>
+                </div>
+              </div>
 
-                            <div class="product-price">
-                                <span class="price">{{ $t('common.currency') }}{{ product.price }}</span>
-                                <span class="unit">/{{ $t('product.detail.unit') }}</span>
-                                <span v-if="product.originalPrice" class="original-price">
-                  {{ $t('product.originalPrice', {price: product.originalPrice}) }}
+              <div class="product-price">
+                <span class="price">{{ $t('common.currency') }}{{ currentPrice }}</span>
+                <span class="unit">/{{ $t('product.detail.unit') }}</span>
+                <span v-if="product.originalPrice" class="original-price">
+                  {{ $t('product.originalPrice', { price: product.originalPrice }) }}
                 </span>
-                            </div>
+              </div>
 
-                            <div class="product-actions">
-                                <div class="quantity-wrapper">
-                                    <span class="label">{{ $t('product.detail.quantity') }}：</span>
-                                    <el-input-number
-                                            v-model="quantity"
-                                            :min="1"
-                                            :max="99"
-                                            :step="1"
-                                            :precision="1"
-                                            size="large"
-                                            controls-position="right"
-                                    />
-                                    <span class="unit">{{ $t('product.detail.unit') }}</span>
-                                </div>
+              <div class="product-actions">
+                <div class="quantity-wrapper">
+                  <span class="label">{{ $t('product.detail.quantity') }}：</span>
+                  <el-input-number v-model="quantity" :min="1" :max="99" :step="1" :precision="1" size="large"
+                    controls-position="right" />
+                  <span class="unit">{{ $t('product.detail.unit') }}</span>
+                </div>
 
-                                <div class="buttons">
-                                    <el-button type="primary" size="large" @click="addToCard">
-                                        <el-icon>
-                                            <ShoppingCart/>
-                                        </el-icon>
-                                        {{ $t('product.detail.addToCart') }}
-                                    </el-button>
+                <div class="buttons">
+                  <el-button type="primary" size="large" @click="addToCard">
+                    <el-icon>
+                      <ShoppingCart />
+                    </el-icon>
+                    {{ $t('product.detail.addToCart') }}
+                  </el-button>
 
-                                    <el-button type="danger" size="large" @click="buyNow">
-                                        {{ $t('product.detail.buyNow') }}
-                                    </el-button>
+                  <el-button type="danger" size="large" @click="buyNow">
+                    {{ $t('product.detail.buyNow') }}
+                  </el-button>
 
-                                    <el-button
-                                            :type="isFavorite ? 'danger' : 'default'"
-                                            size="large"
-                                            plain
-                                            @click="toggleFavorite"
-                                    >
-                                        <el-icon>
-                                            <Star/>
-                                        </el-icon>
-                                        {{
-                                        isFavorite ? $t('product.removeFromFavorites') : $t('product.addToFavorites')
-                                        }}
-                                    </el-button>
-                                </div>
-                            </div>
-                        </div>
-                    </el-col>
-                </el-row>
-            </el-card>
+                  <el-button :type="isFavorite ? 'danger' : 'default'" size="large" plain @click="toggleFavorite">
+                    <el-icon>
+                      <Star />
+                    </el-icon>
+                    {{
+                      isFavorite ? $t('product.removeFromFavorites') : $t('product.addToFavorites')
+                    }}
+                  </el-button>
+                </div>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </el-card>
 
-            <!-- 商品详情标签页 -->
-            <el-card class="product-tabs">
-                <el-tabs v-model="activeTab">
-                    <!-- 商品详情 -->
-                    <el-tab-pane :label="$t('product.detail.detailTab')" name="detail">
-                        <div class="product-description" v-html="product.description"></div>
-                    </el-tab-pane>
+      <!-- 商品详情标签页 -->
+      <el-card class="product-tabs">
+        <el-tabs v-model="activeTab">
+          <!-- 商品详情 -->
+          <el-tab-pane :label="$t('product.detail.detailTab')" name="detail">
+            <div class="product-description" v-html="product.description"></div>
+          </el-tab-pane>
 
-                    <!-- 规格参数 -->
-                    <el-tab-pane :label="$t('product.detail.specsTab')" name="specs">
-                        <div class="product-specs">
-                            <el-descriptions :column="1" border>
-                                <el-descriptions-item :label="$t('product.category')">
-                                    {{ product.category || $t('common.noData') }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('product.brand')">
-                                    {{ product.brand || $t('product.defaultBrand') }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('product.origin')">
-                                    {{ product.origin || $t('product.defaultOrigin') }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('product.weight')">
-                                    {{ product.weight || $t('product.defaultWeight') }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('product.detail.efficacy')">
-                                    {{ product.efficacy || $t('common.noData') }}
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('product.detail.precautions')">
-                                    {{ product.precautions || $t('common.noData') }}
-                                </el-descriptions-item>
-                            </el-descriptions>
-                        </div>
-                    </el-tab-pane>
+          <!-- 规格参数 -->
+          <el-tab-pane :label="$t('product.detail.specsTab')" name="specs">
+            <div class="product-specs">
+              <el-descriptions :column="1" border>
+                <el-descriptions-item :label="$t('product.category')">
+                  {{ product.category || $t('common.noData') }}
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('product.brand')">
+                  {{ product.brand || $t('product.defaultBrand') }}
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('product.origin')">
+                  {{ product.origin || $t('product.defaultOrigin') }}
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('product.weight')">
+                  {{ product.weight || $t('product.defaultWeight') }}
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('product.detail.efficacy')">
+                  {{ product.efficacy || $t('common.noData') }}
+                </el-descriptions-item>
+                <el-descriptions-item :label="$t('product.detail.precautions')">
+                  {{ product.precautions || $t('common.noData') }}
+                </el-descriptions-item>
+              </el-descriptions>
+            </div>
+          </el-tab-pane>
 
-                    <!-- 买家评价 -->
-                    <el-tab-pane :label="$t('product.detail.reviewsTab')" name="reviews">
-                        <div class="product-reviews">
-                            <!-- 评价统计 -->
-                            <div class="review-summary">
-                                <div class="rating-average">
-                                    <span class="rating-value">{{ product.rating || 5 }}</span>
-                                    <el-rate v-model="product.rating" disabled/>
-                                    <span class="rating-count">{{
-                                        product.ratingCount || 0
-                                        }} {{ $t('product.ratingCount') }}</span>
-                                </div>
-                            </div>
+          <!-- 买家评价 -->
+          <el-tab-pane :label="$t('product.detail.reviewsTab')" name="reviews">
+            <div class="product-reviews">
+              <!-- 评价统计 -->
+              <div class="review-summary">
+                <div class="rating-average">
+                  <span class="rating-value">{{ product.rating || 5 }}</span>
+                  <el-rate v-model="product.rating" disabled />
+                  <span class="rating-count">{{
+                    product.ratingCount || 0
+                  }} {{ $t('product.ratingCount') }}</span>
+                </div>
+              </div>
 
-                            <!-- 评价列表 -->
-                            <div class="review-list">
-                                <div v-if="reviews.length === 0" class="no-reviews">
-                                    {{ $t('common.noData') }}
-                                </div>
-                                <div v-else v-for="(review, index) in reviews" :key="index" class="review-item">
-                                    <div class="review-header">
-                                        <span class="reviewer">{{ review.username }}</span>
-                                        <el-rate v-model="review.level" disabled/>
-                                        <span class="review-date">{{ review.createTime }}</span>
-                                    </div>
-                                    <div class="review-content">{{ review.content }}</div>
-                                    <div v-if="review.reply" class="review-reply">
-                                        <div class="reply-header">{{ $t('product.detail.merchantReply') }}:</div>
-                                        <div class="reply-content">{{ review.reply }}</div>
-                                    </div>
-                                </div>
-                            </div>
+              <!-- 评价列表 -->
+              <div class="review-list">
+                <div v-if="reviews.length === 0" class="no-reviews">
+                  {{ $t('common.noData') }}
+                </div>
+                <div v-else v-for="(review, index) in reviews" :key="index" class="review-item">
+                  <div class="review-header">
+                    <span class="reviewer">{{ review.username }}</span>
+                    <el-rate v-model="review.rating" disabled />
+                    <span class="review-date">{{ review.createTime }}</span>
+                  </div>
+                  <div class="review-content">{{ review.content }}</div>
+                  <div v-if="review.images && review.images.length > 0" class="review-images">
+                    <el-image
+                      v-for="(image, imgIndex) in review.images"
+                      :key="imgIndex"
+                      :src="getImageUrl(image)"
+                      :preview-src-list="review.images.map(img => getImageUrl(img))"
+                      fit="cover"
+                      class="review-image"
+                    />
+                  </div>
+                  <div v-if="review.reply" class="review-reply">
+                    <div class="reply-header">{{ $t('product.detail.merchantReply') }}:</div>
+                    <div class="reply-content">{{ review.reply }}</div>
+                  </div>
+                </div>
+              </div>
 
-                            <!-- 评价分页 -->
-                            <div class="reviews-pagination" v-if="reviewTotal > reviewPageSize">
-                                <el-pagination
-                                        v-model:current-page="reviewPage"
-                                        v-model:page-size="reviewPageSize"
-                                        :total="reviewTotal"
-                                        layout="prev, pager, next"
-                                        @current-change="handleReviewPageChange"
-                                />
-                            </div>
-                        </div>
-                    </el-tab-pane>
-                </el-tabs>
-            </el-card>
-        </div>
+              <!-- 评价分页 -->
+              <div class="reviews-pagination" v-if="reviewTotal > reviewPageSize">
+                <el-pagination v-model:current-page="reviewPage" v-model:page-size="reviewPageSize" :total="reviewTotal"
+                  layout="prev, pager, next" @current-change="handleReviewPageChange" />
+              </div>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+      </el-card>
     </div>
+  </div>
 </template>
 
 <script setup>
-import {ref, onMounted, reactive, computed} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {useCartStore} from '@/stores/cart'
-import {useI18n} from 'vue-i18n'
-import {ElMessage} from 'element-plus'
-import {ShoppingCart, Star, Check} from '@element-plus/icons-vue'
-import {getProductDetail, getProductReviews} from '@/api/product'
-import {getProductStats, getProductSpecs} from '@/api/mock'
-import {addToFavorite, removeFavorite} from '@/api/favorite'
-import {addCard} from "@/api/cart";
+import { ref, onMounted, reactive, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useCartStore } from '@/stores/cart'
+import { useI18n } from 'vue-i18n'
+import { ElMessage } from 'element-plus'
+import { ShoppingCart, Star, Check } from '@element-plus/icons-vue'
+import { getProductDetail, getProductReviews } from '@/api/product'
+import { getProductStats, getProductSpecs } from '@/api/mock'
+import { addToFavorite, removeFavorite } from '@/api/favorite'
+import { addToCart } from "@/api/cart";
 
 const route = useRoute()
 const router = useRouter()
@@ -261,22 +238,46 @@ const currentSku = ref(null)
 
 // 计算所有规格是否已选择
 const isAllSpecsSelected = computed(() => {
-    if (!product.value?.specifications || product.value.specifications.length === 0) {
-        return true
-    }
-    return product.value.specifications.every(spec => selectedSpecs[spec.name])
+  if (!product.value?.specifications || product.value.specifications.length === 0) {
+    return true
+  }
+  return product.value.specifications.every(spec => selectedSpecs[spec.name])
+})
+
+// 计算当前选择的规格对应的价格
+const currentPrice = computed(() => {
+  if (!product.value || !product.value.skus) {
+    return 0
+  }
+
+  // 如果没有规格，直接返回商品基础价格
+  if (!product.value.specifications || product.value.specifications.length === 0) {
+    return Number(product.value.price || 0)
+  }
+
+  // 找到匹配当前选择规格的SKU
+  const matchingSku = product.value.skus.find(sku => {
+    if (!sku.specs) return false
+    // 检查所有已选择的规格是否匹配
+    return Object.entries(selectedSpecs).every(([name, value]) => {
+      return sku.specs[name] === value
+    })
+  })
+
+  // 如果找到匹配的SKU，返回其价格，否则返回基础价格
+  return matchingSku ? Number(matchingSku.price) : Number(product.value.price || 0)
 })
 
 // 获取商品详情
 const fetchProductDetail = async () => {
-    try {
-        // 模拟数据，实际项目中应该从API获取
-        const data = await getProductDetail(route.params.id)
-        data.specifications = JSON.parse(data.specifications)
-        data.skus.forEach(sku => {
-            sku.specs = JSON.parse(sku.specs)
-        })
-        product.value = data
+  try {
+    // 模拟数据，实际项目中应该从API获取
+    const data = await getProductDetail(route.params.id)
+    data.specifications = JSON.parse(data.specifications)
+    data.skus.forEach(sku => {
+      sku.specs = JSON.parse(sku.specs)
+    })
+    product.value = data
 
         // // 使用模拟数据
         // product.value = {
@@ -361,17 +362,17 @@ const fetchProductDetail = async () => {
         //   ]
         // }
 
-        // 获取商品评价统计
-        productStats.value = await getProductStats(product.value.id)
+    // 获取商品评价统计
+    productStats.value = await getProductStats(product.value.id)
 
-        // 获取商品规格信息
-        const specsData = await getProductSpecs(product.value.id)
-        if (specsData) {
-            productSpecs.value = specsData
-        }
+    // 获取商品规格信息
+    const specsData = await getProductSpecs(product.value.id)
+    if (specsData) {
+      productSpecs.value = specsData
+    }
 
         // 模拟评论数据
-        /*reviews.value = [
+        reviews.value = [
             {
                 id: 1,
                 username: '张先生',
@@ -395,7 +396,7 @@ const fetchProductDetail = async () => {
                 createTime: '2023-12-05'
             }
         ]
-        reviewTotal.value = 3*/
+        reviewTotal.value = 3
 
     } catch (error) {
         console.error('Failed to fetch product detail:', error)
@@ -406,155 +407,156 @@ const fetchProductDetail = async () => {
 // 获取商品评价
 const fetchReviews = async () => {
     try {
-        const pageRequestParam = {
-            pageNum: reviewPage.value,
-            pageSize: reviewPageSize.value,
-            productId: route.params.id
-        }
         // 使用模拟数据，实际项目中应该从API获取
-        const { list, total } = await getProductReviews(pageRequestParam)
-        reviews.value = list
-        reviewTotal.value = total
-        console.log("返回的评论数据：",total)
+        // const { list, total } = await getProductReviews(route.params.id, {
+        //   page: reviewPage.value,
+        //   pageSize: reviewPageSize.value
+        // })
+        // reviews.value = list
+        // reviewTotal.value = total
+
         // 已在fetchProductDetail中设置了模拟评论数据
+        console.log('使用模拟评论数据')
     } catch (error) {
         console.error('Failed to fetch reviews:', error)
     }
 }
 
-// 处理图片URL
+// 获取图片完整URL
 const getImageUrl = (url) => {
-    if (!url) return ''
-    if (url.startsWith('http')) return url
-    return import.meta.env.VITE_API_BASE_URL + url
+  if (!url) return ''
+  if (url.startsWith('http')) return url
+  return `${import.meta.env.VITE_API_BASE_URL}${url}`
 }
 
 // 添加到购物车
-const addToCard = () => {
-    // 检查是否选择了所有必要的规格
-    if (product.value.specifications && product.value.specifications.length > 0) {
-        const allSpecsSelected = product.value.specifications.every(spec => selectedSpecs[spec.name])
-        if (!allSpecsSelected) {
-            ElMessage.warning(t('product.message.selectAllSpecs'))
-            return
-        }
+const addToCard = async () => {
+  // 检查是否选择了所有必要的规格
+  if (product.value.specifications && product.value.specifications.length > 0) {
+    const allSpecsSelected = product.value.specifications.every(spec => selectedSpecs[spec.name])
+    if (!allSpecsSelected) {
+      ElMessage.warning(t('product.message.selectAllSpecs'))
+      return
     }
+  }
 
-    // 检查是否找到对应的 SKU
-    if (!currentSku.value) {
-        ElMessage.warning(t('product.message.skuNotFound'))
-        return
-    }
+  // 检查是否找到对应的 SKU
+  if (!currentSku.value) {
+    ElMessage.warning(t('product.message.skuNotFound'))
+    return
+  }
 
-    // 创建包含规格信息的商品对象
-    const productToAdd = {
-        ...product.value,
-        preBuyNum: quantity.value,
-        selectedSpecs: {...selectedSpecs},
-        productId: product.value.id,
-        skuId: currentSku.value.id,
-        price: currentSku.value.price,
-        stock: currentSku.value.stock,
-        image: getImageUrl(currentSku.value.image || product.value.image)
-    }
-    console.log("添加到购物车",productToAdd)
+  // 创建包含规格信息的商品对象
+  const productToAdd = {
+    // ...product.value,
+    preBuyNum: quantity.value,
+    // selectedSpecs: {...selectedSpecs},
+    productId: product.value.id,
+    skuId: currentSku.value.id,
+    price: currentSku.value.price,
+    // stock: currentSku.value.stock,
+    // image: getImageUrl(currentSku.value.image || product.value.image)
+  }
+
+  try {
+    // 调用添加到购物车API
+    const response = await addToCart(productToAdd)
     cartStore.addItem(productToAdd, quantity.value)
     // TODO 添加到购物车
     addCard(productToAdd)
     ElMessage.success(t('product.message.addToCartSuccess'))
+    // 重新加载购物车数据
+    // await cartStore.loadCart()
+
+  } catch (error) {
+    console.error('添加到购物车失败:', error)
+    ElMessage.error(t('product.message.addToCartFailed'))
+  }
 }
 
 // 立即购买
 const buyNow = () => {
-    // 检查是否选择了所有必要的规格
-    if (!isAllSpecsSelected.value) {
-        ElMessage.warning(t('product.message.selectAllSpecs'))
-        return
-    }
+  // 检查是否选择了所有必要的规格
+  if (!isAllSpecsSelected.value) {
+    ElMessage.warning(t('product.message.selectAllSpecs'))
+    return
+  }
 
-    // 检查是否找到对应的 SKU
-    if (!currentSku.value) {
-        ElMessage.warning(t('product.message.skuNotFound'))
-        return
-    }
+  // 检查是否找到对应的 SKU
+  if (!currentSku.value) {
+    ElMessage.warning(t('product.message.skuNotFound'))
+    return
+  }
 
-    // 创建包含规格信息的商品对象
-    const productToAdd = {
-        ...product.value,
-        selectedSpecs: {...selectedSpecs},
-        sku: currentSku.value.id,
-        price: currentSku.value.price,
-        stock: currentSku.value.stock,
-        image: getImageUrl(currentSku.value.image || product.value.image)
-    }
+  // 创建包含规格信息的商品对象
+  const productToAdd = {
+    ...product.value,
+    selectedSpecs: { ...selectedSpecs },
+    sku: currentSku.value.id,
+    price: currentSku.value.price,
+    stock: currentSku.value.stock,
+    image: getImageUrl(currentSku.value.image || product.value.image)
+  }
 
-    cartStore.buyNow(productToAdd, quantity.value)
-    router.push('/checkout')
+  cartStore.buyNow(productToAdd, quantity.value)
+  router.push('/checkout')
 }
 
 // 收藏/取消收藏
 const toggleFavorite = async () => {
-    try {
-        if (isFavorite.value) {
-            await removeFavorite(product.value.id)
-            isFavorite.value = false
-            ElMessage.success(t('product.message.unfavoriteSuccess'))
-        } else {
-            await addToFavorite(product.value.id)
-            isFavorite.value = true
-            ElMessage.success(t('product.message.favoriteSuccess'))
-        }
-    } catch (error) {
-        console.error('Failed to toggle favorite:', error)
-        ElMessage.error(error.message)
+  try {
+    if (isFavorite.value) {
+      await removeFavorite(product.value.id)
+      isFavorite.value = false
+      ElMessage.success(t('product.message.unfavoriteSuccess'))
+    } else {
+      await addToFavorite(product.value.id)
+      isFavorite.value = true
+      ElMessage.success(t('product.message.favoriteSuccess'))
     }
+  } catch (error) {
+    console.error('Failed to toggle favorite:', error)
+    ElMessage.error(error.message)
+  }
 }
 
 // 评价分页
 const handleReviewPageChange = (page) => {
-    reviewPage.value = page
-    fetchReviews()
+  reviewPage.value = page
+  fetchReviews()
 }
 
 // 处理规格选择变化
 const handleSpecChange = () => {
-    // 根据选择的规格找到对应的SKU
-    if (product.value.skus && product.value.skus.length > 0) {
-        const matchingSku = product.value.skus.find(sku => {
-            return Object.keys(selectedSpecs).every(specName => {
-                return sku.specs[specName] === selectedSpecs[specName]
-            })
-        })
-
-        if (matchingSku) {
-            currentSku.value = matchingSku
-            // 更新价格、库存等信息
-            if (matchingSku.price) product.value.price = matchingSku.price
-            if (matchingSku.stock !== undefined) product.value.stock = matchingSku.stock
-            if (matchingSku.image) product.value.image = matchingSku.image
-        }
-    }
+  // 更新当前SKU
+  if (product.value.skus) {
+    currentSku.value = product.value.skus.find(sku => {
+      return Object.entries(selectedSpecs).every(([name, value]) => {
+        return sku.specs[name] === value
+      })
+    })
+  }
 }
 
 // 初始化默认规格选择
 const initDefaultSpecs = () => {
-    if (product.value.specifications && product.value.specifications.length > 0) {
-        product.value.specifications.forEach(spec => {
-            if (spec.options && spec.options.length > 0) {
-                // 默认选择第一个可用选项
-                const defaultOption = spec.options.find(opt => opt.available !== false) || spec.options[0]
-                selectedSpecs[spec.name] = defaultOption.value
-            }
-        })
-        handleSpecChange()
-    }
+  if (product.value.specifications && product.value.specifications.length > 0) {
+    product.value.specifications.forEach(spec => {
+      if (spec.options && spec.options.length > 0) {
+        // 默认选择第一个可用选项
+        const defaultOption = spec.options.find(opt => opt.available !== false) || spec.options[0]
+        selectedSpecs[spec.name] = defaultOption.value
+      }
+    })
+    handleSpecChange()
+  }
 }
 
 onMounted(() => {
-    fetchProductDetail().then(() => {
-        initDefaultSpecs()
-    })
-    fetchReviews()
+  fetchProductDetail().then(() => {
+    initDefaultSpecs()
+  })
+  fetchReviews()
 })
 </script>
 
@@ -848,6 +850,21 @@ onMounted(() => {
             margin-bottom: 10px;
           }
 
+          .review-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+
+            .review-image {
+              width: 80px;
+              height: 80px;
+              border-radius: 4px;
+              cursor: pointer;
+              object-fit: cover;
+            }
+          }
+
           .review-reply {
             margin-top: 10px;
             background: #f8f8f8;
@@ -886,4 +903,19 @@ onMounted(() => {
     }
   }
 }
-</style> 
+
+.review-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+
+  .review-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    cursor: pointer;
+    object-fit: cover;
+  }
+}
+</style>

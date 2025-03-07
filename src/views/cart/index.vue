@@ -32,7 +32,7 @@
                 <template v-else>
                     <!-- 商品列表 -->
                     <div class="cart-list">
-                        <div class="cart-item" v-for="item in cartStore.items" :key="item.id">
+                        <div class="cart-item" v-for="item in currentPageItems" :key="item.id">
                             <el-checkbox v-model="item.selected" @change="handleItemSelect"/>
 
                             <div class="item-info">
@@ -73,6 +73,19 @@
                                 </el-button>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- 分页器 -->
+                    <div class="pagination-container">
+                        <el-pagination
+                            v-model:current-page="currentPage"
+                            v-model:page-size="pageSize"
+                            :page-sizes="[5, 10, 20, 50]"
+                            :total="total"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                        />
                     </div>
 
                     <!-- 底部结算栏 -->
@@ -149,41 +162,72 @@ import {generateCartItems} from "@/utils/mockData";
 const router = useRouter()
 const cartStore = useCartStore()
 const {t} = useI18n()
-cartStore.loadCart()
-const cartItems = computed(() => cartStore.items)
 
-watch(cartStore.items,() => {
-    console.log("数据发生了变化：：：：", cartStore.items)})
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+
+// 获取当前页的商品
+const currentPageItems = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value
+    const end = start + pageSize.value
+    return cartStore.items.slice(start, end)
+})
+
+// 处理分页变化
+const handleSizeChange = (val) => {
+    pageSize.value = val
+    currentPage.value = 1
+    cartStore.loadCart({pageNum: currentPage.value, pageSize: pageSize.value})
+}
+
+const handleCurrentChange = (val) => {
+    currentPage.value = val
+    cartStore.loadCart({pageNum: currentPage.value, pageSize: pageSize.value})
+}
+
+// 监听购物车数据变化，更新总数
+watch(() => cartStore.items, (items) => {
+    total.value = items.length
+    // 如果当前页没有数据且不是第一页，则回到上一页
+    if (currentPageItems.value.length === 0 && currentPage.value > 1) {
+        currentPage.value--
+    }
+}, { deep: true })
+
+onMounted(async () => {
+    await cartStore.loadCart({pageNum: currentPage.value, pageSize: pageSize.value})
+    total.value = cartStore.items.length
+})
+
 // 选中商品数量
 const selectedCount = computed(() => {
-    return cartItems.value.filter(item => item.selected).length
+    return cartStore.selectedCount
 })
 
 // 总金额
 const totalAmount = computed(() => {
-    return cartItems.value
-        .filter(item => item.selected)
-        .reduce((total, item) => total + item.price * item.quantity, 0)
+    return cartStore.selectedAmount
 })
 
 // 是否全选
 const isAllSelected = computed({
     get: () => {
-        return cartItems.value.length > 0 && cartItems.value.every(item => item.selected)
+        return cartStore.items.length > 0 && cartStore.items.every(item => item.selected)
     },
     set: (value) => {
-        cartItems.value.forEach(item => item.selected = value)
+        cartStore.toggleAll(value)
     }
 })
 
 // 全选/取消全选
 const handleSelectAll = (value) => {
-    cartItems.value.forEach(item => item.selected = value)
+    cartStore.toggleAll(value)
 }
 
 // 选择单个商品
 const handleItemSelect = () => {
-    // 更新本地存储
     cartStore.saveToStorage()
 }
 
@@ -232,6 +276,7 @@ const handleCheckout = () => {
     }
 }
 </script>
+
 
 <style lang="scss" scoped>
 .cart-page {
@@ -377,6 +422,13 @@ const handleCheckout = () => {
         }
       }
     }
+  }
+
+  .pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px;
+    border-top: 1px solid #eee;
   }
 }
 </style> 
