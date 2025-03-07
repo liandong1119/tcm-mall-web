@@ -358,9 +358,9 @@ const handleSubmitOrder = async () => {
     try {
         // 将 Proxy 对象转换为普通对象
         const items = cartStore.selectedItems.map(item => ({
-            // goodsId: item.id,
+            goodsId: item.id,
             skuId: item.skuId || item.sku, // 兼容两种属性名
-            // buyNum: item.quantity,
+            buyNum: item.quantity,
             // specs: JSON.parse(JSON.stringify(item.selectedSpecs || {})) // 深拷贝规格信息
         }))
 
@@ -370,12 +370,13 @@ const handleSubmitOrder = async () => {
         }
 
         console.log("提交订单数据：", orderData)
-        const {orderId} = await createOrder(orderData)
+         await createOrder(orderData)
         ElMessage.success(t('checkout.createSuccess'))
         // 清除已购买的商品
         cartStore.clear()
         // 跳转到支付页面
-        router.push(`/pay/${orderId}`)
+        // TODO 模拟订单支付
+        router.push(`/pay/123`)
     } catch (error) {
         console.error('Failed to create order:', error)
         ElMessage.error(error.message)

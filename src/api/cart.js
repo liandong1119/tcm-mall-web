@@ -14,7 +14,7 @@ export function getCartList(queryPage) {
 }
 
 // 添加到购物车
-export function addToCart(data) {
+export function addCard(data) {
   if (USE_MOCK) return mockApi.addToCart(data)
   return request({
     url: '/cart',

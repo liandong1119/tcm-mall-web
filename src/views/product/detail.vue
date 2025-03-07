@@ -101,9 +101,9 @@
                                     <span class="label">{{ $t('product.detail.quantity') }}：</span>
                                     <el-input-number
                                             v-model="quantity"
-                                            :min="0.5"
+                                            :min="1"
                                             :max="99"
-                                            :step="0.5"
+                                            :step="1"
                                             :precision="1"
                                             size="large"
                                             controls-position="right"
@@ -112,7 +112,7 @@
                                 </div>
 
                                 <div class="buttons">
-                                    <el-button type="primary" size="large" @click="addToCart">
+                                    <el-button type="primary" size="large" @click="addToCard">
                                         <el-icon>
                                             <ShoppingCart/>
                                         </el-icon>
@@ -238,6 +238,7 @@ import {ShoppingCart, Star, Check} from '@element-plus/icons-vue'
 import {getProductDetail, getProductReviews} from '@/api/product'
 import {getProductStats, getProductSpecs} from '@/api/mock'
 import {addToFavorite, removeFavorite} from '@/api/favorite'
+import {addCard} from "@/api/cart";
 
 const route = useRoute()
 const router = useRouter()
@@ -428,7 +429,7 @@ const getImageUrl = (url) => {
 }
 
 // 添加到购物车
-const addToCart = () => {
+const addToCard = () => {
     // 检查是否选择了所有必要的规格
     if (product.value.specifications && product.value.specifications.length > 0) {
         const allSpecsSelected = product.value.specifications.every(spec => selectedSpecs[spec.name])
@@ -447,14 +448,18 @@ const addToCart = () => {
     // 创建包含规格信息的商品对象
     const productToAdd = {
         ...product.value,
+        preBuyNum: quantity.value,
         selectedSpecs: {...selectedSpecs},
-        sku: currentSku.value.id,
+        productId: product.value.id,
+        skuId: currentSku.value.id,
         price: currentSku.value.price,
         stock: currentSku.value.stock,
         image: getImageUrl(currentSku.value.image || product.value.image)
     }
     console.log("添加到购物车",productToAdd)
     cartStore.addItem(productToAdd, quantity.value)
+    // TODO 添加到购物车
+    addCard(productToAdd)
     ElMessage.success(t('product.message.addToCartSuccess'))
 }
 

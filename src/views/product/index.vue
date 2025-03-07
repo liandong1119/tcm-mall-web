@@ -47,7 +47,7 @@
                 :disabled="product.stock <= 0"
                 @click="handleAddToCart"
               >
-                {{ $t('product.addToCart') }}
+                {{ $t('product.addCard') }}
               </el-button>
               <el-button
                 type="danger"

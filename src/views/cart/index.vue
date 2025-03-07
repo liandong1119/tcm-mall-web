@@ -39,7 +39,8 @@
                                 <el-image :src="item.image" :alt="item.name" class="item-image"/>
                                 <div class="item-details">
                                     <h3 class="item-name">{{ item.name }}</h3>
-                                    <p class="item-price">¥{{ item.price}}/{{ $t('cart.unit') }}</p>
+                                    <p class="item-price">¥{{ item.price
+                                         }}/{{ $t('cart.unit') }}</p>
                                 </div>
                             </div>
 

@@ -30,7 +30,7 @@
             <ul>
               <li>{{ $t('guide.shopping.details') }}</li>
               <li>{{ $t('guide.shopping.quantity') }}</li>
-              <li>{{ $t('guide.shopping.addToCart') }}</li>
+              <li>{{ $t('guide.shopping.addCard') }}</li>
             </ul>
           </div>
 
