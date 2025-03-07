@@ -95,10 +95,10 @@ export function getPromotionProducts(params) {
 }
 
 // 获取商品评价
-export function getProductReviews(productId, params) {
+export function getProductReviews( params) {
   if (USE_MOCK) return mockApi.getProductReviews(productId, params)
   return request({
-    url: `/products/${productId}/reviews`,
+    url: `/comment/list`,
     method: 'get',
     params
   })

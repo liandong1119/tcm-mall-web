@@ -31,7 +31,7 @@ export const useCartStore = defineStore('cart', () => {
    */
   async function loadCart() {
     try {
-      const res = await getCartList({pageNum: 1, pageSize: 7})
+      const res = await getCartList({pageNum: 2, pageSize: 7})
       if (res && res.list) {
         // 确保每个商品项都有必要的字段
         const cartItems = res.list.map(item => ({

@@ -199,7 +199,7 @@
                                 <div v-else v-for="(review, index) in reviews" :key="index" class="review-item">
                                     <div class="review-header">
                                         <span class="reviewer">{{ review.username }}</span>
-                                        <el-rate v-model="review.rating" disabled/>
+                                        <el-rate v-model="review.level" disabled/>
                                         <span class="review-date">{{ review.createTime }}</span>
                                     </div>
                                     <div class="review-content">{{ review.content }}</div>
@@ -371,7 +371,7 @@ const fetchProductDetail = async () => {
         }
 
         // 模拟评论数据
-        reviews.value = [
+        /*reviews.value = [
             {
                 id: 1,
                 username: '张先生',
@@ -395,7 +395,7 @@ const fetchProductDetail = async () => {
                 createTime: '2023-12-05'
             }
         ]
-        reviewTotal.value = 3
+        reviewTotal.value = 3*/
 
     } catch (error) {
         console.error('Failed to fetch product detail:', error)
@@ -406,16 +406,17 @@ const fetchProductDetail = async () => {
 // 获取商品评价
 const fetchReviews = async () => {
     try {
+        const pageRequestParam = {
+            pageNum: reviewPage.value,
+            pageSize: reviewPageSize.value,
+            productId: route.params.id
+        }
         // 使用模拟数据，实际项目中应该从API获取
-        // const { list, total } = await getProductReviews(route.params.id, {
-        //   page: reviewPage.value,
-        //   pageSize: reviewPageSize.value
-        // })
-        // reviews.value = list
-        // reviewTotal.value = total
-
+        const { list, total } = await getProductReviews(pageRequestParam)
+        reviews.value = list
+        reviewTotal.value = total
+        console.log("返回的评论数据：",total)
         // 已在fetchProductDetail中设置了模拟评论数据
-        console.log('使用模拟评论数据')
     } catch (error) {
         console.error('Failed to fetch reviews:', error)
     }
