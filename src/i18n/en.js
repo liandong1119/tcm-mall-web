@@ -1,5 +1,6 @@
 export default {
   common: {
+    operation:'操作',
     systemName: 'TCM Mall',
     search: 'Search products',
     currency: '$',
@@ -637,7 +638,8 @@ export default {
     statusText: {
       pending: 'Processing',
       approved: 'Approved',
-      rejected: 'Rejected'
+      rejected: 'Rejected',
+      cancelled:'Cancelled'
     }
   }
 } 

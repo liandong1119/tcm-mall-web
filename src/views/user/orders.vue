@@ -41,22 +41,22 @@
 
                             <div class="order-products">
                                 <div
-                                        v-for="product in order.orderProductVoList"
-                                        :key="product.id"
+
+                                        :key="order.id"
                                         class="product-item"
                                 >
-                                    <img :src="product.img" :alt="product.name">
+                                    <img :src="order.img" :alt="order.name">
                                     <div class="product-info">
-                                        <router-link :to="`/product/${product.id}`" class="product-name">
-                                            {{ product.name }}
+                                        <router-link :to="`/product/${order.id}`" class="product-name">
+                                            {{ order.name }}
                                         </router-link>
                                         <div class="product-meta">
                                             <span class="price">{{
                                                 $t('common.currency')
-                                                }}{{ (product.price || 0).toFixed(2) }}</span>
+                                                }}{{ (order.price || 0).toFixed(2) }}</span>
                                             <span class="quantity">x{{
-                                                product.num
-                                                }}{{ product.unit || $t('product.detail.unit') }}</span>
+                                                    order.buyNum
+                                                }}{{ order.unit || $t('product.detail.unit') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -67,7 +67,7 @@
                                     {{ $t('order.total') }}:
                                     <span class="amount">{{
                                         $t('common.currency')
-                                        }}{{ (order.totalAmount || 0).toFixed(2) }}</span>
+                                        }}{{ (order.price || 0).toFixed(2) }}</span>
                                 </div>
                                 <div class="order-operations">
                                     <el-button
@@ -208,6 +208,7 @@ import {
     payOrder
 } from '@/api/order'
 import {useI18n} from 'vue-i18n'
+import {userApplyRefund} from "@/api/refund";
 
 const router = useRouter()
 const {t} = useI18n()
@@ -333,7 +334,7 @@ const handleCancelOrder = async (order) => {
         )
 
         await cancelOrder(order.id)
-        ElMessage.success(t('message.cancelSuccess'))
+        ElMessage.success(t('message.cancel Success'))
         fetchOrders()
     } catch (error) {
         if (error !== 'cancel') {
@@ -381,7 +382,11 @@ const submitRefund = async () => {
         if (valid) {
             submitting.value = true
             try {
-                await applyRefund(currentOrder.value.id, refundForm.value)
+                const refundRequest = {
+                    orderId: currentOrder.value.id,
+                    reason: refundForm.value.reason
+                }
+                await userApplyRefund(refundRequest)
                 ElMessage.success(t('message.operateSuccess'))
                 refundDialogVisible.value = false
                 fetchOrders()

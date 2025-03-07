@@ -13,7 +13,7 @@
         <el-col v-for="item in favorites" :key="item.id" :span="8">
           <el-card class="product-card" :body-style="{ padding: '0px' }">
             <div class="product-image">
-              <img :src="item.image" :alt="item.name">
+              <img :src="item.img" :alt="item.name">
             </div>
             <div class="product-info">
               <h4>{{ item.name }}</h4>

@@ -50,9 +50,9 @@ export function getCategoryDetail(id) {
 }
 
 // 获取分类商品列表
-export function getCategoryProducts(categoryId, params) {
+export function getCategoryProducts(params) {
   return request({
-    url: `/categories/${categoryId}/products`,
+    url: `/products`,
     method: 'get',
     params
   })

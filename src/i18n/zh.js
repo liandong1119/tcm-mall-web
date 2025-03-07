@@ -1,5 +1,6 @@
 export default {
   common: {
+    operation:'操作',
     systemName: '中药商城',
     search: '搜索商品',
     currency: '¥',
@@ -672,7 +673,8 @@ export default {
     statusText: {
       pending: '处理中',
       approved: '已通过',
-      rejected: '已拒绝'
+      rejected: '已拒绝',
+      cancelled: '已取消'
     }
   }
 } 

@@ -1,165 +1,169 @@
 <template>
-  <div class="order-detail">
-    <div class="container">
-      <el-card class="order-info" v-loading="loading">
-        <template #header>
-          <div class="card-header">
-            <h3>{{ $t('order.detail') }}</h3>
-            <el-tag :type="getOrderStatusType(orderInfo.status)">
-              {{ $t(`order.statuses.${orderInfo.status}`) }}
-            </el-tag>
-          </div>
-        </template>
-
-        <!-- 订单基本信息 -->
-        <el-descriptions :column="2" border>
-          <el-descriptions-item :label="$t('order.orderNo')">
-            {{ orderInfo.orderCode }}
-          </el-descriptions-item>
-          <el-descriptions-item :label="$t('order.createTime')">
-            {{ orderInfo.createTime }}
-          </el-descriptions-item>
-          <el-descriptions-item :label="$t('order.payTime')" v-if="orderInfo.payTime">
-            {{ orderInfo.payTime }}
-          </el-descriptions-item>
-          <el-descriptions-item :label="$t('order.shipTime')" v-if="orderInfo.shippingTime">
-            {{ orderInfo.shippingTime }}
-          </el-descriptions-item>
-        </el-descriptions>
-
-        <!-- 收货地址信息 -->
-        <div class="section-title">{{ $t('order.shipping') }}</div>
-        <el-descriptions :column="1" border>
-          <el-descriptions-item :label="$t('order.recipient')">
-            {{ orderInfo.addr }}
-          </el-descriptions-item>
-          <el-descriptions-item :label="$t('order.phone')">
-            {{ orderInfo.contactDetailInfo }}
-          </el-descriptions-item>
-          <el-descriptions-item :label="$t('order.address')">
-            {{ orderInfo.receipt }}
-          </el-descriptions-item>
-        </el-descriptions>
-
-        <!-- 商品列表 -->
-        <div class="section-title">{{ $t('order.items') }}</div>
-        <div class="order-items">
-          <div v-for="item in orderInfo.orderProductVoList" :key="item.id" class="order-item">
-            <div class="item-info">
-              <el-image :src="item.img" class="item-image" fit="cover">
-                <template #error>
-                  <div class="image-placeholder">
-                    <el-icon><Picture /></el-icon>
-                  </div>
+    <div class="order-detail">
+        <div class="container">
+            <el-card class="order-info" v-loading="loading">
+                <template #header>
+                    <div class="card-header">
+                        <h3>{{ $t('order.detail') }}</h3>
+                        <el-tag :type="getOrderStatusType(orderInfo.status)">
+                            {{ $t(`order.statuses.${orderInfo.status}`) }}
+                        </el-tag>
+                    </div>
                 </template>
-              </el-image>
-              <div class="item-details">
-                <div class="item-name">{{ item.name }}</div>
-                <div class="item-price">
-                  <span class="price">¥{{ item.price.toFixed(2) }}</span>
-                  <span class="quantity">x {{ item.num }}</span>
+
+                <!-- 订单基本信息 -->
+                <el-descriptions :column="2" border>
+                    <el-descriptions-item :label="$t('order.orderNo')">
+                        {{ orderInfo.orderCode }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('order.createTime')">
+                        {{ orderInfo.createTime }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('order.payTime')" v-if="orderInfo.payTime">
+                        {{ orderInfo.payTime }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('order.shipTime')" v-if="orderInfo.shippingTime">
+                        {{ orderInfo.shippingTime }}
+                    </el-descriptions-item>
+                </el-descriptions>
+
+                <!-- 收货地址信息 -->
+                <div class="section-title">{{ $t('order.shipping') }}</div>
+                <el-descriptions :column="1" border>
+                    <el-descriptions-item :label="$t('order.recipient')">
+                        {{ orderInfo.addr }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('order.phone')">
+                        {{ orderInfo.contactDetailInfo }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('order.address')">
+                        {{ orderInfo.receipt }}
+                    </el-descriptions-item>
+                </el-descriptions>
+
+                <!-- 商品列表 -->
+                <div class="section-title">{{ $t('order.items') }}</div>
+                <div class="order-items">
+                    <div v-for="item in orderInfo.orderProductVoList" :key="item.id" class="order-item">
+                        <div class="item-info">
+                            <el-image :src="item.img" class="item-image" fit="cover">
+                                <template #error>
+                                    <div class="image-placeholder">
+                                        <el-icon>
+                                            <Picture/>
+                                        </el-icon>
+                                    </div>
+                                </template>
+                            </el-image>
+                            <div class="item-details">
+                                <div class="item-name">{{ item.name }}</div>
+                                <div class="item-price">
+                                    <span class="price">¥{{ item.price.toFixed(2) }}</span>
+                                    <span class="quantity">x {{ item.num }}</span>
+                                </div>
+                                <!-- 显示商品状态 -->
+                                <div class="item-status">
+                                    <el-tag size="small" :type="getOrderStatusType(item.status)">
+                                        {{ $t(`order.statuses.${item.status}`) }}
+                                    </el-tag>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 评价按钮 - 根据商品状态显示 -->
+                        <div class="item-actions" v-if="item.status === 'completed'">
+                            <el-button
+                                    v-if="!item.hasReviewed"
+                                    type="primary"
+                                    size="small"
+                                    @click="handleReview(item)"
+                            >
+                                {{ $t('review.writeReview') }}
+                            </el-button>
+                            <el-tag v-else type="info" size="small">{{ $t('review.reviewed') }}</el-tag>
+                        </div>
+                        <!-- 退款按钮 - 根据商品状态显示 -->
+                        <div class="item-actions" v-if="item.status === 'paid' || item.status === 'shipped'">
+                            <el-button
+                                    v-if="!item.refundStatus"
+                                    type="danger"
+                                    size="small"
+                                    @click="handleRefund(item)"
+                            >
+                                {{ $t('order.refund') }}
+                            </el-button>
+                            <el-tag
+                                    v-else
+                                    :type="getRefundStatusType(item.refundStatus)"
+                                    size="small"
+                            >
+                                {{ $t(`order.refundStatus.${item.refundStatus}`) }}
+                            </el-tag>
+                        </div>
+                    </div>
                 </div>
-                <!-- 显示商品状态 -->
-                <div class="item-status">
-                  <el-tag size="small" :type="getOrderStatusType(item.status)">
-                    {{ $t(`order.statuses.${item.status}`) }}
-                  </el-tag>
+
+                <!-- 订单金额信息 -->
+                <div class="order-amount">
+                    <div class="amount-item">
+                        <span>{{ $t('order.subtotal') }}:</span>
+                        <span>¥{{ orderInfo.totalAmount?.toFixed(2) }}</span>
+                    </div>
+                    <div class="amount-item">
+                        <span>{{ $t('order.shipping') }}:</span>
+                        <span>¥{{ orderInfo.shippingFee?.toFixed(2) }}</span>
+                    </div>
+                    <div class="amount-item total">
+                        <span>{{ $t('order.total') }}:</span>
+                        <span class="total-price">¥{{ orderInfo.totalAmount?.toFixed(2) }}</span>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <!-- 评价按钮 - 根据商品状态显示 -->
-            <div class="item-actions" v-if="item.status === 'completed'">
-              <el-button 
-                v-if="!item.hasReviewed"
-                type="primary" 
-                size="small" 
-                @click="handleReview(item)"
-              >
-                {{ $t('review.writeReview') }}
-              </el-button>
-              <el-tag v-else type="info" size="small">{{ $t('review.reviewed') }}</el-tag>
-            </div>
-            <!-- 退款按钮 - 根据商品状态显示 -->
-            <div class="item-actions" v-if="item.status === 'paid' || item.status === 'shipped'">
-              <el-button
-                v-if="!item.refundStatus"
-                type="danger"
-                size="small"
-                @click="handleRefund(item)"
-              >
-                {{ $t('order.refund') }}
-              </el-button>
-              <el-tag 
-                v-else 
-                :type="getRefundStatusType(item.refundStatus)"
-                size="small"
-              >
-                {{ $t(`order.refundStatus.${item.refundStatus}`) }}
-              </el-tag>
-            </div>
-          </div>
+            </el-card>
         </div>
 
-        <!-- 订单金额信息 -->
-        <div class="order-amount">
-          <div class="amount-item">
-            <span>{{ $t('order.subtotal') }}:</span>
-            <span>¥{{ orderInfo.totalAmount?.toFixed(2) }}</span>
-          </div>
-          <div class="amount-item">
-            <span>{{ $t('order.shipping') }}:</span>
-            <span>¥{{ orderInfo.shippingFee?.toFixed(2) }}</span>
-          </div>
-          <div class="amount-item total">
-            <span>{{ $t('order.total') }}:</span>
-            <span class="total-price">¥{{ orderInfo.totalAmount?.toFixed(2) }}</span>
-          </div>
-        </div>
-      </el-card>
-    </div>
-
-    <!-- 评价对话框 -->
-    <el-dialog
-      v-model="reviewDialogVisible"
-      :title="$t('review.writeReview')"
-      width="500px"
-    >
-      <el-form
-        ref="reviewFormRef"
-        :model="reviewForm"
-        :rules="reviewRules"
-        label-position="top"
-      >
-        <el-form-item :label="$t('review.rating')" prop="rating">
-          <el-rate
-            v-model="reviewForm.rating"
-            :texts="ratingTexts"
-            show-text
-          />
-        </el-form-item>
-        <el-form-item :label="$t('review.content')" prop="content">
-          <el-input
-            v-model="reviewForm.content"
-            type="textarea"
-            :rows="4"
-            :placeholder="$t('review.reviewPlaceholder')"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('review.uploadPhotos')">
-          <el-upload
-            action="/api/upload"
-            list-type="picture-card"
-            :limit="5"
-            :on-success="handleUploadSuccess"
-            :on-remove="handleUploadRemove"
-            :auto-upload="false"
-            :http-request="handleUpload"
-          >
-            <el-icon><Plus /></el-icon>
-          </el-upload>
-        </el-form-item>
-      </el-form>
-      <template #footer>
+        <!-- 评价对话框 -->
+        <el-dialog
+                v-model="reviewDialogVisible"
+                :title="$t('review.writeReview')"
+                width="500px"
+        >
+            <el-form
+                    ref="reviewFormRef"
+                    :model="reviewForm"
+                    :rules="reviewRules"
+                    label-position="top"
+            >
+                <el-form-item :label="$t('review.rating')" prop="rating">
+                    <el-rate
+                            v-model="reviewForm.rating"
+                            :texts="ratingTexts"
+                            show-text
+                    />
+                </el-form-item>
+                <el-form-item :label="$t('review.content')" prop="content">
+                    <el-input
+                            v-model="reviewForm.content"
+                            type="textarea"
+                            :rows="4"
+                            :placeholder="$t('review.reviewPlaceholder')"
+                    />
+                </el-form-item>
+                <el-form-item :label="$t('review.uploadPhotos')">
+                    <el-upload
+                            action="/api/upload"
+                            list-type="picture-card"
+                            :limit="5"
+                            :on-success="handleUploadSuccess"
+                            :on-remove="handleUploadRemove"
+                            :auto-upload="false"
+                            :http-request="handleUpload"
+                    >
+                        <el-icon>
+                            <Plus/>
+                        </el-icon>
+                    </el-upload>
+                </el-form-item>
+            </el-form>
+            <template #footer>
         <span class="dialog-footer">
           <el-button @click="reviewDialogVisible = false">
             {{ $t('common.cancel') }}
@@ -168,64 +172,66 @@
             {{ $t('common.submit') }}
           </el-button>
         </span>
-      </template>
-    </el-dialog>
+            </template>
+        </el-dialog>
 
-    <!-- 退款对话框 -->
-    <el-dialog
-      v-model="refundDialogVisible"
-      :title="$t('order.refundApplication')"
-      width="500px"
-    >
-      <el-form
-        ref="refundFormRef"
-        :model="refundForm"
-        :rules="refundRules"
-        label-position="top"
-      >
-        <el-form-item :label="$t('order.refundAmount')" prop="amount">
-          <el-input-number
-            v-model="refundForm.amount"
-            :min="0"
-            :max="currentRefundItem?.price"
-            :precision="2"
-            :step="0.01"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('order.refundReason')" prop="reason">
-          <el-select v-model="refundForm.reason" style="width: 100%">
-            <el-option
-              v-for="(reason, index) in refundReasons"
-              :key="index"
-              :label="$t(`order.refundReasons.${reason}`)"
-              :value="reason"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="$t('order.refundDescription')" prop="description">
-          <el-input
-            v-model="refundForm.description"
-            type="textarea"
-            :rows="4"
-            :placeholder="$t('order.refundDescriptionPlaceholder')"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('order.refundImages')">
-          <el-upload
-            action="/api/upload"
-            list-type="picture-card"
-            :limit="5"
-            :on-success="handleUploadSuccess"
-            :on-remove="handleUploadRemove"
-            :auto-upload="false"
-            :http-request="handleUpload"
-          >
-            <el-icon><Plus /></el-icon>
-          </el-upload>
-        </el-form-item>
-      </el-form>
-      <template #footer>
+        <!-- 退款对话框 -->
+        <el-dialog
+                v-model="refundDialogVisible"
+                :title="$t('order.refundApplication')"
+                width="500px"
+        >
+            <el-form
+                    ref="refundFormRef"
+                    :model="refundForm"
+                    :rules="refundRules"
+                    label-position="top"
+            >
+                <el-form-item :label="$t('order.refundAmount')" prop="amount">
+                    <el-input-number
+                            v-model="refundForm.amount"
+                            :min="0"
+                            :max="currentRefundItem?.price"
+                            :precision="2"
+                            :step="0.01"
+                            style="width: 100%"
+                    />
+                </el-form-item>
+                <el-form-item :label="$t('order.refundReason')" prop="reason">
+                    <el-select v-model="refundForm.reason" style="width: 100%">
+                        <el-option
+                                v-for="(reason, index) in refundReasons"
+                                :key="index"
+                                :label="$t(`order.refundReasons.${reason}`)"
+                                :value="reason"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item :label="$t('order.refundDescription')" prop="description">
+                    <el-input
+                            v-model="refundForm.description"
+                            type="textarea"
+                            :rows="4"
+                            :placeholder="$t('order.refundDescriptionPlaceholder')"
+                    />
+                </el-form-item>
+                <el-form-item :label="$t('order.refundImages')">
+                    <el-upload
+                            action="/api/upload"
+                            list-type="picture-card"
+                            :limit="5"
+                            :on-success="handleUploadSuccess"
+                            :on-remove="handleUploadRemove"
+                            :auto-upload="false"
+                            :http-request="handleUpload"
+                    >
+                        <el-icon>
+                            <Plus/>
+                        </el-icon>
+                    </el-upload>
+                </el-form-item>
+            </el-form>
+            <template #footer>
         <span class="dialog-footer">
           <el-button @click="refundDialogVisible = false">
             {{ $t('common.cancel') }}
@@ -234,21 +240,21 @@
             {{ $t('common.submit') }}
           </el-button>
         </span>
-      </template>
-    </el-dialog>
-  </div>
+            </template>
+        </el-dialog>
+    </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { ElMessage } from 'element-plus'
-import { Plus, Picture } from '@element-plus/icons-vue'
-import { getOrderDetail, submitOrderReview, uploadReviewImage, applyRefund } from '@/api/order'
+import {ref, onMounted} from 'vue'
+import {useRoute} from 'vue-router'
+import {useI18n} from 'vue-i18n'
+import {ElMessage} from 'element-plus'
+import {Plus, Picture} from '@element-plus/icons-vue'
+import {getOrderDetail, submitOrderReview, uploadReviewImage, applyRefund} from '@/api/order'
 
 const route = useRoute()
-const { t } = useI18n()
+const {t} = useI18n()
 
 // 订单数据
 const orderInfo = ref({})
@@ -261,27 +267,27 @@ const currentReviewItem = ref(null)
 const submitting = ref(false)
 
 const reviewForm = ref({
-  rating: 5,
-  content: '',
-  images: []
+    rating: 5,
+    content: '',
+    images: []
 })
 
 const reviewRules = {
-  rating: [
-    { required: true, message: t('validate.ratingRequired'), trigger: 'change' }
-  ],
-  content: [
-    { required: true, message: t('validate.reviewContentRequired'), trigger: 'blur' },
-    { min: 5, max: 500, message: t('validate.reviewContentLength'), trigger: 'blur' }
-  ]
+    rating: [
+        {required: true, message: t('validate.ratingRequired'), trigger: 'change'}
+    ],
+    content: [
+        {required: true, message: t('validate.reviewContentRequired'), trigger: 'blur'},
+        {min: 5, max: 500, message: t('validate.reviewContentLength'), trigger: 'blur'}
+    ]
 }
 
 const ratingTexts = [
-  t('review.rating.terrible'),
-  t('review.rating.bad'),
-  t('review.rating.normal'),
-  t('review.rating.good'),
-  t('review.rating.excellent')
+    t('review.rating.terrible'),
+    t('review.rating.bad'),
+    t('review.rating.normal'),
+    t('review.rating.good'),
+    t('review.rating.excellent')
 ]
 
 // 退款相关
@@ -289,264 +295,268 @@ const refundDialogVisible = ref(false)
 const refundFormRef = ref(null)
 const currentRefundItem = ref(null)
 const refundForm = ref({
-  amount: 0,
-  reason: '',
-  description: '',
-  images: []
+    amount: 0,
+    reason: '',
+    description: '',
+    images: []
 })
 
 const refundReasons = [
-  'quality_issue',
-  'wrong_product',
-  'not_received',
-  'damaged',
-  'other'
+    'quality_issue',
+    'wrong_product',
+    'not_received',
+    'damaged',
+    'other'
 ]
 
 const refundRules = {
-  amount: [
-    { required: true, message: t('validate.refundAmountRequired'), trigger: 'blur' },
-    { type: 'number', min: 0, message: t('validate.refundAmountMin'), trigger: 'blur' }
-  ],
-  reason: [
-    { required: true, message: t('validate.refundReasonRequired'), trigger: 'change' }
-  ],
-  description: [
-    { required: true, message: t('validate.refundDescriptionRequired'), trigger: 'blur' },
-    { min: 10, max: 500, message: t('validate.refundDescriptionLength'), trigger: 'blur' }
-  ]
+    amount: [
+        {required: true, message: t('validate.refundAmountRequired'), trigger: 'blur'},
+        {type: 'number', min: 0, message: t('validate.refundAmountMin'), trigger: 'blur'}
+    ],
+    reason: [
+        {required: true, message: t('validate.refundReasonRequired'), trigger: 'change'}
+    ],
+    description: [
+        {required: true, message: t('validate.refundDescriptionRequired'), trigger: 'blur'},
+        {min: 10, max: 500, message: t('validate.refundDescriptionLength'), trigger: 'blur'}
+    ]
 }
 
 // 获取订单状态样式
 const getOrderStatusType = (status) => {
-  const types = {
-    pending: 'warning',
-    paid: 'primary',
-    shipped: 'success',
-    completed: 'info',
-    cancelled: 'danger'
-  }
-  return types[status] || 'info'
+    const types = {
+        pending: 'warning',
+        paid: 'primary',
+        shipped: 'success',
+        completed: 'info',
+        cancelled: 'danger'
+    }
+    return types[status] || 'info'
 }
 
 // 获取退款状态样式
 const getRefundStatusType = (status) => {
-  const types = {
-    pending: 'warning',
-    approved: 'success',
-    rejected: 'danger',
-    cancelled: 'info'
-  }
-  return types[status] || 'info'
+    const types = {
+        pending: 'warning',
+        approved: 'success',
+        rejected: 'danger',
+        cancelled: 'info'
+    }
+    return types[status] || 'info'
 }
 
 // 获取订单详情
 const fetchOrderDetail = async () => {
-  loading.value = true
-  try {
-    const response = await getOrderDetail({orderCode:route.params.id})
-    // 处理后端返回的数据格式
-    const data = response.data || response
-    
-    // 转换订单状态从数字到字符串
-    const statusMap = {
-      0: "pending",
-      1: "paid",
-      2: "shipped",
-      4: "completed",
-      5: "cancelled",
-      6: "refunding",
-      7: "refunded"
+    loading.value = true
+    try {
+        const response = await getOrderDetail({orderCode: route.params.id})
+        // 处理后端返回的数据格式
+        const data = response.data || response
+
+        // 转换订单状态从数字到字符串
+        const statusMap = {
+            0: "pending",
+            1: "paid",
+            2: "shipped",
+            4: "completed",
+            5: "cancelled",
+            6: "refunding",
+            7: "refunded"
+        }
+
+        // 构建前端需要的数据结构
+        orderInfo.value = {
+            id: data.id || data.orderCode,
+            orderCode: data.orderCode,
+            // 根据商品状态确定整个订单的状态
+            status: determineOrderStatus(data.orderProductVoList),
+            createTime: data.createTime,
+            payTime: data.payTime,
+            shipTime: data.shippingTime,
+            totalAmount: data.totalAmount,
+            shippingFee: data.shippingFee || 0,
+            addr: data.addr,
+            contactDetailInfo: data.contactDetailInfo,
+            receipt: data.receipt,
+            orderProductVoList: (data.orderProductVoList || []).map(item => ({
+                id: item.id || item.orderId,
+                name: item.name,
+                price: item.price,
+                num: item.num,
+                img: item.img,
+                hasReviewed: item.isComment || false,
+                refundStatus: item.refundStatus,
+                specifications: item.specifications || '',
+                // 添加商品状态
+                status: statusMap[item.status] || 'pending'
+            }))
+        }
+    } catch (error) {
+        console.error('Failed to fetch order detail:', error)
+        ElMessage.error(t('message.fetchFailed'))
+    } finally {
+        loading.value = false
     }
-    
-    // 构建前端需要的数据结构
-    orderInfo.value = {
-      id: data.id || data.orderCode,
-      orderCode: data.orderCode,
-      // 根据商品状态确定整个订单的状态
-      status: determineOrderStatus(data.orderProductVoList),
-      createTime: data.createTime,
-      payTime: data.payTime,
-      shipTime: data.shippingTime,
-      totalAmount: data.totalAmount,
-      shippingFee: data.shippingFee || 0,
-      addr: data.addr,
-      contactDetailInfo: data.contactDetailInfo,
-      receipt: data.receipt,
-      orderProductVoList: (data.orderProductVoList || []).map(item => ({
-        id: item.id || item.orderId,
-        name: item.name,
-        price: item.price,
-        num: item.num,
-        img: item.img,
-        hasReviewed: item.isComment || false,
-        refundStatus: item.refundStatus,
-        specifications: item.specifications || '',
-        // 添加商品状态
-        status: statusMap[item.status] || 'pending'
-      }))
-    }
-  } catch (error) {
-    console.error('Failed to fetch order detail:', error)
-    ElMessage.error(t('message.fetchFailed'))
-  } finally {
-    loading.value = false
-  }
 }
 
 // 根据商品状态确定整个订单的状态
 const determineOrderStatus = (products) => {
-  if (!products || products.length === 0) {
-    return 'pending'
-  }
-  
-  // 状态优先级: cancelled > refunded > refunding > completed > shipped > paid > pending
-  const statusPriority = {
-    'cancelled': 7,
-    'refunded': 6,
-    'refunding': 5,
-    'completed': 4,
-    'shipped': 3,
-    'paid': 2,
-    'pending': 1
-  }
-  
-  // 数字状态映射到字符串
-  const statusMap = {
-    0: "pending",
-    1: "paid",
-    2: "shipped",
-    4: "completed",
-    5: "cancelled",
-    6: "refunding",
-    7: "refunded"
-  }
-  
-  // 获取所有商品的状态
-  const statuses = products.map(item => statusMap[item.status] || 'pending')
-  
-  // 按优先级排序，取最高优先级的状态
-  return statuses.sort((a, b) => statusPriority[b] - statusPriority[a])[0]
+    if (!products || products.length === 0) {
+        return 'pending'
+    }
+
+    // 状态优先级: cancelled > refunded > refunding > completed > shipped > paid > pending
+    const statusPriority = {
+        'cancelled': 7,
+        'refunded': 6,
+        'refunding': 5,
+        'completed': 4,
+        'shipped': 3,
+        'paid': 2,
+        'pending': 1
+    }
+
+    // 数字状态映射到字符串
+    const statusMap = {
+        0: "pending",
+        1: "paid",
+        2: "shipped",
+        4: "completed",
+        5: "cancelled",
+        6: "refunding",
+        7: "refunded"
+    }
+
+    // 获取所有商品的状态
+    const statuses = products.map(item => statusMap[item.status] || 'pending')
+
+    // 按优先级排序，取最高优先级的状态
+    return statuses.sort((a, b) => statusPriority[b] - statusPriority[a])[0]
 }
 
 // 处理评价
 const handleReview = (item) => {
-  currentReviewItem.value = item
-  reviewForm.value = {
-    rating: 5,
-    content: '',
-    images: []
-  }
-  reviewDialogVisible.value = true
+    currentReviewItem.value = item
+    reviewForm.value = {
+        rating: 5,
+        content: '',
+        images: []
+    }
+    reviewDialogVisible.value = true
 }
 
 // 处理退款
 const handleRefund = (item) => {
-  currentRefundItem.value = item
-  refundForm.value = {
-    amount: item.price,
-    reason: '',
-    description: '',
-    images: []
-  }
-  refundDialogVisible.value = true
+    currentRefundItem.value = item
+    refundForm.value = {
+        amount: item.price,
+        reason: '',
+        description: '',
+        images: []
+    }
+    refundDialogVisible.value = true
 }
 
 // 处理图片上传
-const handleUpload = async ({ file }) => {
-  try {
-    const { url } = await uploadReviewImage(file)
-    if (reviewDialogVisible.value) {
-      reviewForm.value.images.push(url)
-    } else if (refundDialogVisible.value) {
-      refundForm.value.images.push(url)
+const handleUpload = async ({file}) => {
+    try {
+        const {url} = await uploadReviewImage(file)
+        if (reviewDialogVisible.value) {
+            reviewForm.value.images.push(url)
+        } else if (refundDialogVisible.value) {
+            refundForm.value.images.push(url)
+        }
+        return {url}
+    } catch (error) {
+        ElMessage.error(t('message.uploadFailed'))
+        return false
     }
-    return { url }
-  } catch (error) {
-    ElMessage.error(t('message.uploadFailed'))
-    return false
-  }
 }
 
 const handleUploadSuccess = (response) => {
-  if (response.url) {
-    if (reviewDialogVisible.value) {
-      reviewForm.value.images.push(response.url)
-    } else if (refundDialogVisible.value) {
-      refundForm.value.images.push(response.url)
+    if (response.url) {
+        if (reviewDialogVisible.value) {
+            reviewForm.value.images.push(response.url)
+        } else if (refundDialogVisible.value) {
+            refundForm.value.images.push(response.url)
+        }
     }
-  }
 }
 
 const handleUploadRemove = (file) => {
-  if (reviewDialogVisible.value) {
-    const index = reviewForm.value.images.indexOf(file.url)
-    if (index > -1) {
-      reviewForm.value.images.splice(index, 1)
+    if (reviewDialogVisible.value) {
+        const index = reviewForm.value.images.indexOf(file.url)
+        if (index > -1) {
+            reviewForm.value.images.splice(index, 1)
+        }
+    } else if (refundDialogVisible.value) {
+        const index = refundForm.value.images.indexOf(file.url)
+        if (index > -1) {
+            refundForm.value.images.splice(index, 1)
+        }
     }
-  } else if (refundDialogVisible.value) {
-    const index = refundForm.value.images.indexOf(file.url)
-    if (index > -1) {
-      refundForm.value.images.splice(index, 1)
-    }
-  }
 }
 
 // 提交评价
 const submitReview = async () => {
-  if (!reviewFormRef.value) return
+    if (!reviewFormRef.value) return
 
-  await reviewFormRef.value.validate(async (valid) => {
-    if (valid) {
-      submitting.value = true
-      try {
-        await submitOrderReview({
-          orderId: orderInfo.value.id,
-          itemId: currentReviewItem.value.id,
-          ...reviewForm.value
-        })
-        ElMessage.success(t('message.reviewSuccess'))
-        reviewDialogVisible.value = false
-        // 刷新订单详情
-        fetchOrderDetail()
-      } catch (error) {
-        console.error('Submit review failed:', error)
-        ElMessage.error(t('message.reviewFailed'))
-      } finally {
-        submitting.value = false
-      }
-    }
-  })
+    await reviewFormRef.value.validate(async (valid) => {
+        if (valid) {
+            submitting.value = true
+            try {
+                // TODO 单独的商品id
+                const reviewRequest = {
+                    orderId: orderInfo.value.id,
+                    goodsId: 4,
+                    content: reviewForm.value.content,
+                    level: reviewForm.value.rating,
+                    photoIds: reviewForm.value.images
+                }
+                await submitOrderReview(reviewRequest)
+                ElMessage.success(t('message.reviewSuccess'))
+                reviewDialogVisible.value = false
+                // 刷新订单详情
+                fetchOrderDetail()
+            } catch (error) {
+                console.error('Submit review failed:', error)
+                ElMessage.error(t('message.reviewFailed'))
+            } finally {
+                submitting.value = false
+            }
+        }
+    })
 }
 
 // 提交退款申请
 const submitRefund = async () => {
-  if (!refundFormRef.value) return
+    if (!refundFormRef.value) return
 
-  await refundFormRef.value.validate(async (valid) => {
-    if (valid) {
-      submitting.value = true
-      try {
-        await applyRefund(orderInfo.value.orderCode, {
-          itemId: currentRefundItem.value.id,
-          ...refundForm.value
-        })
-        ElMessage.success(t('message.refundSuccess'))
-        refundDialogVisible.value = false
-        // 刷新订单详情
-        fetchOrderDetail()
-      } catch (error) {
-        console.error('Submit refund failed:', error)
-        ElMessage.error(t('message.refundFailed'))
-      } finally {
-        submitting.value = false
-      }
-    }
-  })
+    await refundFormRef.value.validate(async (valid) => {
+        if (valid) {
+            submitting.value = true
+            try {
+                await applyRefund(orderInfo.value.orderCode, {
+                    itemId: currentRefundItem.value.id,
+                    ...refundForm.value
+                })
+                ElMessage.success(t('message.refundSuccess'))
+                refundDialogVisible.value = false
+                // 刷新订单详情
+                fetchOrderDetail()
+            } catch (error) {
+                console.error('Submit refund failed:', error)
+                ElMessage.error(t('message.refundFailed'))
+            } finally {
+                submitting.value = false
+            }
+        }
+    })
 }
 
 onMounted(() => {
-  fetchOrderDetail()
+    fetchOrderDetail()
 })
 </script>
 

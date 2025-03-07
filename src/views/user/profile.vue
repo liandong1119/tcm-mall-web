@@ -232,7 +232,7 @@ const addressForm = ref({
 // 地址分页参数
 const addressPage = ref({
     pageNum: 1,
-    pageSize: 10,
+    pageSize: 5,
     total: 0
 })
 

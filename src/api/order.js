@@ -36,16 +36,16 @@ export function getOrderDetail(params) {
 // 取消订单
 export function cancelOrder(id) {
   return request({
-    url: `/order/${id}/cancel`,
-    method: 'post'
+    url: `/order/cancel/${id}`,
+    method: 'put'
   })
 }
 
 // 确认收货
 export function confirmReceive(id) {
   return request({
-    url: `/order/${id}/confirm`,
-    method: 'post'
+    url: `/order/confirm/${id}`,
+    method: 'put'
   })
 }
 
@@ -102,7 +102,7 @@ export function payOrder(id, data) {
 // 提交订单评价
 export function submitOrderReview(data) {
   return request({
-    url: '/order/review',
+    url: '/comment/add',
     method: 'post',
     data
   })

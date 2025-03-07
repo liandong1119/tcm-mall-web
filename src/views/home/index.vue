@@ -129,7 +129,7 @@ const fetchProducts = async () => {
     const params = {
       pageNum: currentPage.value,
       pageSize: pageSize.value,
-      query: searchQuery.value,
+      name: searchQuery.value,
       categoryId: activeCategory.value === 'all' ? undefined : activeCategory.value
     }
     const { list, total: totalCount } = await getProductList(params)
