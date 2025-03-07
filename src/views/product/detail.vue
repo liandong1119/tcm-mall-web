@@ -20,7 +20,7 @@
               <!-- 评分展示 -->
               <div class="product-rating">
                 <el-rate v-model="product.rating" disabled show-score text-color="#ff9900" score-template="{value}" />
-                <span class="rating-count">{{ product.ratingCount || 0 }} {{
+                <span class="rating-count">{{ reviewTotal || 0 }} {{
                   $t('product.ratingCount')
                 }}</span>
               </div>
@@ -158,7 +158,7 @@
                   <span class="rating-value">{{ product.rating || 5 }}</span>
                   <el-rate v-model="product.rating" disabled />
                   <span class="rating-count">{{
-                    product.ratingCount || 0
+                    reviewTotal || 0
                   }} {{ $t('product.ratingCount') }}</span>
                 </div>
               </div>
@@ -171,16 +171,16 @@
                 <div v-else v-for="(review, index) in reviews" :key="index" class="review-item">
                   <div class="review-header">
                     <span class="reviewer">{{ review.username }}</span>
-                    <el-rate v-model="review.rating" disabled />
+                    <el-rate v-model="review.level" disabled />
                     <span class="review-date">{{ review.createTime }}</span>
                   </div>
                   <div class="review-content">{{ review.content }}</div>
-                  <div v-if="review.images && review.images.length > 0" class="review-images">
+                  <div v-if="review.photoUrl && review.photoUrl.length > 0" class="review-images">
                     <el-image
-                      v-for="(image, imgIndex) in review.images"
+                      v-for="(image, imgIndex) in review.photoUrl"
                       :key="imgIndex"
-                      :src="getImageUrl(image)"
-                      :preview-src-list="review.images.map(img => getImageUrl(img))"
+                      :src="image"
+                      :preview-src-list="review.photoUrl.map(img => getImageUrl(img))"
                       fit="cover"
                       class="review-image"
                     />
@@ -372,7 +372,7 @@ const fetchProductDetail = async () => {
     }
 
         // 模拟评论数据
-        reviews.value = [
+       /* reviews.value = [
             {
                 id: 1,
                 username: '张先生',
@@ -396,7 +396,7 @@ const fetchProductDetail = async () => {
                 createTime: '2023-12-05'
             }
         ]
-        reviewTotal.value = 3
+        reviewTotal.value = 3*/
 
     } catch (error) {
         console.error('Failed to fetch product detail:', error)
@@ -408,12 +408,14 @@ const fetchProductDetail = async () => {
 const fetchReviews = async () => {
     try {
         // 使用模拟数据，实际项目中应该从API获取
-        // const { list, total } = await getProductReviews(route.params.id, {
-        //   page: reviewPage.value,
-        //   pageSize: reviewPageSize.value
-        // })
-        // reviews.value = list
-        // reviewTotal.value = total
+        const pageParam = {
+            pageNum: reviewPage.value,
+            pageSize: reviewPageSize.value,
+            productId: route.params.id
+        }
+        const { list, total } = await getProductReviews(pageParam)
+        reviews.value = list
+        reviewTotal.value = total
 
         // 已在fetchProductDetail中设置了模拟评论数据
         console.log('使用模拟评论数据')
