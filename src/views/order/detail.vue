@@ -59,10 +59,16 @@
                   <span class="price">¥{{ item.price.toFixed(2) }}</span>
                   <span class="quantity">x {{ item.num }}</span>
                 </div>
+                <!-- 显示商品状态 -->
+                <div class="item-status">
+                  <el-tag size="small" :type="getOrderStatusType(item.status)">
+                    {{ $t(`order.statuses.${item.status}`) }}
+                  </el-tag>
+                </div>
               </div>
             </div>
-            <!-- 评价按钮 -->
-            <div class="item-actions" v-if="orderInfo.status === 'completed'">
+            <!-- 评价按钮 - 根据商品状态显示 -->
+            <div class="item-actions" v-if="item.status === 'completed'">
               <el-button 
                 v-if="!item.hasReviewed"
                 type="primary" 
@@ -73,8 +79,8 @@
               </el-button>
               <el-tag v-else type="info" size="small">{{ $t('review.reviewed') }}</el-tag>
             </div>
-            <!-- 添加退款按钮 -->
-            <div class="item-actions" v-if="orderInfo.status === 'paid' || orderInfo.status === 'shipped'">
+            <!-- 退款按钮 - 根据商品状态显示 -->
+            <div class="item-actions" v-if="item.status === 'paid' || item.status === 'shipped'">
               <el-button
                 v-if="!item.refundStatus"
                 type="danger"
@@ -239,7 +245,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Plus, Picture } from '@element-plus/icons-vue'
-import { getOrderDetail, submitOrderReview, uploadReviewImage } from '@/api/order'
+import { getOrderDetail, submitOrderReview, uploadReviewImage, applyRefund } from '@/api/order'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -338,14 +344,89 @@ const getRefundStatusType = (status) => {
 const fetchOrderDetail = async () => {
   loading.value = true
   try {
-    const data = await getOrderDetail({orderCode:route.params.id})
-    orderInfo.value = data
+    const response = await getOrderDetail({orderCode:route.params.id})
+    // 处理后端返回的数据格式
+    const data = response.data || response
+    
+    // 转换订单状态从数字到字符串
+    const statusMap = {
+      0: "pending",
+      1: "paid",
+      2: "shipped",
+      4: "completed",
+      5: "cancelled",
+      6: "refunding",
+      7: "refunded"
+    }
+    
+    // 构建前端需要的数据结构
+    orderInfo.value = {
+      id: data.id || data.orderCode,
+      orderCode: data.orderCode,
+      // 根据商品状态确定整个订单的状态
+      status: determineOrderStatus(data.orderProductVoList),
+      createTime: data.createTime,
+      payTime: data.payTime,
+      shipTime: data.shippingTime,
+      totalAmount: data.totalAmount,
+      shippingFee: data.shippingFee || 0,
+      addr: data.addr,
+      contactDetailInfo: data.contactDetailInfo,
+      receipt: data.receipt,
+      orderProductVoList: (data.orderProductVoList || []).map(item => ({
+        id: item.id || item.orderId,
+        name: item.name,
+        price: item.price,
+        num: item.num,
+        img: item.img,
+        hasReviewed: item.isComment || false,
+        refundStatus: item.refundStatus,
+        specifications: item.specifications || '',
+        // 添加商品状态
+        status: statusMap[item.status] || 'pending'
+      }))
+    }
   } catch (error) {
     console.error('Failed to fetch order detail:', error)
     ElMessage.error(t('message.fetchFailed'))
   } finally {
     loading.value = false
   }
+}
+
+// 根据商品状态确定整个订单的状态
+const determineOrderStatus = (products) => {
+  if (!products || products.length === 0) {
+    return 'pending'
+  }
+  
+  // 状态优先级: cancelled > refunded > refunding > completed > shipped > paid > pending
+  const statusPriority = {
+    'cancelled': 7,
+    'refunded': 6,
+    'refunding': 5,
+    'completed': 4,
+    'shipped': 3,
+    'paid': 2,
+    'pending': 1
+  }
+  
+  // 数字状态映射到字符串
+  const statusMap = {
+    0: "pending",
+    1: "paid",
+    2: "shipped",
+    4: "completed",
+    5: "cancelled",
+    6: "refunding",
+    7: "refunded"
+  }
+  
+  // 获取所有商品的状态
+  const statuses = products.map(item => statusMap[item.status] || 'pending')
+  
+  // 按优先级排序，取最高优先级的状态
+  return statuses.sort((a, b) => statusPriority[b] - statusPriority[a])[0]
 }
 
 // 处理评价
@@ -446,7 +527,7 @@ const submitRefund = async () => {
     if (valid) {
       submitting.value = true
       try {
-        await applyRefund(orderInfo.value.id, {
+        await applyRefund(orderInfo.value.orderCode, {
           itemId: currentRefundItem.value.id,
           ...refundForm.value
         })
@@ -551,6 +632,10 @@ onMounted(() => {
               color: var(--el-color-danger);
               margin-right: 8px;
             }
+          }
+
+          .item-status {
+            margin-top: 8px;
           }
         }
       }
