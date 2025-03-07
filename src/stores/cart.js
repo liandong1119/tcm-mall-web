@@ -7,7 +7,8 @@ export const useCartStore = defineStore('cart', () => {
 
   // 计算属性
   const totalCount = computed(() => {
-    return items.value.reduce((total, item) => total + Number(item.quantity || 0), 0)
+    // 返回商品种类数量，而不是商品总数量
+    return items.value.length
   })
 
   const totalAmount = computed(() => {
@@ -19,7 +20,8 @@ export const useCartStore = defineStore('cart', () => {
   })
 
   const selectedCount = computed(() => {
-    return selectedItems.value.reduce((total, item) => total + Number(item.quantity || 0), 0)
+    // 返回选中的商品种类数量
+    return selectedItems.value.length
   })
 
   const selectedAmount = computed(() => {

@@ -68,6 +68,11 @@ const routes = [
             meta: { title: 'user.orders' }
           },
           {
+            path: 'refunds',
+            component: () => import('@/views/user/refunds.vue'),
+            meta: { title: 'user.refunds' }
+          },
+          {
             path: 'favorites',
             name: 'UserFavorites',
             component: () => import('@/views/user/favorites.vue'),

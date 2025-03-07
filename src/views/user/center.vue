@@ -24,6 +24,10 @@
                 <el-icon><List /></el-icon>
                 <span>{{ $t('user.orders') }}</span>
               </el-menu-item>
+              <el-menu-item index="/user/refunds">
+                <el-icon><RefreshRight /></el-icon>
+                <span>{{ $t('user.refunds') }}</span>
+              </el-menu-item>
               <el-menu-item index="/user/favorites">
                 <el-icon><Star /></el-icon>
                 <span>{{ $t('user.favorites') }}</span>
@@ -49,7 +53,7 @@
 import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { User, List, Star } from '@element-plus/icons-vue'
+import { User, List, Star, RefreshRight } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()

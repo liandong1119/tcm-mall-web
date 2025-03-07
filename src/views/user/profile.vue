@@ -117,6 +117,19 @@
                                     </div>
                                 </el-card>
                             </div>
+
+                            <!-- 添加分页组件 -->
+                            <div class="pagination-container">
+                                <el-pagination
+                                    v-model:current-page="addressPage.pageNum"
+                                    v-model:page-size="addressPage.pageSize"
+                                    :page-sizes="[5, 10, 20]"
+                                    :total="addressPage.total"
+                                    layout="total, sizes, prev, pager, next"
+                                    @size-change="handleAddressPageSizeChange"
+                                    @current-change="handleAddressPageChange"
+                                />
+                            </div>
                         </div>
                     </el-tab-pane>
                 </el-tabs>
@@ -216,6 +229,13 @@ const addressForm = ref({
     isMainAddr: false
 })
 
+// 地址分页参数
+const addressPage = ref({
+    pageNum: 1,
+    pageSize: 10,
+    total: 0
+})
+
 // 表单验证规则
 const basicRules = {
     nickname: [
@@ -303,8 +323,12 @@ const fetchUserInfo = async () => {
 // 获取地址列表
 const fetchAddresses = async () => {
     try {
-        const addressData = await getAddressList({pageNum: 1, pageSize: 10});
+        const addressData = await getAddressList({
+            pageNum: addressPage.value.pageNum,
+            pageSize: addressPage.value.pageSize
+        });
         addresses.value = addressData.list
+        addressPage.value.total = addressData.total
         userStore.setAddresses(addressData.list)
     } catch (error) {
         console.error('Failed to fetch addresses:', error)
@@ -438,6 +462,19 @@ const handleSetDefaultAddress = async (address) => {
     }
 }
 
+// 处理分页大小变化
+const handleAddressPageSizeChange = (val) => {
+    addressPage.value.pageSize = val
+    addressPage.value.pageNum = 1
+    fetchAddresses()
+}
+
+// 处理页码变化
+const handleAddressPageChange = (val) => {
+    addressPage.value.pageNum = val
+    fetchAddresses()
+}
+
 onMounted(() => {
     fetchUserInfo()
     // fetchAddresses()
@@ -496,6 +533,12 @@ onMounted(() => {
         display: flex;
         gap: 10px;
       }
+    }
+
+    .pagination-container {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
     }
   }
 }

@@ -37,7 +37,12 @@ export default {
     tips: 'Tips',
     warning: 'Warning',
     all: 'All',
-    home: 'Home'
+    home: 'Home',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+    lastWeek: 'Last Week',
+    lastMonth: 'Last Month',
+    detail: 'Detail'
   },
   message: {
     loginSuccess: 'Login Successful',
@@ -352,7 +357,9 @@ export default {
     updateSuccess: 'Update Successful',
     updateFailed: 'Update Failed',
     deleteSuccess: 'Delete Successful',
-    deleteFailed: 'Delete Failed'
+    deleteFailed: 'Delete Failed',
+    refundManagement: 'Refund Management',
+    refunds: 'My Refunds'
   },
   address: {
     addAddress: 'Add Address',
@@ -618,6 +625,19 @@ export default {
     footerNav: {
       title: 'Footer Navigation',
       description: 'Learn more about us, get help and customer service'
+    }
+  },
+  refund: {
+    amount: 'Refund Amount',
+    reason: 'Refund Reason',
+    status: 'Refund Status',
+    applyTime: 'Apply Time',
+    detail: 'Refund Detail',
+    timeRange: 'Apply Time Range',
+    statusText: {
+      pending: 'Processing',
+      approved: 'Approved',
+      rejected: 'Rejected'
     }
   }
 } 

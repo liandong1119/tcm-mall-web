@@ -36,7 +36,12 @@ export default {
     pleaseInput: '请输入',
     tips: '提示',
     warning: '警告',
-    all: '全部'
+    all: '全部',
+    startDate: '开始日期',
+    endDate: '结束日期',
+    lastWeek: '最近一周',
+    lastMonth: '最近一月',
+    detail: '详情'
   },
   message: {
     loginSuccess: '登录成功',
@@ -361,7 +366,9 @@ export default {
     updateSuccess: '更新成功',
     updateFailed: '更新失败',
     deleteSuccess: '删除成功',
-    deleteFailed: '删除失败'
+    deleteFailed: '删除失败',
+    refundManagement: '退款管理',
+    refunds: '我的退款'
   },
   address: {
     addAddress: '添加地址',
@@ -653,6 +660,19 @@ export default {
     footerNav: {
       title: '底部导航',
       description: '了解更多关于我们的信息，获取帮助和客户服务'
+    }
+  },
+  refund: {
+    amount: '退款金额',
+    reason: '退款原因',
+    status: '退款状态',
+    applyTime: '申请时间',
+    detail: '退款详情',
+    timeRange: '申请时间',
+    statusText: {
+      pending: '处理中',
+      approved: '已通过',
+      rejected: '已拒绝'
     }
   }
 } 
