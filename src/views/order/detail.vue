@@ -73,6 +73,24 @@
               </el-button>
               <el-tag v-else type="info" size="small">{{ $t('review.reviewed') }}</el-tag>
             </div>
+            <!-- 添加退款按钮 -->
+            <div class="item-actions" v-if="orderInfo.status === 'paid' || orderInfo.status === 'shipped'">
+              <el-button
+                v-if="!item.refundStatus"
+                type="danger"
+                size="small"
+                @click="handleRefund(item)"
+              >
+                {{ $t('order.refund') }}
+              </el-button>
+              <el-tag 
+                v-else 
+                :type="getRefundStatusType(item.refundStatus)"
+                size="small"
+              >
+                {{ $t(`order.refundStatus.${item.refundStatus}`) }}
+              </el-tag>
+            </div>
           </div>
         </div>
 
@@ -146,6 +164,72 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 退款对话框 -->
+    <el-dialog
+      v-model="refundDialogVisible"
+      :title="$t('order.refundApplication')"
+      width="500px"
+    >
+      <el-form
+        ref="refundFormRef"
+        :model="refundForm"
+        :rules="refundRules"
+        label-position="top"
+      >
+        <el-form-item :label="$t('order.refundAmount')" prop="amount">
+          <el-input-number
+            v-model="refundForm.amount"
+            :min="0"
+            :max="currentRefundItem?.price"
+            :precision="2"
+            :step="0.01"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item :label="$t('order.refundReason')" prop="reason">
+          <el-select v-model="refundForm.reason" style="width: 100%">
+            <el-option
+              v-for="(reason, index) in refundReasons"
+              :key="index"
+              :label="$t(`order.refundReasons.${reason}`)"
+              :value="reason"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('order.refundDescription')" prop="description">
+          <el-input
+            v-model="refundForm.description"
+            type="textarea"
+            :rows="4"
+            :placeholder="$t('order.refundDescriptionPlaceholder')"
+          />
+        </el-form-item>
+        <el-form-item :label="$t('order.refundImages')">
+          <el-upload
+            action="/api/upload"
+            list-type="picture-card"
+            :limit="5"
+            :on-success="handleUploadSuccess"
+            :on-remove="handleUploadRemove"
+            :auto-upload="false"
+            :http-request="handleUpload"
+          >
+            <el-icon><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="refundDialogVisible = false">
+            {{ $t('common.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="submitRefund" :loading="submitting">
+            {{ $t('common.submit') }}
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -194,6 +278,39 @@ const ratingTexts = [
   t('review.rating.excellent')
 ]
 
+// 退款相关
+const refundDialogVisible = ref(false)
+const refundFormRef = ref(null)
+const currentRefundItem = ref(null)
+const refundForm = ref({
+  amount: 0,
+  reason: '',
+  description: '',
+  images: []
+})
+
+const refundReasons = [
+  'quality_issue',
+  'wrong_product',
+  'not_received',
+  'damaged',
+  'other'
+]
+
+const refundRules = {
+  amount: [
+    { required: true, message: t('validate.refundAmountRequired'), trigger: 'blur' },
+    { type: 'number', min: 0, message: t('validate.refundAmountMin'), trigger: 'blur' }
+  ],
+  reason: [
+    { required: true, message: t('validate.refundReasonRequired'), trigger: 'change' }
+  ],
+  description: [
+    { required: true, message: t('validate.refundDescriptionRequired'), trigger: 'blur' },
+    { min: 10, max: 500, message: t('validate.refundDescriptionLength'), trigger: 'blur' }
+  ]
+}
+
 // 获取订单状态样式
 const getOrderStatusType = (status) => {
   const types = {
@@ -202,6 +319,17 @@ const getOrderStatusType = (status) => {
     shipped: 'success',
     completed: 'info',
     cancelled: 'danger'
+  }
+  return types[status] || 'info'
+}
+
+// 获取退款状态样式
+const getRefundStatusType = (status) => {
+  const types = {
+    pending: 'warning',
+    approved: 'success',
+    rejected: 'danger',
+    cancelled: 'info'
   }
   return types[status] || 'info'
 }
@@ -231,11 +359,27 @@ const handleReview = (item) => {
   reviewDialogVisible.value = true
 }
 
+// 处理退款
+const handleRefund = (item) => {
+  currentRefundItem.value = item
+  refundForm.value = {
+    amount: item.price,
+    reason: '',
+    description: '',
+    images: []
+  }
+  refundDialogVisible.value = true
+}
+
 // 处理图片上传
 const handleUpload = async ({ file }) => {
   try {
     const { url } = await uploadReviewImage(file)
-    reviewForm.value.images.push(url)
+    if (reviewDialogVisible.value) {
+      reviewForm.value.images.push(url)
+    } else if (refundDialogVisible.value) {
+      refundForm.value.images.push(url)
+    }
     return { url }
   } catch (error) {
     ElMessage.error(t('message.uploadFailed'))
@@ -245,14 +389,25 @@ const handleUpload = async ({ file }) => {
 
 const handleUploadSuccess = (response) => {
   if (response.url) {
-    reviewForm.value.images.push(response.url)
+    if (reviewDialogVisible.value) {
+      reviewForm.value.images.push(response.url)
+    } else if (refundDialogVisible.value) {
+      refundForm.value.images.push(response.url)
+    }
   }
 }
 
 const handleUploadRemove = (file) => {
-  const index = reviewForm.value.images.indexOf(file.url)
-  if (index > -1) {
-    reviewForm.value.images.splice(index, 1)
+  if (reviewDialogVisible.value) {
+    const index = reviewForm.value.images.indexOf(file.url)
+    if (index > -1) {
+      reviewForm.value.images.splice(index, 1)
+    }
+  } else if (refundDialogVisible.value) {
+    const index = refundForm.value.images.indexOf(file.url)
+    if (index > -1) {
+      refundForm.value.images.splice(index, 1)
+    }
   }
 }
 
@@ -276,6 +431,32 @@ const submitReview = async () => {
       } catch (error) {
         console.error('Submit review failed:', error)
         ElMessage.error(t('message.reviewFailed'))
+      } finally {
+        submitting.value = false
+      }
+    }
+  })
+}
+
+// 提交退款申请
+const submitRefund = async () => {
+  if (!refundFormRef.value) return
+
+  await refundFormRef.value.validate(async (valid) => {
+    if (valid) {
+      submitting.value = true
+      try {
+        await applyRefund(orderInfo.value.id, {
+          itemId: currentRefundItem.value.id,
+          ...refundForm.value
+        })
+        ElMessage.success(t('message.refundSuccess'))
+        refundDialogVisible.value = false
+        // 刷新订单详情
+        fetchOrderDetail()
+      } catch (error) {
+        console.error('Submit refund failed:', error)
+        ElMessage.error(t('message.refundFailed'))
       } finally {
         submitting.value = false
       }
@@ -415,6 +596,12 @@ onMounted(() => {
       }
     }
   }
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .dialog-footer {

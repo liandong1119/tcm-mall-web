@@ -67,7 +67,9 @@ export default {
     fetchFailed: '获取数据失败',
     confirmLogout: '确认退出登录？',
     paySuccess: '支付成功',
-    payFailed: '支付失败'
+    payFailed: '支付失败',
+    refundSuccess: '退款申请提交成功',
+    refundFailed: '退款申请提交失败'
   },
   validate: {
     accountRequired: '请输入账号',
@@ -96,7 +98,11 @@ export default {
     regionRequired: '请选择地区',
     detailAddressRequired: '请输入详细地址',
     refundReasonRequired: '请输入退款原因',
-    refundReasonLength: '退款原因长度应在10-200个字符之间'
+    refundReasonLength: '退款原因长度应在10-200个字符之间',
+    refundAmountRequired: '请输入退款金额',
+    refundAmountMin: '退款金额必须大于0',
+    refundDescriptionRequired: '请输入详细说明',
+    refundDescriptionLength: '详细说明长度应在10-500个字符之间'
   },
   home: {
     title: '首页',
@@ -389,7 +395,26 @@ export default {
     carrier: '快递公司',
     trackingNo: '快递单号',
     shippingInfo: '物流信息',
+    refund: '申请退款',
+    refundApplication: '退款申请',
+    refundAmount: '退款金额',
     refundReason: '退款原因',
+    refundDescription: '详细说明',
+    refundDescriptionPlaceholder: '请详细描述退款原因...',
+    refundImages: '凭证图片',
+    refundStatus: {
+      pending: '退款处理中',
+      approved: '退款已通过',
+      rejected: '退款已拒绝',
+      cancelled: '已取消退款'
+    },
+    refundReasons: {
+      quality_issue: '商品质量问题',
+      wrong_product: '商品错误',
+      not_received: '未收到商品',
+      damaged: '商品损坏',
+      other: '其他原因'
+    },
     statuses: {
       all: '全部',
       pending: '待付款',
@@ -415,14 +440,12 @@ export default {
     discount: '优惠金额',
     total: '订单总额',
     confirm: '确认收货',
-    refund: '申请退款',
     confirmCancel: '确认要取消该订单吗？',
     cancelSuccess: '订单已取消',
     cancelFailed: '取消订单失败',
     confirmReceipt: '确认已收到商品吗？',
     confirmSuccess: '确认收货成功',
     confirmFailed: '确认收货失败',
-    refundApplication: '退款申请',
     enterRefundReason: '请输入退款原因',
     refundReasonPlaceholder: '请输入您的退款原因',
     refundSuccess: '退款申请已提交',
