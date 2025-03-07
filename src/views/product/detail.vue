@@ -73,7 +73,7 @@
               </div>
 
               <div class="product-price">
-                <span class="price">{{ $t('common.currency') }}{{ product.price }}</span>
+                <span class="price">{{ $t('common.currency') }}{{ currentPrice }}</span>
                 <span class="unit">/{{ $t('product.detail.unit') }}</span>
                 <span v-if="product.originalPrice" class="original-price">
                   {{ $t('product.originalPrice', { price: product.originalPrice }) }}
@@ -175,6 +175,16 @@
                     <span class="review-date">{{ review.createTime }}</span>
                   </div>
                   <div class="review-content">{{ review.content }}</div>
+                  <div v-if="review.images && review.images.length > 0" class="review-images">
+                    <el-image
+                      v-for="(image, imgIndex) in review.images"
+                      :key="imgIndex"
+                      :src="getImageUrl(image)"
+                      :preview-src-list="review.images.map(img => getImageUrl(img))"
+                      fit="cover"
+                      class="review-image"
+                    />
+                  </div>
                   <div v-if="review.reply" class="review-reply">
                     <div class="reply-header">{{ $t('product.detail.merchantReply') }}:</div>
                     <div class="reply-content">{{ review.reply }}</div>
@@ -232,6 +242,30 @@ const isAllSpecsSelected = computed(() => {
     return true
   }
   return product.value.specifications.every(spec => selectedSpecs[spec.name])
+})
+
+// 计算当前选择的规格对应的价格
+const currentPrice = computed(() => {
+  if (!product.value || !product.value.skus) {
+    return 0
+  }
+
+  // 如果没有规格，直接返回商品基础价格
+  if (!product.value.specifications || product.value.specifications.length === 0) {
+    return Number(product.value.price || 0)
+  }
+
+  // 找到匹配当前选择规格的SKU
+  const matchingSku = product.value.skus.find(sku => {
+    if (!sku.specs) return false
+    // 检查所有已选择的规格是否匹配
+    return Object.entries(selectedSpecs).every(([name, value]) => {
+      return sku.specs[name] === value
+    })
+  })
+
+  // 如果找到匹配的SKU，返回其价格，否则返回基础价格
+  return matchingSku ? Number(matchingSku.price) : Number(product.value.price || 0)
 })
 
 // 获取商品详情
@@ -343,23 +377,35 @@ const fetchProductDetail = async () => {
         id: 1,
         username: '张先生',
         rating: 5,
-        content: '品质非常好，包装精美，服用后感觉精力充沛，很满意这次购买！',
+        content: '品质非常好，包装精美，服用后感觉精力充沛，很满意这次购买！人参的品相也很好，一看就是正品。',
         createTime: '2023-12-15',
+        images: [
+          'https://img.alicdn.com/imgextra/i4/2200724907121/O1CN01LNnUzA22KCPpjQove_!!2200724907121.jpg',
+          'https://img.alicdn.com/imgextra/i1/2200724907121/O1CN01LkJnIP22KCPrKMDpP_!!2200724907121.jpg'
+        ],
         reply: '感谢您的支持，我们将继续提供优质的产品和服务！'
       },
       {
         id: 2,
         username: '李女士',
         rating: 4,
-        content: '人参品质不错，但是包装有点简单，希望可以改进一下。',
-        createTime: '2023-12-10'
+        content: '收到货后第一时间拍照分享，人参个头很大，品相不错，包装也很精致。',
+        createTime: '2023-12-10',
+        images: [
+          'https://img.alicdn.com/imgextra/i3/2200724907121/O1CN01Z6Zd8q22KCPpjPq6C_!!2200724907121.jpg'
+        ]
       },
       {
         id: 3,
         username: '王先生',
         rating: 5,
-        content: '第二次购买了，效果很好，全家人都在用，会继续支持！',
-        createTime: '2023-12-05'
+        content: '第二次购买了，效果很好，全家人都在用，这次买的是礼盒装，送礼很有面子！',
+        createTime: '2023-12-05',
+        images: [
+          'https://img.alicdn.com/imgextra/i2/2200724907121/O1CN01q1qx5122KCPrKLyQC_!!2200724907121.jpg',
+          'https://img.alicdn.com/imgextra/i4/2200724907121/O1CN01LNnUzA22KCPpjQove_!!2200724907121.jpg',
+          'https://img.alicdn.com/imgextra/i1/2200724907121/O1CN01LkJnIP22KCPrKMDpP_!!2200724907121.jpg'
+        ]
       }
     ]
     reviewTotal.value = 3
@@ -388,11 +434,11 @@ const fetchReviews = async () => {
   }
 }
 
-// 处理图片URL
+// 获取图片完整URL
 const getImageUrl = (url) => {
   if (!url) return ''
   if (url.startsWith('http')) return url
-  return import.meta.env.VITE_API_BASE_URL + url
+  return `${import.meta.env.VITE_API_BASE_URL}${url}`
 }
 
 // 添加到购物车
@@ -492,21 +538,13 @@ const handleReviewPageChange = (page) => {
 
 // 处理规格选择变化
 const handleSpecChange = () => {
-  // 根据选择的规格找到对应的SKU
-  if (product.value.skus && product.value.skus.length > 0) {
-    const matchingSku = product.value.skus.find(sku => {
-      return Object.keys(selectedSpecs).every(specName => {
-        return sku.specs[specName] === selectedSpecs[specName]
+  // 更新当前SKU
+  if (product.value.skus) {
+    currentSku.value = product.value.skus.find(sku => {
+      return Object.entries(selectedSpecs).every(([name, value]) => {
+        return sku.specs[name] === value
       })
     })
-
-    if (matchingSku) {
-      currentSku.value = matchingSku
-      // 更新价格、库存等信息
-      if (matchingSku.price) product.value.price = matchingSku.price
-      if (matchingSku.stock !== undefined) product.value.stock = matchingSku.stock
-      if (matchingSku.image) product.value.image = matchingSku.image
-    }
   }
 }
 
@@ -822,6 +860,21 @@ onMounted(() => {
             margin-bottom: 10px;
           }
 
+          .review-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+
+            .review-image {
+              width: 80px;
+              height: 80px;
+              border-radius: 4px;
+              cursor: pointer;
+              object-fit: cover;
+            }
+          }
+
           .review-reply {
             margin-top: 10px;
             background: #f8f8f8;
@@ -858,6 +911,21 @@ onMounted(() => {
         height: 300px;
       }
     }
+  }
+}
+
+.review-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+
+  .review-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    cursor: pointer;
+    object-fit: cover;
   }
 }
 </style>
