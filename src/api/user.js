@@ -146,4 +146,17 @@ export function removeFavorite(productId) {
     url: `/user/favorite/${productId}`,
     method: 'delete'
   })
-} 
+}
+
+
+
+/**
+ * 获取一个图片验证码的信息
+ * @returns {*}
+ */
+export function getPictureVerifyCode(){
+  return request({
+    url: '/verifyCode/photo',
+    method: 'get'
+  })
+}

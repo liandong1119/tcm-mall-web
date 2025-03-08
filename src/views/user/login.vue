@@ -1,182 +1,191 @@
 <template>
-  <div class="login-container">
-    <div class="login-box">
-      <!-- 左侧 Banner -->
-      <div class="banner-section">
-        <img src="@/assets/login-banner.svg" alt="Login Banner">
-        <div class="banner-text">
-          <h2>{{ $t('user.welcomeBack') }}</h2>
-          <p>{{ $t('user.loginDesc') }}</p>
-        </div>
-      </div>
-
-      <!-- 右侧登录表单 -->
-      <div class="form-section">
-        <div class="form-header">
-          <div class="logo">
-            <img src="@/assets/logo.svg" alt="TCM Mall">
-            <span>{{ $t('common.systemName') }}</span>
-          </div>
-          <h2>{{ $t('user.login') }}</h2>
-          <p>{{ $t('user.loginTip') }}</p>
-        </div>
-
-        <el-form
-          ref="formRef"
-          :model="form"
-          :rules="rules"
-          class="login-form"
-          @submit.prevent="handleSubmit"
-        >
-          <el-form-item prop="account">
-            <el-input
-              v-model="form.account"
-              :placeholder="$t('user.accountPlaceholder')"
-              prefix-icon="User"
-            />
-          </el-form-item>
-
-          <el-form-item prop="password">
-            <el-input
-              v-model="form.password"
-              type="password"
-              :placeholder="$t('user.passwordPlaceholder')"
-              prefix-icon="Lock"
-              show-password
-            />
-          </el-form-item>
-
-          <el-form-item prop="captcha">
-            <div class="captcha-container">
-              <el-input
-                v-model="form.captcha"
-                :placeholder="$t('user.captchaPlaceholder')"
-                prefix-icon="Key"
-              />
-              <img 
-                :src="captchaUrl" 
-                class="captcha-image" 
-                alt="captcha"
-                @click="refreshCaptcha"
-              >
+    <div class="login-container">
+        <div class="login-box">
+            <!-- 左侧 Banner -->
+            <div class="banner-section">
+                <img src="@/assets/login-banner.svg" alt="Login Banner">
+                <div class="banner-text">
+                    <h2>{{ $t('user.welcomeBack') }}</h2>
+                    <p>{{ $t('user.loginDesc') }}</p>
+                </div>
             </div>
-          </el-form-item>
 
-          <div class="form-options">
-            <el-checkbox v-model="form.rememberMe">
-              {{ $t('user.rememberMe') }}
-            </el-checkbox>
-            <el-button type="text" @click="handleForgotPassword">
-              {{ $t('user.forgotPassword') }}
-            </el-button>
-          </div>
+            <!-- 右侧登录表单 -->
+            <div class="form-section">
+                <div class="form-header">
+                    <div class="logo">
+                        <img src="@/assets/logo.svg" alt="TCM Mall">
+                        <span>{{ $t('common.systemName') }}</span>
+                    </div>
+                    <h2>{{ $t('user.login') }}</h2>
+                    <p>{{ $t('user.loginTip') }}</p>
+                </div>
 
-          <el-form-item>
-            <el-button
-              type="primary"
-              :loading="loading"
-              class="submit-btn"
-              @click="handleSubmit"
-            >
-              {{ $t('user.login') }}
-            </el-button>
-          </el-form-item>
+                <el-form
+                        ref="formRef"
+                        :model="form"
+                        :rules="rules"
+                        class="login-form"
+                        @submit.prevent="handleSubmit"
+                >
+                    <el-form-item prop="account">
+                        <el-input
+                                v-model="form.account"
+                                :placeholder="$t('user.accountPlaceholder')"
+                                prefix-icon="User"
+                        />
+                    </el-form-item>
 
-          <div class="form-footer">
-            <span>{{ $t('user.noAccount') }}</span>
-            <router-link to="/user/register">
-              {{ $t('user.register') }}
-            </router-link>
-          </div>
-        </el-form>
+                    <el-form-item prop="password">
+                        <el-input
+                                v-model="form.password"
+                                type="password"
+                                :placeholder="$t('user.passwordPlaceholder')"
+                                prefix-icon="Lock"
+                                show-password
+                        />
+                    </el-form-item>
 
-        <!-- 语言切换 -->
-        <div class="lang-switch">
-          <LanguageSwitch />
+                    <el-form-item prop="captcha">
+                        <div class="captcha-container">
+                            <el-input
+                                    v-model="form.captcha"
+                                    :placeholder="$t('user.captchaPlaceholder')"
+                                    prefix-icon="Key"
+                            />
+                            <img
+                                    :src="captchaUrl"
+                                    class="captcha-image"
+                                    alt="captcha"
+                                    @click="refreshCaptcha"
+                            >
+                        </div>
+                    </el-form-item>
+
+                    <div class="form-options">
+                        <el-checkbox v-model="form.rememberMe">
+                            {{ $t('user.rememberMe') }}
+                        </el-checkbox>
+                        <el-button type="text" @click="handleForgotPassword">
+                            {{ $t('user.forgotPassword') }}
+                        </el-button>
+                    </div>
+
+                    <el-form-item>
+                        <el-button
+                                type="primary"
+                                :loading="loading"
+                                class="submit-btn"
+                                @click="handleSubmit"
+                        >
+                            {{ $t('user.login') }}
+                        </el-button>
+                    </el-form-item>
+
+                    <div class="form-footer">
+                        <span>{{ $t('user.noAccount') }}</span>
+                        <router-link to="/user/register">
+                            {{ $t('user.register') }}
+                        </router-link>
+                    </div>
+                </el-form>
+
+                <!-- 语言切换 -->
+                <div class="lang-switch">
+                    <LanguageSwitch/>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { useUserStore } from '@/stores/user'
-import { ElMessage } from 'element-plus'
+import {ref, reactive, onMounted} from 'vue'
+import {useRouter, useRoute} from 'vue-router'
+import {useI18n} from 'vue-i18n'
+import {useUserStore} from '@/stores/user'
+import {ElMessage} from 'element-plus'
 import LanguageSwitch from '@/components/LanguageSwitch.vue'
+import {getPictureVerifyCode} from "@/api/user";
 
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
-const { t } = useI18n()
+const {t} = useI18n()
 
 const formRef = ref(null)
 const loading = ref(false)
-const captchaUrl = ref('/api/captcha')
+const captchaUrl = ref('')
 
 const form = reactive({
-  account: '',
-  password: '',
-  captcha: '',
-  rememberMe: false
+    account: '',
+    password: '',
+    captcha: '',
+    pictureUUID: '',
+    rememberMe: false
 })
 
 const rules = {
-  account: [
-    { required: true, message: () => t('validate.accountRequired'), trigger: 'blur' },
-    { min: 3, max: 20, message: () => t('validate.accountLength'), trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: () => t('validate.passwordRequired'), trigger: 'blur' },
-    { min: 6, max: 20, message: () => t('validate.passwordLength'), trigger: 'blur' }
-  ],
-  captcha: [
-    { required: true, message: () => t('validate.captchaRequired'), trigger: 'blur' },
-    { len: 4, message: () => t('validate.captchaLength'), trigger: 'blur' }
-  ]
+    account: [
+        {required: true, message: () => t('validate.accountRequired'), trigger: 'blur'},
+        {min: 3, max: 20, message: () => t('validate.accountLength'), trigger: 'blur'}
+    ],
+    password: [
+        {required: true, message: () => t('validate.passwordRequired'), trigger: 'blur'},
+        {min: 6, max: 20, message: () => t('validate.passwordLength'), trigger: 'blur'}
+    ],
+    captcha: [
+        {required: true, message: () => t('validate.captchaRequired'), trigger: 'blur'},
+        {len: 4, message: () => t('validate.captchaLength'), trigger: 'blur'}
+    ]
 }
 
-const refreshCaptcha = () => {
-  captchaUrl.value = `/api/captcha?t=${Date.now()}`
+const refreshCaptcha = async () => {
+    const {code, imgUrl} = await getPictureVerifyCode()
+    captchaUrl.value = imgUrl
+    form.pictureUUID = code
+
 }
 
 const handleSubmit = async () => {
-  if (!formRef.value) return
-  
-  try {
-    await formRef.value.validate()
-    loading.value = true
-    
-    const success = await userStore.login({
-      account: form.account,
-      password: form.password,
-      captcha: form.captcha,
-      rememberMe: form.rememberMe
-    })
+    if (!formRef.value) return
 
-      console.log("当前的请求是否成功；",success)
-    if (success) {
-      ElMessage.success(t('message.loginSuccess'))
-      const redirect = route.query.redirect || '/'
-      router.push(redirect)
+    try {
+        await formRef.value.validate()
+        loading.value = true
+
+        const success = await userStore.login({
+            account: form.account,
+            password: form.password,
+            verifyCode: form.captcha,
+            pictureUUID: form.pictureUUID,
+            verifyType: 3,
+            rememberMe: form.rememberMe
+        })
+
+        console.log("当前的请求是否成功；", success)
+        if (success) {
+            ElMessage.success(t('message.loginSuccess'))
+            const redirect = route.query.redirect || '/'
+            router.push(redirect)
+        }else{
+            refreshCaptcha()
+        }
+    } catch (error) {
+        console.error('Login failed:', error)
+        refreshCaptcha()
+    } finally {
+        loading.value = false
     }
-  } catch (error) {
-    console.error('Login failed:', error)
-    refreshCaptcha()
-  } finally {
-    loading.value = false
-  }
 }
 
 const handleForgotPassword = () => {
-  router.push('/user/forgot-password')
+    router.push('/user/forgot-password')
 }
 
 // 组件挂载时刷新验证码
 onMounted(() => {
-  refreshCaptcha()
+    refreshCaptcha()
 })
 </script>
 
