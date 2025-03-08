@@ -149,13 +149,14 @@
                 </el-form-item>
                 <el-form-item :label="$t('review.uploadPhotos')">
                     <el-upload
-                            action="/api/upload"
-                            list-type="picture-card"
-                            :limit="5"
-                            :on-success="handleUploadSuccess"
-                            :on-remove="handleUploadRemove"
-                            :auto-upload="false"
-                            :http-request="handleUpload"
+                        limit="5"
+                        :action="uploadUrl"
+                        :on-remove="handleRemove"
+                        :headers="uploadHeaders"
+                        list-type="picture-card"
+                        :on-success="handleUploadSuccess"
+                        :on-error="handleUploadError"
+                        :before-upload="beforeUpload"
                     >
                         <el-icon>
                             <Plus/>
@@ -217,13 +218,13 @@
                 </el-form-item>
                 <el-form-item :label="$t('order.refundImages')">
                     <el-upload
-                            action="/api/upload"
-                            list-type="picture-card"
-                            :limit="5"
-                            :on-success="handleUploadSuccess"
-                            :on-remove="handleUploadRemove"
-                            :auto-upload="false"
-                            :http-request="handleUpload"
+                        :action="uploadUrl"
+                        :on-remove="handleRemove"
+                        :headers="uploadHeaders"
+                        list-type="picture-card"
+                        :on-success="handleUploadSuccess"
+                        :on-error="handleUploadError"
+                        :before-upload="beforeUpload"
                     >
                         <el-icon>
                             <Plus/>
@@ -252,43 +253,97 @@ import {useI18n} from 'vue-i18n'
 import {ElMessage} from 'element-plus'
 import {Plus, Picture} from '@element-plus/icons-vue'
 import {getOrderDetail, submitOrderReview, uploadReviewImage, applyRefund} from '@/api/order'
+import {deletePhoto} from "@/api/photos";
+
 
 const route = useRoute()
 const {t} = useI18n()
 
-// 订单数据
-const orderInfo = ref({})
-const loading = ref(false)
 
-// 评价相关
-const reviewDialogVisible = ref(false)
-const reviewFormRef = ref(null)
-const currentReviewItem = ref(null)
-const submitting = ref(false)
-
-const reviewForm = ref({
-    rating: 5,
-    content: '',
-    images: []
+/**
+ * 页面挂载执行的方法
+ */
+onMounted(() => {
+    fetchOrderDetail()
 })
 
-const reviewRules = {
-    rating: [
-        {required: true, message: t('validate.ratingRequired'), trigger: 'change'}
-    ],
-    content: [
-        {required: true, message: t('validate.reviewContentRequired'), trigger: 'blur'},
-        {min: 5, max: 500, message: t('validate.reviewContentLength'), trigger: 'blur'}
-    ]
+
+
+
+
+///// 图片上传相关的配置和方法定义
+
+/**
+ * 上传图片的请求头的配置
+ * @type {{token: string}}
+ */
+const uploadHeaders = {
+    token: `Bearer ${localStorage.getItem('token')}`
+}
+/**
+ * 上传地址的配置
+ * @type {any}
+ */
+const uploadUrl = import.meta.env.VITE_APP_UPLOAD_URL
+/**
+ * 图片上传前检测大小
+ * @param file 文件
+ * @returns {boolean}
+ */
+const beforeUpload = (file) => {
+    const isImage = file.type.startsWith('image/')
+    const isLt2M = file.size / 1024 / 1024 < 2
+
+    if (!isImage) {
+        ElMessage.error(t('validate.imageTypeError'))
+        return false
+    }
+    if (!isLt2M) {
+        ElMessage.error(t('validate.imageSizeError'))
+        return false
+    }
+    return true
 }
 
-const ratingTexts = [
-    t('review.rating.terrible'),
-    t('review.rating.bad'),
-    t('review.rating.normal'),
-    t('review.rating.good'),
-    t('review.rating.excellent')
-]
+
+/**
+ * 图片上传成功后的回调
+ * @param response
+ * @param uploadFile
+ */
+const handleUploadSuccess = (response,uploadFile) => {
+    // 文件回填操作
+    const {id: fileId, addr} = response.data
+    uploadFile.fileId = fileId
+    reviewForm.value.photoIds.push(fileId)
+    reviewForm.value.images.push(addr)
+
+}
+
+/**
+ * 图片上传出现错误
+ */
+const handleUploadError = () => {
+    ElMessage.error(t('message.uploadFailed'))
+}
+
+/**
+ * 删除一张图片信息
+ * @param file
+ * @returns {Promise<void>}
+ */
+const handleRemove = async (file) => {
+    deletePhoto([file.fileId])
+    // 删除的时候还要从数组中移除
+    reviewForm.value.photoIds = reviewForm.value.photoIds.filter(id => id !== file.fileId)
+}
+
+
+
+
+
+
+////// 退款相关的方法配置
 
 // 退款相关
 const refundDialogVisible = ref(false)
@@ -309,6 +364,10 @@ const refundReasons = [
     'other'
 ]
 
+/**
+ * 退款的校验规则
+ * @type {{reason: [{trigger: string, message: string, required: boolean}], amount: [{trigger: string, message: string, required: boolean},{min: number, trigger: string, type: string, message: string}], description: [{trigger: string, message: string, required: boolean},{min: number, max: number, trigger: string, message: string}]}}
+ */
 const refundRules = {
     amount: [
         {required: true, message: t('validate.refundAmountRequired'), trigger: 'blur'},
@@ -323,6 +382,68 @@ const refundRules = {
     ]
 }
 
+
+
+// 获取退款状态样式
+const getRefundStatusType = (status) => {
+    const types = {
+        pending: 'warning',
+        approved: 'success',
+        rejected: 'danger',
+        cancelled: 'info'
+    }
+    return types[status] || 'info'
+}
+
+
+// 提交退款申请
+const submitRefund = async () => {
+    if (!refundFormRef.value) return
+
+    await refundFormRef.value.validate(async (valid) => {
+        if (valid) {
+            submitting.value = true
+            try {
+                await applyRefund(orderInfo.value.orderCode, {
+                    itemId: currentRefundItem.value.id,
+                    ...refundForm.value
+                })
+                ElMessage.success(t('message.refundSuccess'))
+                refundDialogVisible.value = false
+                // 刷新订单详情
+                fetchOrderDetail()
+            } catch (error) {
+                console.error('Submit refund failed:', error)
+                ElMessage.error(t('message.refundFailed'))
+            } finally {
+                submitting.value = false
+            }
+        }
+    })
+}
+
+
+// 处理退款
+const handleRefund = (item) => {
+    currentRefundItem.value = item
+    refundForm.value = {
+        amount: item.price,
+        reason: '',
+        description: '',
+        images: []
+    }
+    refundDialogVisible.value = true
+}
+
+
+
+
+////// 订单相关的配置和方法
+
+// 订单数据
+const orderInfo = ref({})
+const loading = ref(false)
+
 // 获取订单状态样式
 const getOrderStatusType = (status) => {
     const types = {
@@ -335,16 +456,6 @@ const getOrderStatusType = (status) => {
     return types[status] || 'info'
 }
 
-// 获取退款状态样式
-const getRefundStatusType = (status) => {
-    const types = {
-        pending: 'warning',
-        approved: 'success',
-        rejected: 'danger',
-        cancelled: 'info'
-    }
-    return types[status] || 'info'
-}
 
 // 获取订单详情
 const fetchOrderDetail = async () => {
@@ -435,28 +546,9 @@ const determineOrderStatus = (products) => {
     return statuses.sort((a, b) => statusPriority[b] - statusPriority[a])[0]
 }
 
-// 处理评价
-const handleReview = (item) => {
-    currentReviewItem.value = item
-    reviewForm.value = {
-        rating: 5,
-        content: '',
-        images: []
-    }
-    reviewDialogVisible.value = true
-}
 
-// 处理退款
-const handleRefund = (item) => {
-    currentRefundItem.value = item
-    refundForm.value = {
-        amount: item.price,
-        reason: '',
-        description: '',
-        images: []
-    }
-    refundDialogVisible.value = true
-}
+
+
 
 // 处理图片上传
 const handleUpload = async ({file}) => {
@@ -474,28 +566,52 @@ const handleUpload = async ({file}) => {
     }
 }
 
-const handleUploadSuccess = (response) => {
-    if (response.url) {
-        if (reviewDialogVisible.value) {
-            reviewForm.value.images.push(response.url)
-        } else if (refundDialogVisible.value) {
-            refundForm.value.images.push(response.url)
-        }
-    }
+
+
+
+////// 评价相关的方法和配置
+
+// 评价相关
+const reviewDialogVisible = ref(false)
+const reviewFormRef = ref(null)
+const currentReviewItem = ref(null)
+const submitting = ref(false)
+
+const reviewForm = ref({
+    rating: 5,
+    content: '',
+    photoIds: [],
+    images: []
+})
+
+const reviewRules = {
+    rating: [
+        {required: true, message: t('validate.ratingRequired'), trigger: 'change'}
+    ],
+    content: [
+        {required: true, message: t('validate.reviewContentRequired'), trigger: 'blur'},
+        {min: 5, max: 500, message: t('validate.reviewContentLength'), trigger: 'blur'}
+    ]
 }
 
-const handleUploadRemove = (file) => {
-    if (reviewDialogVisible.value) {
-        const index = reviewForm.value.images.indexOf(file.url)
-        if (index > -1) {
-            reviewForm.value.images.splice(index, 1)
-        }
-    } else if (refundDialogVisible.value) {
-        const index = refundForm.value.images.indexOf(file.url)
-        if (index > -1) {
-            refundForm.value.images.splice(index, 1)
-        }
+const ratingTexts = [
+    t('review.rating.terrible'),
+    t('review.rating.bad'),
+    t('review.rating.normal'),
+    t('review.rating.good'),
+    t('review.rating.excellent')
+]
+
+// 处理评价
+const handleReview = (item) => {
+    currentReviewItem.value = item
+    reviewForm.value = {
+        rating: 5,
+        content: '',
+        images: [],
+        photoIds:[]
     }
+    reviewDialogVisible.value = true
 }
 
 // 提交评价
@@ -512,7 +628,7 @@ const submitReview = async () => {
                     goodsId: 4,
                     content: reviewForm.value.content,
                     level: reviewForm.value.rating,
-                    photoIds: reviewForm.value.images
+                    photoIds: reviewForm.value.photoIds
                 }
                 await submitOrderReview(reviewRequest)
                 ElMessage.success(t('message.reviewSuccess'))
@@ -529,35 +645,11 @@ const submitReview = async () => {
     })
 }
 
-// 提交退款申请
-const submitRefund = async () => {
-    if (!refundFormRef.value) return
 
-    await refundFormRef.value.validate(async (valid) => {
-        if (valid) {
-            submitting.value = true
-            try {
-                await applyRefund(orderInfo.value.orderCode, {
-                    itemId: currentRefundItem.value.id,
-                    ...refundForm.value
-                })
-                ElMessage.success(t('message.refundSuccess'))
-                refundDialogVisible.value = false
-                // 刷新订单详情
-                fetchOrderDetail()
-            } catch (error) {
-                console.error('Submit refund failed:', error)
-                ElMessage.error(t('message.refundFailed'))
-            } finally {
-                submitting.value = false
-            }
-        }
-    })
-}
 
-onMounted(() => {
-    fetchOrderDetail()
-})
+
+
+
 </script>
 
 <style lang="scss" scoped>
