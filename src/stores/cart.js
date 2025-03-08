@@ -120,6 +120,12 @@ export const useCartStore = defineStore('cart', () => {
     saveToStorage()
   }
 
+  // 移除选中的商品
+  function removeSelectedItems() {
+    items.value = items.value.filter(item => !item.selected)
+    saveToStorage()
+  }
+
   // 持久化存储
   function saveToStorage() {
     localStorage.setItem('cartItems', JSON.stringify(items.value))
@@ -140,6 +146,7 @@ export const useCartStore = defineStore('cart', () => {
     toggleAll,
     clear,
     loadCart,
-    saveToStorage
+    saveToStorage,
+    removeSelectedItems
   }
 }) 

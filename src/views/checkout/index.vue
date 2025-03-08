@@ -370,13 +370,28 @@ const handleSubmitOrder = async () => {
         }
 
         console.log("提交订单数据：", orderData)
-         await createOrder(orderData)
-        ElMessage.success(t('checkout.createSuccess'))
-        // 清除已购买的商品
-        cartStore.clear()
-        // 跳转到支付页面
-        // TODO 模拟订单支付
-        router.push(`/pay/123`)
+        try {
+            const { orderCode } = await createOrder(orderData)
+            // const orderCode = 'a1123509-b815-40e1-93f3-699ff8b762c5'
+            console.log("订单号：", orderCode)
+            
+            ElMessage.success(t('checkout.createSuccess'))
+            
+            // 先进行路由跳转
+            await router.replace({
+                name: 'Payment',
+                query: { 
+                    orderCode,
+                    amount: cartStore.selectedAmount.toFixed(2)
+                }
+            })
+            
+            // 跳转成功后再清空购物车
+            cartStore.removeSelectedItems()
+        } catch (error) {
+            console.error('Failed to create order:', error)
+            ElMessage.error(error.message)
+        }
     } catch (error) {
         console.error('Failed to create order:', error)
         ElMessage.error(error.message)

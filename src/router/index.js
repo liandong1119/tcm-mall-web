@@ -99,6 +99,12 @@ const routes = [
         ]
       },
       {
+        path: 'payment',
+        name: 'Payment',
+        component: () => import('@/views/payment/index.vue'),
+        meta: { title: 'payment.title', requiresAuth: true }
+      },
+      {
         path: 'guide',
         name: 'Guide',
         component: () => import('@/views/guide/index.vue'),

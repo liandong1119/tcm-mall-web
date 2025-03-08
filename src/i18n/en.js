@@ -234,7 +234,9 @@ export default {
     total: 'Total',
     submitOrder: 'Place Order',
     selectAddress: 'Please select a shipping address',
-    createSuccess: 'Order created successfully'
+    createSuccess: 'Order created successfully',
+    paymentSuccess: 'Payment successful',
+    noItems: 'No items in cart'
   },
   user: {
     register: 'Register Account',
@@ -421,22 +423,18 @@ export default {
     refundFailed: 'Failed to submit refund application'
   },
   payment: {
-    method: {
-      alipay: 'Alipay',
-      wechat: 'WeChat Pay',
-      unionpay: 'UnionPay'
-    },
+    title: 'Payment',
     amount: 'Payment Amount',
-    status: 'Payment Status',
-    time: 'Payment Time',
-    channel: 'Payment Channel',
-    orderInfo: 'Order Information',
-    payNow: 'Pay Now',
-    success: 'Payment Successful',
-    failed: 'Payment Failed',
-    processing: 'Processing',
-    timeout: 'Payment Timeout',
-    cancel: 'Cancel Payment'
+    method: 'Payment Method',
+    alipay: 'Alipay',
+    wechat: 'WeChat Pay',
+    confirm: 'Confirm Payment',
+    selectMethod: 'Please select a payment method',
+    success: 'Payment successful',
+    failed: 'Payment failed',
+    processing: 'Processing payment',
+    timeout: 'Payment timeout',
+    cancel: 'Cancel payment'
   },
   footer: {
     freeShipping: 'Free Shipping',

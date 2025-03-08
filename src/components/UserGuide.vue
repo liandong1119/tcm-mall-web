@@ -104,7 +104,7 @@ onMounted(() => {
   if (!hasShownGuide) {
     showGuideButton.value = false
     // 自动开始引导
-    startGuide()
+    // startGuide()
   }
 })
 

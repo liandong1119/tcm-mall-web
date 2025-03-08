@@ -418,12 +418,17 @@ const handleViewShipping = async (order) => {
 // 支付订单
 const handlePayOrder = async (order) => {
     try {
-        const data = await payOrder(order.id)
-        // TODO: 处理支付结果，可能需要跳转到支付页面或其他操作
-        ElMessage.success(t('message.paySuccess'))
-        fetchOrders()
+        // 跳转到支付页面，带上订单编号和金额
+        router.push({
+            path: '/payment',
+            query: {
+                orderCode: order.orderCode,
+                amount: order.price.toFixed(2),
+                orderId: order.id
+            }
+        })
     } catch (error) {
-        console.error('Failed to pay order:', error)
+        console.error('支付跳转失败:', error)
         ElMessage.error(t('message.payFailed'))
     }
 }

@@ -239,7 +239,9 @@ export default {
     total: '合计',
     submitOrder: '提交订单',
     selectAddress: '请选择收货地址',
-    createSuccess: '订单创建成功'
+    createSuccess: '订单创建成功',
+    paymentSuccess: '支付成功',
+    noItems: '购物车中没有商品'
   },
   user: {
     register: '注册账号',
@@ -449,20 +451,16 @@ export default {
     refundFailed: '退款申请失败'
   },
   payment: {
-    method: {
-      alipay: '支付宝',
-      wechat: '微信支付',
-      unionpay: '银联支付'
-    },
+    title: '订单支付',
     amount: '支付金额',
-    status: '支付状态',
-    time: '支付时间',
-    channel: '支付渠道',
-    orderInfo: '订单信息',
-    payNow: '立即支付',
+    method: '支付方式',
+    alipay: '支付宝支付',
+    wechat: '微信支付',
+    confirm: '确认支付',
+    selectMethod: '请选择支付方式',
     success: '支付成功',
     failed: '支付失败',
-    processing: '处理中',
+    processing: '支付处理中',
     timeout: '支付超时',
     cancel: '取消支付'
   },
