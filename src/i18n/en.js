@@ -74,7 +74,8 @@ export default {
     fetchFailed: 'Failed to fetch data',
     confirmLogout: 'Are you sure to logout?',
     paySuccess: 'Payment successful',
-    payFailed: 'Payment failed'
+    payFailed: 'Payment failed',
+    confirmReceive: 'Confirm Receipt?',
   },
   validate: {
     accountRequired: 'Please enter username/phone',

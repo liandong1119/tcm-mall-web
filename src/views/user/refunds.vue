@@ -88,7 +88,7 @@
             </div>
         </el-card>
 
-        <!-- 退款详情对话框 -->
+        <!-- 退款详情对话框 TODO 拒绝退款的原因-->
         <el-dialog
                 v-model="detailDialogVisible"
                 :title="$t('refund.detail')"
@@ -159,8 +159,8 @@ const loading = ref(false)
 // 退款状态选项
 const refundStatusOptions = {
     pending: {title: t('refund.statusText.pending'),val:0},
-    approved: {title: t('refund.statusText.approved'),val:2},
-    rejected: {title:t('refund.statusText.rejected'),val:1},
+    approved: {title: t('refund.statusText.approved'),val:1},
+    rejected: {title:t('refund.statusText.rejected'),val:2},
     cancelled: {title:t('refund.statusText.cancelled'),val:3},
 }
 

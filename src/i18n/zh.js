@@ -75,14 +75,14 @@ export default {
     paySuccess: '支付成功',
     payFailed: '支付失败',
     refundSuccess: '退款申请提交成功',
-    refundFailed: '退款申请提交失败'
+    refundFailed: '退款申请提交失败',
+    confirmReceive: '您是否确认收货？',
   },
   validate: {
     accountRequired: '请输入账号',
     accountLength: '账号长度应为3-20个字符',
     passwordRequired: '请输入密码',
     passwordLength: '密码长度应为6-20个字符',
-    confirmPasswordRequired: '请确认密码',
     passwordNotMatch: '两次输入的密码不一致',
     emailRequired: '请输入邮箱',
     emailFormat: '请输入正确的邮箱格式',
