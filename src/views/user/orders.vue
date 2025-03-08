@@ -91,12 +91,12 @@
                                     >
                                         {{ $t('order.confirmReceive') }}
                                     </el-button>
-                                    <el-button
+                                    <!-- <el-button
                                             v-if="['paid', 'shipped', 'completed'].includes(order.status)"
                                             @click="handleViewShipping(order)"
                                     >
                                         {{ $t('order.viewShipping') }}
-                                    </el-button>
+                                    </el-button> -->
                                     <el-button
                                             v-if="order.status === 'completed'"
                                             type="warning"
