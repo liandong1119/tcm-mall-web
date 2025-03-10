@@ -39,7 +39,8 @@
           <div class="nav-group">
             <h3>{{ $t('footer.aboutUs') }}</h3>
             <ul>
-              <li><a href="#">{{ $t('footer.aboutCompany') }}</a></li>
+              <!-- <li><a href="#">{{ $t('footer.aboutCompany') }}</a></li> -->
+              <li><router-link to="/merchant/register">{{ $t('footer.merchantSettled') }}</router-link></li>
               <li><a href="#">{{ $t('footer.contactUs') }}</a></li>
               <li><a href="#">{{ $t('footer.joinUs') }}</a></li>
             </ul>

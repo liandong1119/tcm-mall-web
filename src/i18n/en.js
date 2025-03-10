@@ -43,7 +43,8 @@ export default {
     endDate: 'End Date',
     lastWeek: 'Last Week',
     lastMonth: 'Last Month',
-    detail: 'Detail'
+    detail: 'Detail',
+    info: 'Information'
   },
   message: {
     loginSuccess: 'Login Successful',
@@ -76,6 +77,24 @@ export default {
     paySuccess: 'Payment successful',
     payFailed: 'Payment failed',
     confirmReceive: 'Confirm Receipt?',
+    codeSent: 'Verification code sent successfully',
+    sendCodeFailed: 'Failed to send verification code',
+    invalidInput: 'Invalid input, please check and try again',
+    operationSuccess: 'Operation successful',
+    operationFailed: 'Operation failed',
+    pleaseWait: 'Please wait...',
+    confirmDelete: 'Are you sure you want to delete?',
+    deleteSuccess: 'Deleted successfully',
+    deleteFailed: 'Failed to delete',
+    saveSuccess: 'Saved successfully',
+    saveFailed: 'Failed to save',
+    uploadSuccess: 'Uploaded successfully',
+    uploadFailed: 'Failed to upload',
+    loginRequired: 'Please login first',
+    unauthorized: 'Unauthorized access',
+    forbidden: 'Access forbidden',
+    notFound: 'Resource not found',
+    serverError: 'Server error, please try again later'
   },
   validate: {
     accountRequired: 'Please enter username/phone',
@@ -423,13 +442,13 @@ export default {
     refundFailed: 'Failed to submit refund application'
   },
   payment: {
-    title: 'Payment',
+    title: 'Order Payment',
     amount: 'Payment Amount',
     method: 'Payment Method',
     alipay: 'Alipay',
     wechat: 'WeChat Pay',
     confirm: 'Confirm Payment',
-    selectMethod: 'Please select a payment method',
+    selectMethod: 'Please select payment method',
     success: 'Payment successful',
     failed: 'Payment failed',
     processing: 'Processing payment',
@@ -445,11 +464,12 @@ export default {
     serviceDesc: '7-Day Returns',
     return: 'Easy Returns',
     returnDesc: 'Quick Refunds',
+    about: 'About Us',
     aboutUs: 'About Us',
-    aboutCompany: 'Company Profile',
     contactUs: 'Contact Us',
     joinUs: 'Join Us',
     help: 'Help Center',
+    shoppingGuide: 'Shopping Guide',
     paymentGuide: 'Payment Guide',
     shippingGuide: 'Shipping Guide',
     returnGuide: 'Return Guide',
@@ -463,7 +483,11 @@ export default {
     customerService: 'Customer Service',
     serviceTime: 'Service Hours: Mon-Sun 9:00-18:00',
     copyright: '© 2024 TCM Mall All Rights Reserved',
-    icp: 'ICP License XXXXXXXX'
+    icp: 'ICP License XXXXXXXX',
+    merchantSettled: 'Merchant Registration',
+    deliveryInfo: 'Delivery Info',
+    afterSale: 'After-sales Service',
+    faq: 'FAQ'
   },
   review: {
     writeReview: 'Write Review',
@@ -630,6 +654,53 @@ export default {
       approved: 'Approved',
       rejected: 'Rejected',
       cancelled:'Cancelled'
+    }
+  },
+  merchant: {
+    register: {
+      title: 'Merchant Registration',
+      subtitle: 'Welcome to TCM Mall, Start Your Online Business Journey',
+      email: 'Email',
+      emailPlaceholder: 'Please enter your email',
+      phone: 'Phone',
+      phonePlaceholder: 'Please enter your phone number',
+      verifyCode: 'Verification Code',
+      verifyCodePlaceholder: 'Please enter verification code',
+      getCode: 'Get Code',
+      shopName: 'Shop Name',
+      shopNamePlaceholder: 'Please enter shop name',
+      submit: 'Submit Application',
+      success: 'Application submitted successfully',
+      fail: 'Application submission failed',
+      agreement: 'I have read and agree to the',
+      terms: 'Merchant Agreement',
+      successTips: 'Your merchant registration application has been submitted successfully. We will review your application within 1-3 business days. Please check your email for the review result.',
+      login: 'Merchant Login',
+      qualification: {
+        title: 'Qualification Upload',
+        businessLicense: 'Business License',
+        idCard: 'ID Card',
+        other: 'Other Qualifications',
+        upload: 'Upload',
+        uploadTip: 'Support jpg, png, pdf format, size limit 5MB'
+      }
+    },
+    validate: {
+      emailRequired: 'Please enter your email',
+      emailFormat: 'Please enter a valid email address',
+      phoneRequired: 'Please enter your phone number',
+      phoneFormat: 'Please enter a valid phone number',
+      verifyCodeRequired: 'Please enter verification code',
+      shopNameRequired: 'Please enter shop name',
+      shopNameLength: 'Shop name length should be between 2-20 characters',
+      agreementRequired: 'Please read and agree to the merchant agreement',
+      qualificationRequired: 'Please upload required qualifications'
+    },
+    status: {
+      pending: 'Under Review',
+      approved: 'Approved',
+      rejected: 'Rejected',
+      reason: 'Review Result'
     }
   }
 } 
