@@ -439,7 +439,17 @@ export default {
     enterRefundReason: 'Please enter refund reason',
     refundReasonPlaceholder: 'Enter your refund reason',
     refundSuccess: 'Refund application submitted',
-    refundFailed: 'Failed to submit refund application'
+    refundFailed: 'Failed to submit refund application',
+    paymentTimeout: 'Payment Timeout',
+    timeRemaining: 'Time Remaining',
+    expired: 'Order Expired',
+    autoCancel: 'Order will be automatically cancelled after timeout',
+    payNow: 'Pay Now',
+    countdown: {
+      hours: 'hours',
+      minutes: 'minutes',
+      seconds: 'seconds'
+    }
   },
   payment: {
     title: 'Order Payment',

@@ -129,3 +129,44 @@ export function uploadReviewImage(file) {
     }
   })
 }
+
+/**
+ * 获取订单支付倒计时
+ * @param {string} orderCode - 订单编号
+ * @returns {Promise<Object>} 返回倒计时信息
+ * 返回数据格式：
+ * {
+ *   remainingTime: number, // 剩余支付时间（秒）
+ *   expireTime: string,    // 过期时间，ISO格式
+ *   status: string,        // 订单状态：pending（待支付）, expired（已过期）
+ *   orderCode: string      // 订单编号
+ * }
+ */
+export function getOrderPaymentCountdown(orderCode) {
+  return request({
+    url: `/order/${orderCode}/countdown`,
+    method: 'get'
+  })
+}
+
+/**
+ * 批量获取订单支付倒计时
+ * @param {string[]} orderCodes - 订单编号数组
+ * @returns {Promise<Object>} 返回多个订单的倒计时信息
+ * 返回数据格式：
+ * {
+ *   [orderCode: string]: {
+ *     remainingTime: number, // 剩余支付时间（秒）
+ *     expireTime: string,    // 过期时间，ISO格式
+ *     status: string,        // 订单状态
+ *     orderCode: string      // 订单编号
+ *   }
+ * }
+ */
+export function batchGetOrderPaymentCountdown(orderCodes) {
+  return request({
+    url: '/order/countdown/batch',
+    method: 'post',
+    data: { orderCodes }
+  })
+}
