@@ -133,6 +133,12 @@ const routes = [
         name: 'Password',
         component: () => import('@/views/user/forgot-password.vue'),
         meta: { title: 'user.password' }
+      },
+      {
+        path: 'merchant/register',
+        name: 'MerchantRegister',
+        component: () => import('@/views/merchant/register.vue'),
+        meta: { title: 'merchant.register.title' }
       }
     ]
   }

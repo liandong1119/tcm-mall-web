@@ -490,8 +490,19 @@ export default {
     app: '下载APP',
     customerService: '客户服务',
     serviceTime: '服务时间：周一至周日 9:00-18:00',
-    copyright: '© 2024 中药材商城 版权所有',
-    icp: '京ICP备XXXXXXXX号'
+    copyright: '© 2024 中药商城 版权所有',
+    icp: '京ICP备XXXXXXXX号',
+    about: '关于我们',
+    aboutUs: '关于我们',
+    contactUs: '联系我们',
+    merchantSettled: '商家入驻',
+    shoppingGuide: '购物指南',
+    paymentGuide: '支付说明',
+    deliveryInfo: '配送说明',
+    service: '客户服务',
+    afterSale: '售后服务',
+    faq: '常见问题',
+    copyright: '© 2024 中药商城 版权所有'
   },
   review: {
     writeReview: '写评价',
@@ -662,6 +673,36 @@ export default {
       approved: '已通过',
       rejected: '已拒绝',
       cancelled: '已取消'
+    }
+  },
+  merchant: {
+    register: {
+      title: '商家入驻',
+      subtitle: '欢迎加入中药商城，开启您的在线经营之旅',
+      email: '邮箱',
+      emailPlaceholder: '请输入您的邮箱',
+      phone: '手机号',
+      phonePlaceholder: '请输入您的手机号',
+      verifyCode: '验证码',
+      verifyCodePlaceholder: '请输入验证码',
+      getCode: '获取验证码',
+      shopName: '店铺名称',
+      shopNamePlaceholder: '请输入店铺名称',
+      submit: '提交申请',
+      success: '申请提交成功',
+      fail: '申请提交失败',
+      agreement: '我已阅读并同意',
+      terms: '《商家入驻协议》'
+    },
+    validate: {
+      emailRequired: '请输入邮箱',
+      emailFormat: '请输入正确的邮箱格式',
+      phoneRequired: '请输入手机号',
+      phoneFormat: '请输入正确的手机号格式',
+      verifyCodeRequired: '请输入验证码',
+      shopNameRequired: '请输入店铺名称',
+      shopNameLength: '店铺名称长度应在2-20个字符之间',
+      agreementRequired: '请阅读并同意商家入驻协议'
     }
   }
 } 

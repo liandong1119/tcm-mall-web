@@ -4,10 +4,22 @@
             <el-card class="order-info" v-loading="loading">
                 <template #header>
                     <div class="card-header">
-                        <h3>{{ $t('order.detail') }}</h3>
-                        <el-tag :type="getOrderStatusType(orderInfo.status)">
-                            {{ $t(`order.statuses.${orderInfo.status}`) }}
-                        </el-tag>
+                        <div class="header-left">
+                            <h3>{{ $t('order.detail') }}</h3>
+                            <el-tag :type="getOrderStatusType(orderInfo.status)" class="status-tag">
+                                {{ $t(`order.statusText.${orderInfo.status}`) }}
+                            </el-tag>
+                            <!-- 待支付状态显示倒计时 -->
+                            <OrderCountdown
+                                v-if="orderInfo.status === 'pending'"
+                                :order-code="orderInfo.orderCode"
+                                @timeout="handleTimeout"
+                                class="countdown-wrapper"
+                            />
+                        </div>
+                        <div class="header-right">
+                            <el-button @click="goBack">{{ $t('common.back') }}</el-button>
+                        </div>
                     </div>
                 </template>
 
@@ -248,17 +260,17 @@
 
 <script setup>
 import {ref, onMounted} from 'vue'
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import {useI18n} from 'vue-i18n'
 import {ElMessage} from 'element-plus'
 import {Plus, Picture} from '@element-plus/icons-vue'
 import {getOrderDetail, submitOrderReview, uploadReviewImage, applyRefund} from '@/api/order'
 import {deletePhoto} from "@/api/photos";
-
+import OrderCountdown from '@/components/OrderCountdown.vue'
 
 const route = useRoute()
+const router = useRouter()
 const {t} = useI18n()
-
 
 /**
  * 页面挂载执行的方法
@@ -266,10 +278,6 @@ const {t} = useI18n()
 onMounted(() => {
     fetchOrderDetail()
 })
-
-
-
-
 
 ///// 图片上传相关的配置和方法定义
 
@@ -305,7 +313,6 @@ const beforeUpload = (file) => {
     return true
 }
 
-
 /**
  * 图片上传成功后的回调
  * @param response
@@ -337,11 +344,6 @@ const handleRemove = async (file) => {
     // 删除的时候还要从数组中移除
     reviewForm.value.photoIds = reviewForm.value.photoIds.filter(id => id !== file.fileId)
 }
-
-
-
-
-
 
 ////// 退款相关的方法配置
 
@@ -382,8 +384,6 @@ const refundRules = {
     ]
 }
 
-
-
 // 获取退款状态样式
 const getRefundStatusType = (status) => {
     const types = {
@@ -394,7 +394,6 @@ const getRefundStatusType = (status) => {
     }
     return types[status] || 'info'
 }
-
 
 // 提交退款申请
 const submitRefund = async () => {
@@ -422,7 +421,6 @@ const submitRefund = async () => {
     })
 }
 
-
 // 处理退款
 const handleRefund = (item) => {
     currentRefundItem.value = item
@@ -434,9 +432,6 @@ const handleRefund = (item) => {
     }
     refundDialogVisible.value = true
 }
-
-
-
 
 ////// 订单相关的配置和方法
 
@@ -455,7 +450,6 @@ const getOrderStatusType = (status) => {
     }
     return types[status] || 'info'
 }
-
 
 // 获取订单详情
 const fetchOrderDetail = async () => {
@@ -546,9 +540,23 @@ const determineOrderStatus = (products) => {
     return statuses.sort((a, b) => statusPriority[b] - statusPriority[a])[0]
 }
 
+// 处理倒计时结束
+const handleTimeout = () => {
+    ElMessage.warning(t('order.autoCancel'))
+    // 刷新订单详情
+    fetchOrderDetail()
+}
 
-
-
+// 处理立即支付
+const handlePay = () => {
+    router.push({
+        name: 'Payment',
+        query: { 
+            orderCode: orderInfo.value.orderCode,
+            amount: orderInfo.value.totalAmount.toFixed(2)
+        }
+    })
+}
 
 // 处理图片上传
 const handleUpload = async ({file}) => {
@@ -565,9 +573,6 @@ const handleUpload = async ({file}) => {
         return false
     }
 }
-
-
-
 
 ////// 评价相关的方法和配置
 
@@ -645,11 +650,21 @@ const submitReview = async () => {
     })
 }
 
+// 处理立即支付
+const handlePay = () => {
+    router.push({
+        name: 'Payment',
+        query: { 
+            orderCode: orderInfo.value.orderCode,
+            amount: orderInfo.value.totalAmount.toFixed(2)
+        }
+    })
+}
 
-
-
-
-
+// 处理返回
+const goBack = () => {
+    router.back()
+}
 </script>
 
 <style lang="scss" scoped>
@@ -667,9 +682,18 @@ const submitReview = async () => {
     justify-content: space-between;
     align-items: center;
 
-    h3 {
-      margin: 0;
-      font-size: 18px;
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .status-tag {
+        margin: 0 12px;
+      }
+
+      .countdown-wrapper {
+        margin-left: 4px;
+      }
     }
   }
 

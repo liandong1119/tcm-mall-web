@@ -8,6 +8,30 @@
                     </div>
                 </template>
 
+                <!-- 搜索和筛选区域
+                <div class="filter-section">
+                    <el-form :inline="true" :model="searchForm">
+                        <el-form-item :label="$t('order.orderNo')">
+                            <el-input v-model="searchForm.orderNo" :placeholder="$t('common.pleaseInput')" />
+                        </el-form-item>
+                        <el-form-item :label="$t('order.status')">
+                            <el-select v-model="searchForm.status" :placeholder="$t('common.pleaseSelect')">
+                                <el-option :label="$t('common.all')" value="" />
+                                <el-option
+                                        v-for="(label, value) in orderStatus"
+                                        :key="value"
+                                        :label="label"
+                                        :value="value"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="handleSearch">{{ $t('common.search') }}</el-button>
+                            <el-button @click="resetSearch">{{ $t('common.reset') }}</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div> -->
+
                 <!-- 订单状态标签 -->
                 <div class="status-tabs">
                     <el-tabs v-model="activeStatus" @tab-click="handleStatusChange">
@@ -41,7 +65,6 @@
 
                             <div class="order-products">
                                 <div
-
                                         :key="order.id"
                                         class="product-item"
                                 >
@@ -209,6 +232,7 @@ import {
 } from '@/api/order'
 import {useI18n} from 'vue-i18n'
 import {userApplyRefund} from "@/api/refund";
+import OrderCountdown from '@/components/OrderCountdown.vue'
 
 const router = useRouter()
 const {t} = useI18n()
@@ -433,6 +457,24 @@ const handlePayOrder = async (order) => {
     }
 }
 
+// 处理倒计时结束
+const handleTimeout = async (order) => {
+    ElMessage.warning(t('order.autoCancel'))
+    // 刷新订单列表
+    await fetchOrders()
+}
+
+// 处理立即支付
+const handlePay = (order) => {
+    router.push({
+        name: 'Payment',
+        query: { 
+            orderCode: order.orderNo,
+            amount: order.amount.toFixed(2)
+        }
+    })
+}
+
 onMounted(() => {
     fetchOrders()
 })
@@ -602,6 +644,79 @@ onMounted(() => {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+  }
+
+  .filter-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+  }
+
+  .order-products {
+    .product-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      
+      &:not(:last-child) {
+        border-bottom: 1px solid var(--el-border-color-lighter);
+      }
+
+      .product-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 4px;
+        margin-right: 10px;
+      }
+
+      .product-info {
+        flex: 1;
+        
+        .product-name {
+          font-size: 14px;
+          margin-bottom: 5px;
+          color: var(--el-text-color-primary);
+        }
+        
+        .product-price {
+          font-size: 13px;
+          color: var(--el-text-color-secondary);
+        }
+      }
+    }
+  }
+
+  .amount {
+    .total {
+      font-weight: bold;
+      color: var(--el-color-danger);
+    }
+    
+    .shipping {
+      font-size: 12px;
+      color: var(--el-text-color-secondary);
+    }
+  }
+
+  .status-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+    .countdown-wrapper {
+      margin-top: 4px;
+    }
+  }
+
+  .operation-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .pagination-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
   }
 }
 </style> 
