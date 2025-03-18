@@ -175,10 +175,11 @@ export default {
     image: '商品图片',
     name: '商品名称',
     subtotal: '小计',
+    detailTitle: '商品详情',
     detail: {
       functionTitle: '功能与主治',
       quantity: '购买数量',
-      unit: '斤',
+      unit: '份',
       addToCart: '加入购物车',
       buyNow: '立即购买',
       detailTab: '商品详情',
@@ -191,7 +192,8 @@ export default {
     message: {
       addToCartSuccess: '已添加到购物车',
       favoriteSuccess: '收藏成功',
-      unfavoriteSuccess: '已取消收藏'
+      unfavoriteSuccess: '已取消收藏',
+      addToCartFailed: '添加到购物车失败'
     }
   },
   cart: {
@@ -217,13 +219,14 @@ export default {
       clearConfirm: '确定要清空购物车吗？',
       deleteSuccess: '商品已删除',
       clearSuccess: '购物车已清空',
-      updateSuccess: '数量已更新'
+      updateSuccess: '数量已更新',
+      deleteConfirm: '确定要删除该商品吗？'
     },
     clearConfirm: '确定要清空购物车吗？',
     deleteSuccess: '商品已删除',
     clearSuccess: '购物车已清空',
     updateSuccess: '数量已更新',
-    unit: '斤',
+    unit: '份',
     clear: '清空'
   },
   checkout: {

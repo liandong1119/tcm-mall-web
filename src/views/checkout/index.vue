@@ -218,7 +218,7 @@
 
 <script setup>
 import {ref, onMounted, computed, watch} from 'vue'
-import {useRouter} from 'vue-router'
+import {useRouter, useRoute} from 'vue-router'
 import {useI18n} from 'vue-i18n'
 import {useCartStore} from '@/stores/cart'
 import {ElMessage, ElMessageBox} from 'element-plus'
@@ -265,6 +265,7 @@ const addressRules = {
 // 订单相关
 const remark = ref('')
 const submitting = ref(false)
+const isDirectBuy = ref(false) // 添加标记是否是直接购买
 
 // 获取收货地址列表
 const fetchAddresses = async () => {
@@ -356,13 +357,15 @@ const handleSubmitOrder = async () => {
 
     submitting.value = true
     try {
-        // 将 Proxy 对象转换为普通对象
+        // 将 Proxy 对象转换为普通对象，确保使用正确的ID
         const items = cartStore.selectedItems.map(item => ({
-            goodsId: item.id,
+            goodsId: item.productId || item.id, // 使用productId或id
             skuId: item.skuId || item.sku, // 兼容两种属性名
             buyNum: item.quantity,
-            // specs: JSON.parse(JSON.stringify(item.selectedSpecs || {})) // 深拷贝规格信息
+            specifications: item.selectedSpecs || {} // 添加规格信息
         }))
+
+        console.log("订单商品数据：", items) // 添加日志
 
         const orderData = {
             addressId: selectedAddress.value,
@@ -372,7 +375,6 @@ const handleSubmitOrder = async () => {
         console.log("提交订单数据：", orderData)
         try {
             const { orderCode } = await createOrder(orderData)
-            // const orderCode = 'a1123509-b815-40e1-93f3-699ff8b762c5'
             console.log("订单号：", orderCode)
             
             ElMessage.success(t('checkout.createSuccess'))
@@ -402,8 +404,13 @@ const handleSubmitOrder = async () => {
 
 onMounted(() => {
     fetchAddresses()
+    
+    // 检查是否是从商品详情页直接购买
+    const route = useRoute()
+    isDirectBuy.value = route.query.direct === 'true'
+    
     // 检查购物车是否有商品
-    if (!cartStore.selectedItems.length) {
+    if (!isDirectBuy.value && !cartStore.selectedItems.length) {
         ElMessage.warning(t('checkout.noItems'))
         router.push('/cart')
         return
@@ -420,7 +427,8 @@ const calculateTotal = computed(() => {
 
 // 监听购物车商品变化
 watch(() => cartStore.selectedItems, (newItems) => {
-    if (!newItems.length) {
+    // 如果不是直接购买，且购物车为空，则返回购物车页面
+    if (!isDirectBuy.value && !newItems.length) {
         ElMessage.warning(t('checkout.noItems'))
         router.push('/cart')
     }

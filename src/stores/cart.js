@@ -65,14 +65,17 @@ export const useCartStore = defineStore('cart', () => {
     } else {
       items.value.push({
         id: product.id,
+        productId: product.productId || product.id,
         name: product.name,
         price: Number(product.price || 0),
         image: product.image || '',
         quantity: Number(quantity),
         selected: true,
-        productId: product.productId,
         stock: product.stock,
-        unit: product.unit || '克'
+        unit: product.unit || '份',
+        sku: product.sku || product.skuId,
+        skuId: product.skuId || product.sku,
+        selectedSpecs: product.selectedSpecs || {}
       })
     }
     saveToStorage()

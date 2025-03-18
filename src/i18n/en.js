@@ -189,10 +189,11 @@ export default {
     image: 'Product Image',
     name: 'Product Name',
     subtotal: 'Subtotal',
+    detailTitle: 'Product Details',
     detail: {
       functionTitle: 'Functions & Indications',
       quantity: 'Quantity',
-      unit: 'Jin',
+      unit: 'portion',
       addToCart: 'Add to Cart',
       buyNow: 'Buy Now',
       detailTab: 'Product Details',
@@ -205,7 +206,8 @@ export default {
     message: {
       addToCartSuccess: 'Added to cart',
       favoriteSuccess: 'Added to favorites',
-      unfavoriteSuccess: 'Removed from favorites'
+      unfavoriteSuccess: 'Removed from favorites',
+      addToCartFailed: 'Failed to add to cart'
     }
   },
   cart: {
@@ -231,13 +233,14 @@ export default {
       clearConfirm: 'Are you sure you want to clear your cart?',
       deleteSuccess: 'Product removed',
       clearSuccess: 'Cart cleared',
-      updateSuccess: 'Quantity updated'
+      updateSuccess: 'Quantity updated',
+      deleteConfirm: 'Are you sure you want to delete this item from your cart?'
     },
     clearConfirm: 'Are you sure you want to clear your cart?',
     deleteSuccess: 'Product removed',
     clearSuccess: 'Cart cleared',
     updateSuccess: 'Quantity updated',
-    unit: 'Jin',
+    unit: 'portion',
     clear: 'Clear'
   },
   checkout: {

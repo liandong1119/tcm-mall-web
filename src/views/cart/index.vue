@@ -38,7 +38,7 @@
                             <div class="item-info">
                                 <el-image :src="item.image" :alt="item.name" class="item-image"/>
                                 <div class="item-details">
-                                    <h3 class="item-name">{{ item.name }}</h3>
+                                    <h3 class="item-name"> {{ item.name }} </h3>
                                     <p class="item-price">¥{{ item.price
                                          }}/{{ $t('cart.unit') }}</p>
                                 </div>
@@ -270,9 +270,13 @@ const handleClearCart = () => {
 
 // 结算
 const handleCheckout = () => {
-    if (selectedCount.value > 0) {
-        console.log("开始跳转")
-        router.push('/checkout')
+    if (cartStore.selectedCount > 0) {
+        router.push({
+            path: '/checkout',
+            query: { from: 'cart' }
+        })
+    } else {
+        ElMessage.warning(t('checkout.noItems'))
     }
 }
 </script>

@@ -464,8 +464,8 @@ const addToCard = async () => {
     // 调用添加到购物车API
     const response = await addToCart(productToAdd)
     cartStore.addItem(productToAdd, quantity.value)
-    // TODO 添加到购物车
-    addCard(productToAdd)
+    // // TODO 添加到购物车
+    // addCard(productToAdd)
     ElMessage.success(t('product.message.addToCartSuccess'))
     // 重新加载购物车数据
     // await cartStore.loadCart()
@@ -501,7 +501,10 @@ const buyNow = () => {
   }
 
   cartStore.buyNow(productToAdd, quantity.value)
-  router.push('/checkout')
+  router.push({
+    path: '/checkout',
+    query: { direct: 'true' }
+  })
 }
 
 // 收藏/取消收藏

@@ -35,7 +35,7 @@ const routes = [
         path: 'product/:id',
         name: 'ProductDetail',
         component: () => import('@/views/product/detail.vue'),
-        meta: { title: 'product.detail' }
+        meta: { title: 'product.detailTitle' }
       },
       {
         path: 'cart',
