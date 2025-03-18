@@ -7,7 +7,7 @@
                         <div class="header-left">
                             <h3>{{ $t('order.detail') }}</h3>
                             <el-tag :type="getOrderStatusType(orderInfo.status)" class="status-tag">
-                                {{ $t(`order.statusText.${orderInfo.status}`) }}
+                                {{ $t(`order.statuses.${orderInfo.status}`) }}
                             </el-tag>
                             <!-- 待支付状态显示倒计时 -->
                             <OrderCountdown
@@ -548,15 +548,15 @@ const handleTimeout = () => {
 }
 
 // 处理立即支付
-const handlePay = () => {
-    router.push({
-        name: 'Payment',
-        query: { 
-            orderCode: orderInfo.value.orderCode,
-            amount: orderInfo.value.totalAmount.toFixed(2)
-        }
-    })
-}
+// const handlePay = () => {
+//     router.push({
+//         name: 'Payment',
+//         query: {
+//             orderCode: orderInfo.value.orderCode,
+//             amount: orderInfo.value.totalAmount.toFixed(2)
+//         }
+//     })
+// }
 
 // 处理图片上传
 const handleUpload = async ({file}) => {

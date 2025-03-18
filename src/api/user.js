@@ -14,9 +14,12 @@ export function sendEmailCode(email) {
     })
   }
   return request({
-    url: '/user/email/code',
+    url: '/verifyCode/send',
     method: 'post',
-    data: { email }
+    params: {
+      addr: email,
+      type: 1
+    }
   })
 }
 

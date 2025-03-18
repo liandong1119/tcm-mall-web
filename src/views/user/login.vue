@@ -157,9 +157,8 @@ const handleSubmit = async () => {
         const success = await userStore.login({
             account: form.account,
             password: form.password,
-            verifyCode: form.captcha,
+            chaptchaCode: form.captcha,
             pictureUUID: form.pictureUUID,
-            verifyType: 3,
             rememberMe: form.rememberMe
         })
 

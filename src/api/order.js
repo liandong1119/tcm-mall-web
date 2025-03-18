@@ -132,7 +132,7 @@ export function uploadReviewImage(file) {
 
 /**
  * 获取订单支付倒计时
- * @param {string} orderCode - 订单编号
+ * @param {string} orderCode - 订单编号/订单id
  * @returns {Promise<Object>} 返回倒计时信息
  * 返回数据格式：
  * {
@@ -144,7 +144,7 @@ export function uploadReviewImage(file) {
  */
 export function getOrderPaymentCountdown(orderCode) {
   return request({
-    url: `/order/${orderCode}/countdown`,
+    url: `/order/leftTime/${orderCode}`,
     method: 'get'
   })
 }
