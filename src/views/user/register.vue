@@ -148,7 +148,7 @@ import {useI18n} from 'vue-i18n'
 import {useUserStore} from '@/stores/user'
 import {ElMessage} from 'element-plus'
 import LanguageSwitch from '@/components/LanguageSwitch.vue'
-import {getPictureVerifyCode} from "@/api/user";
+import {getPictureVerifyCode,register} from "@/api/user";
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -260,18 +260,17 @@ const handleSubmit = async () => {
         await formRef.value.validate()
         loading.value = true
 
-        const success = await register({
+        const {code,msg} = await register({
             account: form.username,
             phoneNumber: form.phone,
             email: form.email,
             emailCode: form.emailCode,
             password: form.password,
-            verifyCode: form.captcha,
+            chaptchaCode: form.captcha,
             pictureUUID: form.pictureUUID,
-            verifyType: 3,
         })
 
-        if (success) {
+        if (code === 200) {
             ElMessage.success(t('message.registerSuccess'))
             router.push('/user/login')
         }
