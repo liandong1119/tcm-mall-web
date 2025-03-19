@@ -34,9 +34,9 @@ export const useCartStore = defineStore('cart', () => {
   async function loadCart(queryPage) {
     try {
       const res = await getCartList(queryPage)
-      if (res && res.data && res.data.list) {
+      if (res && res.list) {
         // 确保每个商品项都有必要的字段
-        const cartItems = res.data.list.map(item => ({
+        const cartItems = res.list.map(item => ({
           id: item.id,
           name: item.name || item.medicinalName,
           price: Number(item.price || 0),

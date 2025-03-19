@@ -486,6 +486,7 @@ const fetchOrderDetail = async () => {
             receipt: data.receipt,
             orderProductVoList: (data.orderProductVoList || []).map(item => ({
                 id: item.id || item.orderId,
+                productId: item.productId,
                 name: item.name,
                 price: item.price,
                 num: item.num,
@@ -630,7 +631,7 @@ const submitReview = async () => {
                 // TODO 单独的商品id
                 const reviewRequest = {
                     orderId: orderInfo.value.id,
-                    goodsId: 4,
+                    goodsId: orderInfo.value.orderProductVoList[0].productId,
                     content: reviewForm.value.content,
                     level: reviewForm.value.rating,
                     photoIds: reviewForm.value.photoIds
