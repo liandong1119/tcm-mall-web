@@ -48,9 +48,9 @@
                                 <span class="quantity-label">{{ $t('cart.quantity') }}：</span>
                                 <el-input-number
                                         v-model="item.quantity"
-                                        :min="0.1"
-                                        :max="99.9"
-                                        :step="0.1"
+                                        :min="1"
+                                        :max="100"
+                                        :step="1"
                                         :precision="1"
                                         size="small"
                                         @change="(val) => handleQuantityChange(item.id, val)"
@@ -198,6 +198,7 @@ watch(() => cartStore.items, (items) => {
 
 onMounted(async () => {
     await cartStore.loadCart({pageNum: currentPage.value, pageSize: pageSize.value})
+    console.log("购物车数据：",cartStore.items)
     total.value = cartStore.items.length
 })
 

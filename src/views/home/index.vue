@@ -5,10 +5,10 @@
       <el-carousel height="400px" :interval="5000">
         <el-carousel-item v-for="banner in banners" :key="banner.id">
           <img :src="banner.image" :alt="banner.title" class="banner-image">
-          <div class="banner-content">
+          <!-- <div class="banner-content">
             <h2>{{ banner.title }}</h2>
             <p>{{ banner.description }}</p>
-          </div>
+          </div> -->
         </el-carousel-item>
       </el-carousel>
     </div>
@@ -97,21 +97,21 @@ const categories = ref([])
 const banners = ref([
   {
     id: 1,
-    image: '/images/banners/banner1.jpg',
-    title: '道地药材 品质保证',
-    description: '严选优质中药材，传承千年养生之道'
+    image: '/images/banners/banner1.svg',
+    // title: '地道药材 品质保证',
+    // description: '严选优质中药材，传承千年养生之道'
   },
   {
     id: 2,
-    image: '/images/banners/banner2.jpg',
-    title: '四季调养 科学搭配',
-    description: '专业药师指导，合理搭配养生方案'
+    image: '/images/banners/banner2.svg',
+    // title: '四季调养 科学搭配',
+    // description: '专业药师指导，合理搭配养生方案'
   },
   {
     id: 3,
-    image: '/images/banners/banner3.jpg',
-    title: '产地溯源 安全可靠',
-    description: '源头直采，保证每一味药材的纯正'
+    image: '/images/banners/banner3.svg',
+    // title: '产地溯源 安全可靠',
+    // description: '源头直采，保证每一味药材的纯正'
   }
 ])
 
@@ -241,11 +241,11 @@ onMounted(() => {
   }
 }
 
-:deep(.el-carousel__item) {
-  position: relative;
-  background: linear-gradient(to right, #2b9939, #1d6926);
-  overflow: hidden;
-}
+// :deep(.el-carousel__item) {
+//   position: relative;
+//   background: linear-gradient(to right, #2b9939, #1d6926);
+//   overflow: hidden;
+// }
 
 :deep(.el-tabs__nav-wrap::after) {
   height: 1px;
