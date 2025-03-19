@@ -34,6 +34,7 @@ export const useCartStore = defineStore('cart', () => {
   async function loadCart(queryPage) {
     try {
       const res = await getCartList(queryPage)
+      console.log("购物车数据：",res)
       if (res && res.list) {
         // 确保每个商品项都有必要的字段
         const cartItems = res.list.map(item => ({
@@ -45,7 +46,9 @@ export const useCartStore = defineStore('cart', () => {
           selected: true, // 默认选中
           productId: item.productId,
           stock: item.stock,
-          unit: item.unit || '克'
+          sku: item.sku,
+          skuId: item.skuId,
+          unit: item.unit || '份'
         }))
         items.value = cartItems
         saveToStorage()
