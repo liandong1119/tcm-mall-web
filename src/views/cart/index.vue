@@ -51,7 +51,7 @@
                                         :min="1"
                                         :max="100"
                                         :step="1"
-                                        :precision="1"
+
                                         size="small"
                                         @change="(val) => handleQuantityChange(item.id, val)"
                                 />
