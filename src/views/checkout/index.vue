@@ -332,10 +332,16 @@ const handleSaveAddress = async () => {
     await addressFormRef.value.validate(async (valid) => {
         if (valid) {
             try {
+                const addressRequest = {
+                    addr: addressForm.value.address,
+                    recipient: addressForm.value.name,
+                    contactDetail: addressForm.value.phone,
+                    isMain: addressForm.value.isDefault
+                }
                 if (editingAddress.value) {
-                    await updateAddress(editingAddress.value.id, addressForm.value)
+                    await updateAddress(editingAddress.value.id, addressRequest)
                 } else {
-                    await addAddress(addressForm.value)
+                    await addAddress(addressRequest)
                 }
                 ElMessage.success(t('address.saveSuccess'))
                 addressDialogVisible.value = false
