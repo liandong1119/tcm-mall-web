@@ -71,6 +71,15 @@ export function changePassword(data) {
   })
 }
 
+// 根据邮箱验证码找回密码
+export function resetPassword(data) {
+  return request({
+    url: '/user/findPassword',
+    method: 'post',
+    data
+  })
+}
+
 // 退出登录
 export function logout() {
   return request({

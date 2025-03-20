@@ -129,7 +129,7 @@ const routes = [
         meta: { title: 'user.register' }
       },
       {
-        path: 'user/password',
+        path: 'user/forgot-password',
         name: 'Password',
         component: () => import('@/views/user/forgot-password.vue'),
         meta: { title: 'user.password' }
