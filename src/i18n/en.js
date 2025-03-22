@@ -1,6 +1,6 @@
 export default {
   common: {
-    operation:'操作',
+    operation:'operation',
     systemName: 'TCM Mall',
     search: 'Search products',
     currency: '$',
@@ -56,21 +56,13 @@ export default {
     logoutSuccess: 'Logout Successful',
     sessionExpired: 'Session expired, please login again',
     networkError: 'Network error, please try again later',
-    confirmDelete: 'Confirm deletion?',
-    operationSuccess: 'Operation Successful',
-    operationFailed: 'Operation Failed',
     verificationCodeSent: 'Verification code has been sent',
     resetPasswordSuccess: 'Password reset successful',
     resetPasswordFailed: 'Password reset failed',
     updateSuccess: 'Update successful',
     updateFailed: 'Update failed',
-    deleteSuccess: 'Delete successful',
-    deleteFailed: 'Delete failed',
-    saveSuccess: 'Save successful',
-    saveFailed: 'Save failed',
-    uploadSuccess: 'Upload successful',
-    uploadFailed: 'Upload failed',
     downloadSuccess: 'Download successful',
+    confirmCancel: 'Are you sure to cancel?',
     downloadFailed: 'Download failed',
     fetchFailed: 'Failed to fetch data',
     confirmLogout: 'Are you sure to logout?',
@@ -97,6 +89,11 @@ export default {
     serverError: 'Server error, please try again later'
   },
   validate: {
+    ratingRequired: 'Please rate',
+    reviewContentRequired: 'Please enter review content',
+    reviewContentLength: 'Review content must be between 10-200 characters',
+    nameLength: 'Name must be between 3-20 characters',
+    addressLength: 'Address must be between 3-100 characters',
     accountRequired: 'Please enter username/phone',
     accountLength: 'Username must be between 3-20 characters',
     passwordRequired: 'Please enter password',
@@ -122,7 +119,8 @@ export default {
     regionRequired: 'Please select region',
     detailAddressRequired: 'Please enter detailed address',
     refundReasonRequired: 'Please enter refund reason',
-    refundReasonLength: 'Refund reason should be between 10-200 characters'
+    refundReasonLength: 'Refund reason should be between 10-200 characters',
+    nameRequired: 'Please enter receiver name',
   },
   home: {
     title: 'Home',
@@ -397,6 +395,7 @@ export default {
     confirmDelete: 'Confirm Delete?'
   },
   order: {
+    refund: 'Refund',
     title: 'My Orders',
     orderNo: 'Order No.',
     totalAmount: 'Total Amount',

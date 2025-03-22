@@ -1,5 +1,6 @@
 export default {
   common: {
+    home: '首页',
     operation:'操作',
     systemName: '中药商城',
     search: '搜索商品',
@@ -77,8 +78,23 @@ export default {
     refundSuccess: '退款申请提交成功',
     refundFailed: '退款申请提交失败',
     confirmReceive: '您是否确认收货？',
+    codeSent: '验证码发送成功',
+    sendCodeFailed: '验证码发送失败',
+    invalidInput: '无效的输入，请检查',
+    pleaseWait: '请等待',
+    loginRequired: '请先登录',
+    unauthorized: '取消认证成功',
+    forbidden: '禁止访问',
+    notFound: '资源没有发现',
+    serverError: '服务器错误，请稍后重试',
+    confirmCancel: '确认取消？',
   },
   validate: {
+    ratingRequired: '请输入评分',
+    reviewContentRequired: '请输入评价内容',
+    reviewContentLength: '评价内容长度应为10-200个字符',
+    nameLength: '名称长度应为2-20个字符',
+    addressLength: '地址长度应为2-50个字符',
     accountRequired: '请输入账号',
     accountLength: '账号长度应为3-20个字符',
     passwordRequired: '请输入密码',
@@ -108,7 +124,8 @@ export default {
     refundAmountRequired: '请输入退款金额',
     refundAmountMin: '退款金额必须大于0',
     refundDescriptionRequired: '请输入详细说明',
-    refundDescriptionLength: '详细说明长度应在10-500个字符之间'
+    refundDescriptionLength: '详细说明长度应在10-500个字符之间',
+    nameRequired: '请输入姓名',
   },
   home: {
     title: '首页',
