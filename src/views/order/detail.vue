@@ -200,7 +200,7 @@
                     :rules="refundRules"
                     label-position="top"
             >
-                <el-form-item :label="$t('order.refundAmount')" prop="amount">
+                <!-- <el-form-item :label="$t('order.refundAmount')" prop="amount">
                     <el-input-number
                             v-model="refundForm.amount"
                             :min="0"
@@ -209,8 +209,8 @@
                             :step="0.01"
                             style="width: 100%"
                     />
-                </el-form-item>
-                <el-form-item :label="$t('order.refundReason')" prop="reason">
+                </el-form-item> -->
+                <!-- <el-form-item :label="$t('order.refundReason')" prop="reason">
                     <el-select v-model="refundForm.reason" style="width: 100%">
                         <el-option
                                 v-for="(reason, index) in refundReasons"
@@ -219,10 +219,10 @@
                                 :value="reason"
                         />
                     </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('order.refundDescription')" prop="description">
+                </el-form-item> -->
+                <el-form-item :label="$t('order.refundDescription')" prop="refundReason">
                     <el-input
-                            v-model="refundForm.description"
+                            v-model="refundForm.refundReason"
                             type="textarea"
                             :rows="4"
                             :placeholder="$t('order.refundDescriptionPlaceholder')"
@@ -264,7 +264,7 @@ import {useRoute, useRouter} from 'vue-router'
 import {useI18n} from 'vue-i18n'
 import {ElMessage} from 'element-plus'
 import {Plus, Picture} from '@element-plus/icons-vue'
-import {getOrderDetail, submitOrderReview, uploadReviewImage, applyRefund} from '@/api/order'
+import {getOrderDetail, submitOrderReview, uploadReviewImage, detailRefund} from '@/api/order'
 import {deletePhoto} from "@/api/photos";
 import OrderCountdown from '@/components/OrderCountdown.vue'
 
@@ -354,7 +354,7 @@ const currentRefundItem = ref(null)
 const refundForm = ref({
     amount: 0,
     reason: '',
-    description: '',
+    refundReason: '',
     images: []
 })
 
@@ -371,14 +371,14 @@ const refundReasons = [
  * @type {{reason: [{trigger: string, message: string, required: boolean}], amount: [{trigger: string, message: string, required: boolean},{min: number, trigger: string, type: string, message: string}], description: [{trigger: string, message: string, required: boolean},{min: number, max: number, trigger: string, message: string}]}}
  */
 const refundRules = {
-    amount: [
-        {required: true, message: t('validate.refundAmountRequired'), trigger: 'blur'},
-        {type: 'number', min: 0, message: t('validate.refundAmountMin'), trigger: 'blur'}
-    ],
-    reason: [
-        {required: true, message: t('validate.refundReasonRequired'), trigger: 'change'}
-    ],
-    description: [
+    // amount: [
+    //     {required: true, message: t('validate.refundAmountRequired'), trigger: 'blur'},
+    //     {type: 'number', min: 0, message: t('validate.refundAmountMin'), trigger: 'blur'}
+    // ],
+    // reason: [
+    //     {required: true, message: t('validate.refundReasonRequired'), trigger: 'change'}
+    // ],
+    refundReason: [
         {required: true, message: t('validate.refundDescriptionRequired'), trigger: 'blur'},
         {min: 10, max: 500, message: t('validate.refundDescriptionLength'), trigger: 'blur'}
     ]
@@ -401,10 +401,12 @@ const submitRefund = async () => {
 
     await refundFormRef.value.validate(async (valid) => {
         if (valid) {
+            console.log(refundForm.value)
             submitting.value = true
             try {
-                await applyRefund(orderInfo.value.orderCode, {
-                    itemId: currentRefundItem.value.id,
+                await detailRefund({
+                    orderCode: orderInfo.value.orderCode,
+                    orderId: currentRefundItem.value.id,
                     ...refundForm.value
                 })
                 ElMessage.success(t('message.refundSuccess'))
@@ -427,7 +429,7 @@ const handleRefund = (item) => {
     refundForm.value = {
         amount: item.price,
         reason: '',
-        description: '',
+        refundReason: '',
         images: []
     }
     refundDialogVisible.value = true

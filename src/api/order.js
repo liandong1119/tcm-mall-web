@@ -57,6 +57,15 @@ export function applyRefund(id, data) {
     data
   })
 }
+// 订单详情页退款
+
+export function detailRefund(data) {
+  return request({
+    url: `/order/refund`,
+    method: 'post',
+    data
+  })
+}
 
 // 获取退款详情
 export function getRefundDetail(id) {
