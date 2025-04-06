@@ -139,6 +139,7 @@ export default {
     all: '全部分类'
   },
   product: {
+    supplier: '供应商',
     title: '商品详情',
     price: '￥{price}',
     stock: '库存：{count}',

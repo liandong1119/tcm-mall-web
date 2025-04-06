@@ -134,6 +134,7 @@ export default {
     all: 'All Categories'
   },
   product: {
+    supplier: 'Supplier',
     title: 'Product Details',
     price: '${price}',
     stock: 'Stock: {count}',

@@ -138,8 +138,8 @@
                                 <el-descriptions-item :label="$t('product.category')">
                                     {{ product.category || $t('common.noData') }}
                                 </el-descriptions-item>
-                                <el-descriptions-item :label="$t('product.brand')">
-                                    {{ product.brand || $t('product.defaultBrand') }}
+                                <el-descriptions-item :label="$t('product.supplier')">
+                                    {{ product.supplier || $t('product.supplier') }}
                                 </el-descriptions-item>
                                 <el-descriptions-item :label="$t('product.origin')">
                                     {{ product.origin || $t('product.defaultOrigin') }}
@@ -292,6 +292,7 @@ const fetchProductDetail = async () => {
         data.skus.forEach(sku => {
             sku.specs = JSON.parse(sku.specs)
         })
+        currentSku.value = data.skus[0]
         product.value = data
         // 先预设置封面图片和库存，实际项目中应该从API获取
         coverImg.value = data.img
